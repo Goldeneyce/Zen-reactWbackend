@@ -1,0 +1,237 @@
+/* app/globals.css - Fixed Tailwind CSS v4 version */
+@import "tailwindcss";
+
+/* Enable class-based dark mode (add 'dark' class to <html> for dark theme) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Colors (light mode defaults) */
+  --color-primary: #0a4f7a;
+  --color-primary-dark: #4a9eda;
+  --color-secondary: #00b894;
+  --color-secondary-dark: #00d9a6;
+  --color-accent: #fdcb6e;
+  --color-accent-dark: #ffd166;
+  --color-dark: #2d3436;
+  --color-dark-light: #f5f6fa;
+  --color-light: #f5f6fa;
+  --color-light-dark: #1a1a2e;
+  --color-gray: #636e72;
+  --color-white: #ffffff;
+  --color-white-dark: #16213e;
+
+  /* Tailwind color utilities */
+  --color-primary: #0a4f7a;
+  --color-secondary: #00b894;
+  --color-accent: #fdcb6e;
+  --color-dark: #2d3436;
+  --color-light: #f5f6fa;
+  --color-gray: #636e72;
+
+  /* Fonts (fallbacks; load Inter/Montserrat separately) */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-montserrat: ui-sans-serif, system-ui, sans-serif;
+
+  /* Extended spacing */
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+
+  /* Border Radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --shadow-none: 0 0 #0000;
+  --shadow-custom: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-dark-custom: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  /* Animations */
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+}
+
+/* Dark mode variable overrides */
+@layer theme {
+  :root, :host {
+    @variant dark {
+      --color-primary: var(--color-primary-dark);
+      --color-secondary: var(--color-secondary-dark);
+      --color-accent: var(--color-accent-dark);
+      --color-dark: var(--color-dark-light);
+      --color-light: var(--color-light-dark);
+      --color-white: var(--color-white-dark);
+    }
+  }
+}
+
+/* Base styles */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-dark);
+    background-color: var(--color-light);
+    @apply leading-relaxed overflow-x-hidden transition-colors duration-300;
+  }
+
+  @variant dark {
+    body {
+      color: var(--color-dark-light);
+      background-color: var(--color-light-dark);
+    }
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-montserrat);
+    font-weight: bold;
+    line-height: tight;
+  }
+}
+
+/* Components */
+@layer components {
+  .btn {
+    @apply px-6 py-3 rounded font-bold transition-all duration-300 cursor-pointer inline-flex items-center justify-center min-h-11 min-w-11 font-montserrat text-base;
+  }
+
+  .btn-primary {
+    @apply bg-secondary text-white hover:bg-green-600 hover:-translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white hover:-translate-y-0.5;
+  }
+
+  .btn-buy {
+    @apply bg-orange-500 text-white hover:bg-orange-600 hover:-translate-y-0.5;
+  }
+
+  .btn-icon {
+    @apply bg-(--color-light) border border-gray text-dark text-lg min-w-11 hover:bg-secondary hover:text-white hover:border-secondary;
+  }
+
+  .container {
+    @apply w-full max-w-6xl mx-auto px-5;
+  }
+
+  .section-title h2 {
+    @apply text-3xl md:text-4xl text-primary inline-block relative pb-4 mb-2;
+  }
+
+  .section-title h2::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-secondary;
+  }
+
+  .section-title p {
+    @apply text-gray-600 dark:text-gray-300;
+  }
+
+  .icon-badge {
+    @apply absolute -top-1 -right-1 bg-secondary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center font-bold;
+  }
+
+  .search-bar {
+    @apply flex items-center bg-(--color-light) dark:bg-light-dark rounded px-0 min-w-50 max-w-125 mx-auto mt-4 self-center border border-gray overflow-hidden;
+  }
+
+  .search-bar input {
+    @apply border-none bg-transparent outline-none w-full px-3 py-2 text-sm text-dark dark:text-(--color-light) flex-1;
+  }
+
+  .search-bar input::placeholder {
+    @apply text-gray-400;
+  }
+
+  .dark .search-bar input::placeholder {
+    @apply text-gray-400;
+  }
+
+  .search-bar button {
+    @apply bg-primary border-l border-gray-300 dark:border-gray-600 text-white cursor-pointer px-3 py-3 transition-all duration-300 flex items-center justify-center min-w-11 hover:bg-secondary;
+  }
+
+  .whatsapp-float {
+    @apply fixed w-14 h-14 bottom-10 right-10 bg-[#25d366] text-white rounded-full text-center shadow-lg z-50 flex items-center justify-center;
+  }
+
+  @media (max-width: 768px) {
+    .whatsapp-float {
+      @apply w-12 h-12 bottom-5 right-5;
+    }
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .min-w-44 {
+    min-width: 44px;
+  }
+
+  .min-h-44 {
+    min-height: 44px;
+  }
+
+  .min-w-50 {
+    min-width: 200px;
+  }
+
+  .max-w-125 {
+    max-width: 500px;
+  }
+
+  .animate-fade-in {
+    animation: var(--animate-fade-in);
+  }
+
+  .animate-slide-up {
+    animation: var(--animate-slide-up);
+  }
+}

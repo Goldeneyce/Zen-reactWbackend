@@ -1,0 +1,228 @@
+// app/products/[id]/ProductDetailClient.tsx
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import { toast } from "react-toastify";
+import { useCartStore } from '@/stores/cartStore';
+import Searchbar from '@/components/Searchbar';
+import ProductInteraction from '@/components/ProductInteraction';
+import CTA from '@/components/CTA';
+import { Product } from '@/types';
+import {
+  StarIcon,
+  StarHalfIcon,
+  HeartIcon,
+  HeartOutlineIcon,
+  ShareIcon,
+} from '@/components/Icons';
+
+export default function ProductDetailClient({ product }: { product: Product }) {
+  const [selectedImage, setSelectedImage] = useState(product.images?.[0] ?? product.image);
+  const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
+
+  const renderRating = () => {
+    const stars = [];
+    const fullStars = Math.floor(product.rating);
+    const hasHalfStar = product.rating % 1 !== 0;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<StarIcon key={`star-${i}`} className="w-5 h-5 text-accent" />);
+    }
+    
+    if (hasHalfStar) {
+      stars.push(<StarHalfIcon key="half-star" className="w-5 h-5 text-accent" />);
+    }
+    
+    const emptyStars = 5 - stars.length;
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<StarIcon key={`empty-${i}`} className="w-5 h-5 text-gray-300" />);
+    }
+
+    return stars;
+  };
+
+  const handleAddToCart = () => {
+    addItem(product, quantity);
+    toast.success(`${product.name} added to cart!`);
+  };
+
+  const handleBuyNow = () => {
+    addItem(product, quantity);
+    window.location.href = '/cart';
+  };
+
+  const toggleWishlist = () => {
+    setIsWishlisted(!isWishlisted);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: product.description,
+        url: window.location.href,
+      }).catch((error) => console.log('Error sharing', error));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
+  return (
+    <>
+      <Searchbar className="my-8" />
+      
+      <section className="py-8 bg-white dark:bg-white-dark">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Product Gallery */}
+            <div className="space-y-4">
+              <div className="relative h-100 rounded-lg overflow-hidden cursor-pointer">
+                <Image
+                  src={selectedImage}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                {product.images?.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(image)}
+                    className={`relative w-20 h-20 rounded overflow-hidden border-2 ${
+                      selectedImage === image 
+                        ? 'border-secondary' 
+                        : 'border-transparent'
+                    }`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.name} view ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Product Info */}
+            <div className="space-y-6">
+              <div>
+                <span className="text-secondary font-medium">
+                  {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                </span>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary mt-1">
+                  {product.name}
+                </h1>
+                
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-1">
+                    {renderRating()}
+                    <span className="ml-2 text-gray-600 dark:text-gray-300">
+                      ({product.reviews} reviews)
+                    </span>
+                  </div>
+                  <span className="text-gray-500 text-sm">
+                    SKU: ZP-{product.id.toUpperCase()}-2023
+                  </span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    ₦{product.price.toFixed(2)}
+                  </span>
+                  {product.originalPrice && (
+                    <span className="text-xl text-gray-500 line-through">
+                      ₦{product.originalPrice.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleWishlist}
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                  >
+                    {isWishlisted ? (
+                      <HeartIcon className="w-6 h-6 text-secondary" />
+                    ) : (
+                      <HeartOutlineIcon className="w-6 h-6" />
+                    )}
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    aria-label="Share product"
+                  >
+                    <ShareIcon className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="prose prose-gray dark:prose-invert max-w-none">
+                <p className="text-gray-600 dark:text-gray-300">
+                  {product.description}
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold text-primary mb-3">
+                  Key Features
+                </h3>
+                <ul className="space-y-2">
+                  {product.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="text-secondary mt-1">•</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <ProductInteraction
+                product={product}
+                quantity={quantity}
+                onQuantityChange={setQuantity}
+                onAddToCart={handleAddToCart}
+                onBuyNow={handleBuyNow}
+              />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
+                <div>
+                  <strong>Category:</strong> {product.category}
+                </div>
+                <div>
+                  <strong>Availability:</strong>{' '}
+                  <span className={product.inStock ? 'text-secondary' : 'text-red-500'}>
+                    {product.inStock ? 'In Stock' : 'Out of Stock'}
+                  </span>
+                </div>
+                <div>
+                  <strong>Shipping:</strong> Free on orders over ₦500
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <CTA
+        title="Need Help Choosing the Right Product?"
+        description="Our experts are ready to help you find the perfect solution for your needs."
+        primaryButton={{ text: 'Contact Our Experts', href: '/contact' }}
+        secondaryButton={{ text: 'Browse All Products', href: '/products' }}
+      />
+    </>
+  );
+}
