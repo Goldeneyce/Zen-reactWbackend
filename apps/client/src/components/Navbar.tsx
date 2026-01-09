@@ -15,16 +15,16 @@ import {
   YouTubeIcon,
   WhatsAppIcon,
   ShoppingCartIcon,
+  ShoppingBagIcon,
   BellIcon,
   UserIcon,
-  SearchIcon,
   MoonIcon,
   SunIcon,
   HamburgerIcon,
   ChevronDownIcon,
 } from '@/components/Icons';
 import ShoppingCartIconWithBadge from '@/components/ShoppingCartIcon';
-import Searchbar from '@/components/Searchbar';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -74,6 +74,21 @@ export default function Navbar() {
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
+
+  const ProfileButton = () => {
+    const pathName = usePathname();
+    return (
+      <UserButton>
+        <UserButton.MenuItems>
+          <UserButton.Action
+            label="See Orders"
+            labelIcon={<ShoppingBagIcon />}
+            onClick={() => window.location.assign('/orders')}
+          />
+        </UserButton.MenuItems>
+      </UserButton>
+    )
+  }
 
   return (
     <header className="bg-white dark:bg-white-dark shadow-custom dark:shadow-dark-custom sticky top-0 z-50">
@@ -172,18 +187,24 @@ export default function Navbar() {
                 <span className="icon-badge">2</span>
               </Link>
               
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-3 py-2 rounded hover:bg-light dark:hover:bg-light-dark border border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all"
-              >
-                <UserIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Account</span>
-              </Link>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <ProfileButton />
+              </SignedIn>
             </div>
 
             {/* Mobile Menu Button and Cart */}
             <div className="md:hidden flex items-center gap-3">
               <ShoppingCartIconWithBadge />
+              
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <ProfileButton />
+              </SignedIn>
               
               <button
                 onClick={toggleMobileMenu}
@@ -236,15 +257,6 @@ export default function Navbar() {
                 >
                   <BellIcon className="w-6 h-6" />
                   <span>Notifications</span>
-                </Link>
-                
-                <Link
-                  href="/login"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-3 text-white dark:text-gray-100 hover:text-secondary transition-colors"
-                >
-                  <UserIcon className="w-6 h-6" />
-                  <span>Account</span>
                 </Link>
               </div>
             </div>
