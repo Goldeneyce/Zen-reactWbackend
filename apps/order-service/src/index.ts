@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
-import { clerkPlugin, getAuth } from '@clerk/fastify'
+import { clerkPlugin} from '@clerk/fastify'
 import { get } from 'http';
+import { shouldBeUser } from './middleware/authMiddleware.js';
 
 const fastify = Fastify();
 fastify.register(clerkPlugin);
@@ -12,15 +13,10 @@ fastify.get('/health', (request,reply) => {
     timestamp: Date.now(),
   });
 });
-fastify.get('/test', (request,reply) => {
-  const { userId } = getAuth(request);
-  if(!userId){
-    return reply.status(401).send({
-      message: "You are not logged in!",
-    });
-  }
+fastify.get('/test', {preHandler: shouldBeUser}, (request,reply) => {
+
   return reply.status(200).send({
-    message: "Order service authenticated successfully!",
+    message: "Order service authenticated successfully!",userId: request.userId
   });
 });
 const start = async () => {

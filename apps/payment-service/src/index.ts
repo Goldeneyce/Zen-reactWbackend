@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { ok } from 'assert';
 import { Hono } from 'hono'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
+import { shouldBeUser } from './middleware/authMiddleware.js';
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
@@ -14,15 +15,11 @@ app.get('/health', (c) => {
   });
 });
 
-app.get('/test', (c) => {
-  const  auth = getAuth(c);
-  if(!auth?.userId){
-    return c.json({
-      message: "You are not logged in!",
-    }, 401);
-  }
+app.get('/test', shouldBeUser, (c) => {
+  
+
   return c.json({
-    message: "Payment service authenticated successfully!",
+    message: "Payment service authenticated successfully!", userId:c.get("userId")
   });
 });
 

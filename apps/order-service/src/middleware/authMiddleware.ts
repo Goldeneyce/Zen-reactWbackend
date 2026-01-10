@@ -1,0 +1,19 @@
+import { FastifyReply, FastifyRequest } from "fastify";
+import {getAuth } from '@clerk/fastify'
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    userId?: string | null;
+  }
+}
+
+export const shouldBeUser = async (request:FastifyRequest, reply:FastifyReply) => {
+      const { userId } = getAuth(request);
+  if(!userId){
+    return reply.status(401).send({
+      message: "You are not logged in!",
+    });
+  }
+
+  request.userId = userId;
+}
