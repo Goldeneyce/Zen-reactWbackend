@@ -1,6 +1,9 @@
 import Fastify from 'fastify';
+import { clerkPlugin, getAuth } from '@clerk/fastify'
+import { get } from 'http';
 
 const fastify = Fastify();
+fastify.register(clerkPlugin);
 
 fastify.get('/health', (request,reply) => {
   return reply.status(200).send({
@@ -9,7 +12,17 @@ fastify.get('/health', (request,reply) => {
     timestamp: Date.now(),
   });
 });
-
+fastify.get('/test', (request,reply) => {
+  const { userId } = getAuth(request);
+  if(!userId){
+    return reply.status(401).send({
+      message: "You are not logged in!",
+    });
+  }
+  return reply.status(200).send({
+    message: "Order service authenticated successfully!",
+  });
+});
 const start = async () => {
   try {
     await fastify.listen({ port: 8001 });

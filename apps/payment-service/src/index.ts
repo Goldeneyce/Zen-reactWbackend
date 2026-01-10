@@ -1,14 +1,28 @@
 import { serve } from '@hono/node-server'
 import { ok } from 'assert';
 import { Hono } from 'hono'
+import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 
 const app = new Hono()
+app.use('*', clerkMiddleware())
 
 app.get('/health', (c) => {
   return c.json({
     status: "ok",
     uptime: process.uptime(),
     timestamp: Date.now(),
+  });
+});
+
+app.get('/test', (c) => {
+  const  auth = getAuth(c);
+  if(!auth?.userId){
+    return c.json({
+      message: "You are not logged in!",
+    }, 401);
+  }
+  return c.json({
+    message: "Payment service authenticated successfully!",
   });
 });
 
