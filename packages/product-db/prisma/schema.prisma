@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id              Int     @id @default(autoincrement())
+  name            string
+  description     string
+  price           Int
+  originalPrice?  Int
+  category        ProductCategory
+  image           string
+  images?         string[]
+  rating          Int
+  reviews         Int
+  features        string[]
+  specifications  ProductSpecification[]
+  inStock         boolean
+  badge?          'New' | 'Best Seller' | 'Smart' | 'Energy Efficient' | 'Top Rated'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
