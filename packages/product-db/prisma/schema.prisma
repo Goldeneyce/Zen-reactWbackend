@@ -1,28 +1,56 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum ProductCategory {
+  all
+  power
+  appliances
+  entertainment
+  kitchen
+  security
+  cooling
+  solar
+  automation
+  lighting
+}
+
+enum ProductBadge {
+  New
+  BestSeller
+  Smart
+  EnergyEfficient
+  TopRated
 }
 
 model Product {
-  id              Int     @id @default(autoincrement())
-  name            string
-  description     string
-  price           Int
-  originalPrice?  Int
+  id              String                  @id @default(uuid())
+  name            String
+  description     String
+  price           Float
+  originalPrice   Float?
   category        ProductCategory
-  image           string
-  images?         string[]
-  rating          Int
+  image           String
+  images          String[]
+  rating          Float
   reviews         Int
-  features        string[]
+  features        String[]
   specifications  ProductSpecification[]
-  inStock         boolean
-  badge?          'New' | 'Best Seller' | 'Smart' | 'Energy Efficient' | 'Top Rated'
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  inStock         Boolean
+  badge           ProductBadge?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+}
+
+model ProductSpecification {
+  id        String  @id @default(uuid())
+  key       String
+  value     String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
 }
