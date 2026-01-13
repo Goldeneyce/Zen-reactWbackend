@@ -1,9 +1,9 @@
-import express, {Request, Response} from "express"
+import express, {NextFunction, Request, Response} from "express"
 import cors from "cors";
 import { clerkMiddleware, getAuth } from '@clerk/express'
 import { shouldBeUser } from "./middleware/authMiddleware.js";
 import productRouter from "./routes/product.route.js";
-import categoryRouter from "./routes/category.route.js";
+import categoryRouter from "./routes/productSpecification.route.js";
 
 const app = express();
 app.use(
@@ -29,8 +29,13 @@ app.get("/test", shouldBeUser, (req: Request, res: Response)=>{
     message: "Product service authenticated successfully", userId: req.userId });
   });
 
-  app.use("/products", productRouter)
-  app.use("/categories", categoryRouter)
+  app.use("/products", productRouter);
+  app.use("/categories", categoryRouter);
+
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+  });
 
 app.listen(8000, ()=>{
   console.log("Product service is running on port 8000");
