@@ -6,14 +6,14 @@ const slugify = (value: string) =>
 		.toLowerCase()
 		.trim()
 		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "") || "product";
+		.replace(/(^-|-$)/g, "") || "category";
 
-const ensureUniqueSlug = async (base: string, currentId?: string) => {
+const ensureUniqueSlug = async (base: string, currentId?: number) => {
 	let candidate = base;
 	let suffix = 1;
 
 	while (true) {
-		const existing = await prisma.product.findFirst({
+		const existing = await prisma.category.findFirst({
 			where: {
 				slug: candidate,
 				...(currentId ? { id: { not: currentId } } : {}),
@@ -25,25 +25,22 @@ const ensureUniqueSlug = async (base: string, currentId?: string) => {
 	}
 };
 
-export const createProduct = async (req: Request, res: Response) => {
-	const body = req.body as Prisma.ProductCreateInput & { slug?: string };
+export const createCategory = async (req: Request, res: Response) => {
+	const body = req.body as Prisma.CategoryCreateInput & { slug?: string };
 	const baseSlug = body.slug ? slugify(body.slug) : slugify(body.name);
 	const slug = await ensureUniqueSlug(baseSlug);
 
-	const product = await prisma.product.create({
+	const category = await prisma.category.create({
 		data: {
-			...body,
+			name: body.name,
 			slug,
 		},
-		include: {
-			categories: true,
-		},
 	});
-	res.status(201).json(product);
+	res.status(201).json(category);
 };
 
-export const getProducts = async (req: Request, res: Response) => {
-	const { search, limit, category } = req.query;
+export const getCategories = async (req: Request, res: Response) => {
+	const { search, limit } = req.query;
 
 	// Validate search parameter
 	let validatedSearch: string | undefined;
@@ -57,16 +54,6 @@ export const getProducts = async (req: Request, res: Response) => {
 			return;
 		}
 		validatedSearch = search.trim();
-	}
-
-	// Validate category parameter
-	let validatedCategory: string | undefined;
-	if (category) {
-		if (typeof category !== "string") {
-			res.status(400).json({ error: "Category parameter must be a string" });
-			return;
-		}
-		validatedCategory = category.trim();
 	}
 
 	// Validate limit parameter
@@ -93,45 +80,40 @@ export const getProducts = async (req: Request, res: Response) => {
 		validatedLimit = DEFAULT_LIMIT;
 	}
 
-	const products = await prisma.product.findMany({
+	const categories = await prisma.category.findMany({
 		where: {
 			...(validatedSearch ? { name: { contains: validatedSearch, mode: "insensitive" } } : {}),
-			...(validatedCategory && validatedCategory !== "all"
-				? {
-						categories: {
-							some: {
-								slug: validatedCategory,
-							},
-						},
-				  }
-				: {}),
 		},
 		take: validatedLimit,
 		include: {
-			categories: true,
+			_count: {
+				select: { products: true },
+			},
 		},
 	});
-	res.status(200).json(products);
+	res.status(200).json(categories);
 };
 
-export const getProduct = async (req: Request, res: Response) => {
+export const getCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const product = await prisma.product.findUnique({
-		where: { id },
+	const category = await prisma.category.findUnique({
+		where: { id: parseInt(id) },
 		include: {
-			categories: true,
+			_count: {
+				select: { products: true },
+			},
 		},
 	});
 
-	if (!product) {
-		res.status(404).json({ error: "Product not found" });
+	if (!category) {
+		res.status(404).json({ error: "Category not found" });
 		return;
 	}
 
-	res.status(200).json(product);
+	res.status(200).json(category);
 };
 
-export const getProductBySlug = async (req: Request, res: Response) => {
+export const getCategoryBySlug = async (req: Request, res: Response) => {
 	const { slug } = req.params;
 
 	if (!slug || typeof slug !== "string") {
@@ -139,24 +121,27 @@ export const getProductBySlug = async (req: Request, res: Response) => {
 		return;
 	}
 
-	const product = await prisma.product.findUnique({
+	const category = await prisma.category.findUnique({
 		where: { slug },
 		include: {
-			categories: true,
+			products: true,
+			_count: {
+				select: { products: true },
+			},
 		},
 	});
 
-	if (!product) {
-		res.status(404).json({ error: "Product not found" });
+	if (!category) {
+		res.status(404).json({ error: "Category not found" });
 		return;
 	}
 
-	res.status(200).json(product);
+	res.status(200).json(category);
 };
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const body = req.body as Prisma.ProductUpdateInput & { slug?: string };
+	const body = req.body as Prisma.CategoryUpdateInput & { slug?: string };
 
 	let slugUpdate: string | undefined;
 	const baseSlug = body.slug
@@ -166,29 +151,26 @@ export const updateProduct = async (req: Request, res: Response) => {
 			: undefined;
 
 	if (baseSlug) {
-		slugUpdate = await ensureUniqueSlug(baseSlug, id);
+		slugUpdate = await ensureUniqueSlug(baseSlug, parseInt(id));
 	}
 
-	const product = await prisma.product.update({
-		where: { id },
+	const category = await prisma.category.update({
+		where: { id: parseInt(id) },
 		data: {
-			...body,
+			name: body.name as string,
 			...(slugUpdate ? { slug: slugUpdate } : {}),
 		},
-		include: {
-			categories: true,
-		},
 	});
 
-	res.status(200).json(product);
+	res.status(200).json(category);
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
-	await prisma.product.delete({
-		where: { id },
+	await prisma.category.delete({
+		where: { id: parseInt(id) },
 	});
 
-	res.status(200).json({ message: "Product deleted successfully" });
+	res.status(200).json({ message: "Category deleted successfully" });
 };

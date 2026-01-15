@@ -28,6 +28,13 @@ enum ProductBadge {
   TopRated
 }
 
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
 model Product {
   id              String                  @id @default(uuid())
   slug            String                  @unique
@@ -36,6 +43,7 @@ model Product {
   price           Float
   originalPrice   Float?
   category        ProductCategory
+  categories      Category[]
   image           String
   images          String[]
   rating          Float

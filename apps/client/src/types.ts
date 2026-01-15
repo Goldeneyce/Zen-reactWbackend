@@ -1,4 +1,13 @@
 // types.ts
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  _count?: {
+    products: number;
+  };
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -6,6 +15,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   category: ProductCategory;
+  categories?: Category[];
   image: string;
   images?: string[];
   rating: number;

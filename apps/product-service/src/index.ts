@@ -4,6 +4,7 @@ import { clerkMiddleware } from "@clerk/express";
 import { shouldBeUser } from "./middleware/authMiddleware.js";
 import productRouter from "./routes/product.route.js";
 import productSpecificationRouter from "./routes/productSpecification.route.js";
+import categoryRouter from "./routes/category.route.js";
 
 const app = express();
 app.use(
@@ -32,6 +33,7 @@ app.get("/test", shouldBeUser, (req: Request, res: Response) => {
 
 app.use("/products", productRouter);
 app.use("/productSpecification", productSpecificationRouter);
+app.use("/categories", categoryRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 	console.log(err);
