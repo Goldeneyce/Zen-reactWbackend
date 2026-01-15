@@ -1,0 +1,13 @@
+{
+    "name": "order-db",
+    "version": "1.0.0",
+    "type": "module",
+    
+    "dependencies": {
+        "@prisma/client": "^4.15.0"
+    },
+    "devDependencies": {
+        "@repo/typescript-config": "workspace:*",
+        "prisma": "^4.15.0"
+    }
+}
