@@ -30,6 +30,7 @@ enum ProductBadge {
 
 model Product {
   id              String                  @id @default(uuid())
+  slug            String                  @unique
   name            String
   description     String
   price           Float

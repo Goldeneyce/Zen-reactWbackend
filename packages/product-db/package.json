@@ -8,14 +8,15 @@
     "db:deploy": "prisma migrate deploy"
   },
   "devDependencies": {
+    "@prisma/client": "^7.2.0",
+    "@prisma/client-runtime-utils": "^7.2.0",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.0.6",
     "dotenv": "^17.2.3",
-    "prisma": "^7.2.0",
-    "@repo/typescript-config":"workspace:*"
+    "prisma": "^7.2.0"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0"
+    "@prisma/adapter-pg": "^7.2.0"
   },
   "exports": {
     ".": "./src/index.ts"

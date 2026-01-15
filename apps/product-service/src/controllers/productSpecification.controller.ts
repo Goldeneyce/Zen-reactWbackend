@@ -2,8 +2,31 @@ import { prisma, Prisma } from "@repo/product-db";
 import { Request, Response } from "express";
 
 export const createProductSpecification = async (req: Request, res: Response) => {
-	const data: Prisma.ProductSpecificationCreateInput = req.body;
-	const productSpecification = await prisma.productSpecification.create({ data });
+	const { productId, key, value } = req.body as {
+		productId?: string;
+		key?: string;
+		value?: string;
+	};
+
+	if (!productId) {
+		res.status(400).json({ error: "productId is required" });
+		return;
+	}
+
+	const product = await prisma.product.findUnique({ where: { id: productId } });
+	if (!product) {
+		res.status(404).json({ error: "Product not found" });
+		return;
+	}
+
+	const productSpecification = await prisma.productSpecification.create({
+		data: {
+			key: key ?? "",
+			value: value ?? "",
+			product: { connect: { id: productId } },
+		},
+	});
+
 	res.status(201).json(productSpecification);
 };
 
@@ -28,7 +51,24 @@ export const getProductSpecification = async (req: Request, res: Response) => {
 
 export const updateProductSpecification = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const data: Prisma.ProductSpecificationUpdateInput = req.body;
+	const { productId, key, value } = req.body as {
+		productId?: string;
+		key?: string;
+		value?: string;
+	};
+
+	const data: Prisma.ProductSpecificationUpdateInput = {};
+	if (key !== undefined) data.key = key;
+	if (value !== undefined) data.value = value;
+
+	if (productId) {
+		const product = await prisma.product.findUnique({ where: { id: productId } });
+		if (!product) {
+			res.status(404).json({ error: "Product not found" });
+			return;
+		}
+		data.product = { connect: { id: productId } };
+	}
 
 	const productSpecification = await prisma.productSpecification.update({
 		where: { id },
