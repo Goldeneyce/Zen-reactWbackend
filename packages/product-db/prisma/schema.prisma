@@ -7,19 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum ProductCategory {
-  all
-  power
-  appliances
-  entertainment
-  kitchen
-  security
-  cooling
-  solar
-  automation
-  lighting
-}
-
 enum ProductBadge {
   New
   BestSeller
@@ -42,8 +29,7 @@ model Product {
   description     String
   price           Float
   originalPrice   Float?
-  category        ProductCategory
-  categories      Category[]
+  categories      Category[] @relation(onDelete: Cascade)
   image           String
   images          String[]
   rating          Float

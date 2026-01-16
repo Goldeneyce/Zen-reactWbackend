@@ -138,6 +138,14 @@ const AppSidebar = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
+                  <Link href="/categories">
+                    <Shirt />
+                    See All Categories
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
                   <Sheet>
                     <SheetTrigger asChild>
                       <SidebarMenuButton asChild>
