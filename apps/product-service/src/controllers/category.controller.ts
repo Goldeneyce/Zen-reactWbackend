@@ -96,6 +96,12 @@ export const getCategories = async (req: Request, res: Response) => {
 
 export const getCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
+
+	if (!id) {
+		res.status(400).json({ error: "Category ID is required" });
+		return;
+	}
+
 	const category = await prisma.category.findUnique({
 		where: { id: parseInt(id) },
 		include: {
@@ -141,6 +147,12 @@ export const getCategoryBySlug = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
+
+	if (!id) {
+		res.status(400).json({ error: "Category ID is required" });
+		return;
+	}
+
 	const body = req.body as Prisma.CategoryUpdateInput & { slug?: string };
 
 	let slugUpdate: string | undefined;
@@ -167,6 +179,11 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const deleteCategory = async (req: Request, res: Response) => {
 	const { id } = req.params;
+
+	if (!id) {
+		res.status(400).json({ error: "Category ID is required" });
+		return;
+	}
 
 	await prisma.category.delete({
 		where: { id: parseInt(id) },

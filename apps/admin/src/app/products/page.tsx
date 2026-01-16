@@ -2,11 +2,39 @@ import { Product, columns } from "./columns";
 import { DataTable } from "./data-table";
 
 const getData = async (): Promise<Product[]> => {
-  return [
-    {
-      id: 1,
-      name: "Adidas CoreFit T-Shirt",
-      shortDescription:
+  try {
+    const response = await fetch("http://localhost:8000/products?limit=100", {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Failed to fetch products");
+    const products = await response.json();
+    return products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      shortDescription: product.description.substring(0, 100),
+      description: product.description,
+      price: product.price,
+      categories: product.categories,
+    }));
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+};
+
+const PaymentsPage = async () => {
+  const data = await getData();
+  return (
+    <div className="">
+      <div className="mb-8 px-4 py-2 bg-secondary rounded-md">
+        <h1 className="font-semibold">All Products</h1>
+      </div>
+      <DataTable columns={columns} data={data} />
+    </div>
+  );
+};
+
+export default PaymentsPage;
         "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
       description:
         "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",

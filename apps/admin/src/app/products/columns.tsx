@@ -20,11 +20,13 @@ export type Product = {
   id: string | number;
   price: number;
   name: string;
-  shortDescription: string;
-  description: string;
-  sizes: string[];
-  colors: string[];
-  images: Record<string, string>;
+  shortDescription?: string;
+  description?: string;
+  sizes?: string[];
+  colors?: string[];
+  images?: Record<string, string>;
+  categories?: Array<{ productId: string; categoryId: number; category: { id: number; name: string; slug: string } }>;
+  categoryNames?: string[];
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -87,6 +89,17 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "shortDescription",
     header: "Description",
+  },
+  {
+    id: "categories",
+    header: "Categories",
+    cell: ({ row }) => {
+      const product = row.original;
+      const categoryNames = product.categories
+        ?.map((pc) => pc.category.name)
+        .join(", ") || "No categories";
+      return <span className="text-sm">{categoryNames}</span>;
+    },
   },
   {
     id: "actions",

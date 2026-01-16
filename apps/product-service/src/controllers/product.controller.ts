@@ -30,13 +30,35 @@ export const createProduct = async (req: Request, res: Response) => {
 	const baseSlug = body.slug ? slugify(body.slug) : slugify(body.name);
 	const slug = await ensureUniqueSlug(baseSlug);
 
+	// Extract categories if provided as an array of ids
+	const categoriesData = Array.isArray(body.categories)
+		? { categories: { create: body.categories.map((cat: any) => ({ category: { connect: { id: cat.id || cat } } })) } }
+		: body.categories || {};
+
 	const product = await prisma.product.create({
 		data: {
-			...body,
+			name: body.name,
+			description: body.description,
+			price: body.price,
+			originalPrice: body.originalPrice,
+			image: body.image,
+			images: body.images,
+			rating: body.rating,
+			reviews: body.reviews,
+			features: body.features,
+			inStock: body.inStock,
+			badge: body.badge,
 			slug,
+			...categoriesData,
+			...(body.specifications && { specifications: body.specifications }),
 		},
 		include: {
-			categories: true,
+			categories: {
+				include: {
+					category: true,
+				},
+			},
+			specifications: true,
 		},
 	});
 	res.status(201).json(product);
@@ -100,7 +122,9 @@ export const getProducts = async (req: Request, res: Response) => {
 				? {
 						categories: {
 							some: {
-								slug: validatedCategory,
+								category: {
+									slug: validatedCategory,
+								},
 							},
 						},
 				  }
@@ -108,7 +132,11 @@ export const getProducts = async (req: Request, res: Response) => {
 		},
 		take: validatedLimit,
 		include: {
-			categories: true,
+			categories: {
+				include: {
+					category: true,
+				},
+			},
 		},
 	});
 	res.status(200).json(products);
@@ -119,9 +147,15 @@ export const getProduct = async (req: Request, res: Response) => {
 	const product = await prisma.product.findUnique({
 		where: { id },
 		include: {
-			categories: true,
+			categories: {
+				include: {
+					category: true,
+				},
+			},
+			specifications: true,
 		},
 	});
+
 
 	if (!product) {
 		res.status(404).json({ error: "Product not found" });
@@ -142,7 +176,12 @@ export const getProductBySlug = async (req: Request, res: Response) => {
 	const product = await prisma.product.findUnique({
 		where: { slug },
 		include: {
-			categories: true,
+			categories: {
+				include: {
+					category: true,
+				},
+			},
+			specifications: true,
 		},
 	});
 
@@ -176,7 +215,12 @@ export const updateProduct = async (req: Request, res: Response) => {
 			...(slugUpdate ? { slug: slugUpdate } : {}),
 		},
 		include: {
-			categories: true,
+			categories: {
+				include: {
+					category: true,
+				},
+			},
+			specifications: true,
 		},
 	});
 

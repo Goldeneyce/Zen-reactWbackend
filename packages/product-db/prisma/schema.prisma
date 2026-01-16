@@ -19,7 +19,7 @@ model Category {
   id       Int       @id @default(autoincrement())
   name     String
   slug     String    @unique
-  products Product[]
+  products ProductCategory[]
 }
 
 model Product {
@@ -29,7 +29,7 @@ model Product {
   description     String
   price           Float
   originalPrice   Float?
-  categories      Category[] @relation(onDelete: Cascade)
+  categories      ProductCategory[]
   image           String
   images          String[]
   rating          Float
@@ -40,6 +40,15 @@ model Product {
   badge           ProductBadge?
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
+}
+
+model ProductCategory {
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+
+  @@id([productId, categoryId])
 }
 
 model ProductSpecification {
