@@ -1,13 +1,13 @@
 {
-    "name": "order-db",
-    "version": "1.0.0",
+    "name": "@repo/order-db",
+    "version": "0.0.1",
     "type": "module",
-    
-    "dependencies": {
-        "@prisma/client": "^4.15.0"
-    },
     "devDependencies": {
         "@repo/typescript-config": "workspace:*",
-        "prisma": "^4.15.0"
+        "@types/node": "^25.0.9"
+    },
+    ".": "./src/index.ts",
+    "dependencies": {
+        "mongoose": "^9.1.3"
     }
 }
