@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 
 const TestPage = async () => {
     const {getToken} = await auth();
-    const token = await getToken();
+    const token = await getToken({ template: "zentrics" });
 
     console.log("Clerk token:", token);
     const resProduct = await fetch("http://localhost:8000/test", {
@@ -19,7 +19,7 @@ const TestPage = async () => {
             Authorization: `Bearer ${token}`,
         },
     });
-    const dataOrder = await resProduct.json();
+    const dataOrder = await resOrder.json();
 
     console.log("Data from order service:", dataOrder);
 
@@ -28,7 +28,7 @@ const TestPage = async () => {
             Authorization: `Bearer ${token}`,
         },
     });
-    const dataPayment = await resProduct.json();
+    const dataPayment = await resPayment.json();
 
     console.log("Data from payment service:", dataPayment);
 
