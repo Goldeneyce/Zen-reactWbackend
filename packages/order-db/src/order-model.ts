@@ -13,15 +13,15 @@ const OrderSchema = new Schema({
   amount: { type: Number, required: true },
   status: { type: String, required: true, enum: Object.values(OrderStatus), default: OrderStatus.PENDING },
   products: { type: [
-                {
-                    name: { type: String, required: true },
-                    quantity: { type: Number, required: true },
-                    price: { type: Number, required: true },
-                    shippingAddress: { type: String, required: true }
-                },
-            ],
-            required: true 
-        },
+                    {
+                        name: { type: String, required: true },
+                        quantity: { type: Number, required: true },
+                        price: { type: Number, required: true }
+                    },
+                    ], required: true 
+            },
+    
+  shippingAddress: { type: String, required: true }
     },
     { timestamps: true }
 );

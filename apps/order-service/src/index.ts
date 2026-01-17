@@ -36,6 +36,7 @@ const start = async () => {
     await fastify.listen({ port: 8001 });
     console.log('Order service is running on port 8001');
   } catch (err) {
+    console.log(err);
     fastify.log.error(err);
     process.exit(1);
   }

@@ -5,13 +5,13 @@ import { createProductSpecification,
 	updateProductSpecification,
 	deleteProductSpecification,
 } from "../controllers/productSpecification.controller.js";
+import { shouldBeAdmin } from "../middleware/authMiddleware.js";
 
 const router: Router = Router();
 
-router.post("/", createProductSpecification);
+router.post("/", shouldBeAdmin, createProductSpecification);
 router.get("/", getProductSpecifications);
 router.get("/:id", getProductSpecification);
-router.put("/:id", updateProductSpecification);
-router.delete("/:id", deleteProductSpecification);
-
+router.put("/:id", shouldBeAdmin, updateProductSpecification);
+router.delete("/:id", shouldBeAdmin, deleteProductSpecification);
 export default router;

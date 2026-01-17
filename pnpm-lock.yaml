@@ -212,6 +212,9 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
     devDependencies:
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -237,6 +240,9 @@ importers:
         specifier: ^4.11.3
         version: 4.11.3
     devDependencies:
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -265,6 +271,9 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
     devDependencies:
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -351,6 +360,15 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
+
+  packages/types:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^25.0.9
+        version: 25.0.9
 
   packages/typescript-config: {}
 
