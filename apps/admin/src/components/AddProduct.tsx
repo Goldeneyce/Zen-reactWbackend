@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
 
 const categories = [
@@ -45,44 +44,6 @@ const categories = [
 
 ] as const;
 
-const colors = [
-  "blue",
-  "green",
-  "red",
-  "yellow",
-  "purple",
-  "orange",
-  "pink",
-  "brown",
-  "gray",
-  "black",
-  "white",
-] as const;
-
-const sizes = [
-  "xs",
-  "s",
-  "m",
-  "l",
-  "xl",
-  "xxl",
-  "34",
-  "35",
-  "36",
-  "37",
-  "38",
-  "39",
-  "40",
-  "41",
-  "42",
-  "43",
-  "44",
-  "45",
-  "46",
-  "47",
-  "48",
-] as const;
-
 const formSchema = z.object({
   name: z.string().min(1, { message: "Product name is required!" }),
   shortDescription: z
@@ -92,8 +53,8 @@ const formSchema = z.object({
   description: z.string().min(1, { message: "Description is required!" }),
   price: z.number().min(1, { message: "Price is required!" }),
   category: z.enum(categories),
-  sizes: z.string().optional().transform(val => val ? val.split(',').map(s => s.trim()).filter(Boolean) : []),
-  colors: z.string().optional().transform(val => val ? val.split(',').map(c => c.trim()).filter(Boolean) : []),
+  sizes: z.string().optional(),
+  colors: z.string().optional(),
 });
 
 const AddProduct = () => {
@@ -179,7 +140,7 @@ const AddProduct = () => {
                     <FormItem>
                       <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Select>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>

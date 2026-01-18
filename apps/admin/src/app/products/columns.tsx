@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
@@ -53,7 +52,7 @@ export const columns: ColumnDef<Product>[] = [
     header: "Image",
     cell: ({ row }) => {
       const product = row.original;
-      const imageSrc = product.images[product.id.toString()];
+      const imageSrc = product.images?.[product.id.toString()];
       return (
         <div className="w-9 h-9 relative">
           {imageSrc && (
