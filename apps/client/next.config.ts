@@ -2,19 +2,17 @@
 import type { NextConfig } from 'next';
 import path from 'path';
 
-const nextConfig: NextConfig = {
+const nextConfig: NextConfig & { turbopack?: { root: string } } = {
   images: {
-    // Replace deprecated `domains` with `remotePatterns`
+    // Replace deprecated `images.domains` with `remotePatterns`
     remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
+      { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'localhost' },
     ],
   },
-  // Explicitly set Turbopack workspace root to the monorepo root
+  // Silence workspace root inference warning in Next.js 16 (Turbopack)
   turbopack: {
-    root: path.resolve(__dirname, '../..'),
+    root: path.resolve(__dirname, '../../'),
   },
 };
 

@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -10,9 +9,6 @@ const nextConfig: NextConfig = {
         hostname:"images.pexels.com",
       }
     ]
-  },
-  turbopack: {
-    root: path.resolve(__dirname, "../.."),
   }
 };
 
