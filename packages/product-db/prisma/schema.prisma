@@ -32,6 +32,8 @@ model Product {
   categories      ProductCategory[]
   image           String
   images          String[]
+  sizes           String[]                @default([])
+  colors          String[]                @default([])
   rating          Float
   reviews         Int
   features        String[]

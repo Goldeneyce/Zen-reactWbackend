@@ -5,8 +5,8 @@ import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 interface PaymentFormProps {
-  control: Control<any>;
-  errors: FieldErrors<any>;
+  control?: Control<any>;
+  errors?: FieldErrors<any>;
   onBack: () => void;
   onNext: () => void;
   onPayOnDelivery: () => void;
@@ -14,6 +14,47 @@ interface PaymentFormProps {
 }
 
 export default function PaymentForm({ control, errors, onBack, onNext, onPayOnDelivery, codAvailable }: PaymentFormProps) {
+  const hasControl = Boolean(control);
+
+  const renderInput = (name: string, placeholder: string, type = 'text', extraProps: Record<string, any> = {}) => {
+    if (!hasControl) {
+      return (
+        <input
+          placeholder={placeholder}
+          type={type}
+          disabled
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 text-dark dark:text-light focus:outline-none"
+          {...extraProps}
+        />
+      );
+    }
+
+    return (
+      <Controller
+        name={name}
+        control={control as Control<any>}
+        render={({ field }) => (
+          <input
+            {...field}
+            placeholder={placeholder}
+            type={type}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
+            {...extraProps}
+          />
+        )}
+      />
+    );
+  };
+
+  const renderError = (key: string) => {
+    if (!errors) return null;
+    const error = (errors as Record<string, any>)[key];
+    if (!error) return null;
+    return (
+      <p className="mt-1 text-sm text-red-500">{error?.message as string}</p>
+    );
+  };
+
   return (
     <div className="bg-white dark:bg-white-dark p-8 rounded-lg shadow-custom dark:shadow-dark-custom">
       <h2 className="text-2xl font-bold text-primary mb-6">Payment Information</h2>
@@ -23,40 +64,16 @@ export default function PaymentForm({ control, errors, onBack, onNext, onPayOnDe
           <label className="block text-dark dark:text-light font-medium mb-2">
             Card Number
           </label>
-          <Controller
-            name="payment.cardNumber"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                placeholder="4242 4242 4242 4242"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
-              />
-            )}
-          />
-          {errors?.cardNumber && (
-            <p className="mt-1 text-sm text-red-500">{errors.cardNumber.message as string}</p>
-          )}
+          {renderInput('payment.cardNumber', '4242 4242 4242 4242')}
+          {renderError('cardNumber')}
         </div>
         
         <div>
           <label className="block text-dark dark:text-light font-medium mb-2">
             Card Holder Name
           </label>
-          <Controller
-            name="payment.cardHolder"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
-              />
-            )}
-          />
-          {errors?.cardHolder && (
-            <p className="mt-1 text-sm text-red-500">{errors.cardHolder.message as string}</p>
-          )}
+          {renderInput('payment.cardHolder', 'John Doe')}
+          {renderError('cardHolder')}
         </div>
         
         <div className="grid grid-cols-2 gap-4">
@@ -64,42 +81,16 @@ export default function PaymentForm({ control, errors, onBack, onNext, onPayOnDe
             <label className="block text-dark dark:text-light font-medium mb-2">
               Expiry Date
             </label>
-            <Controller
-              name="payment.expiryDate"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  placeholder="MM/YY"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
-                />
-              )}
-            />
-            {errors?.expiryDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.expiryDate.message as string}</p>
-            )}
+            {renderInput('payment.expiryDate', 'MM/YY')}
+            {renderError('expiryDate')}
           </div>
           
           <div>
             <label className="block text-dark dark:text-light font-medium mb-2">
               CVV
             </label>
-            <Controller
-              name="payment.cvv"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  placeholder="123"
-                  type="password"
-                  maxLength={4}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
-                />
-              )}
-            />
-            {errors?.cvv && (
-              <p className="mt-1 text-sm text-red-500">{errors.cvv.message as string}</p>
-            )}
+            {renderInput('payment.cvv', '123', 'password', { maxLength: 4 })}
+            {renderError('cvv')}
           </div>
         </div>
       </div>

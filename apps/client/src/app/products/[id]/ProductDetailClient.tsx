@@ -20,6 +20,8 @@ import {
 export default function ProductDetailClient({ product }: { product: Product }) {
   const [selectedImage, setSelectedImage] = useState(product.images?.[0] ?? product.image);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(product.sizes?.[0]);
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(product.colors?.[0]);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
@@ -45,12 +47,12 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   };
 
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    addItem(product, quantity, { size: selectedSize, color: selectedColor });
     toast.success(`${product.name} added to cart!`);
   };
 
   const handleBuyNow = () => {
-    addItem(product, quantity);
+    addItem(product, quantity, { size: selectedSize, color: selectedColor });
     window.location.href = '/cart';
   };
 
@@ -117,7 +119,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             <div className="space-y-6">
               <div>
                 <span className="text-secondary font-medium">
-                  {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                  {product.category ? (product.category.charAt(0).toUpperCase() + product.category.slice(1)) : 'Product'}
                 </span>
                 <h1 className="text-3xl md:text-4xl font-bold text-primary mt-1">
                   {product.name}
@@ -177,6 +179,48 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </div>
               
               <div>
+                {product.colors?.length ? (
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-primary mb-2">Colors</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.colors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColor(color)}
+                          className={`px-3 py-2 border rounded-full text-sm transition-colors ${
+                            selectedColor === color
+                              ? 'border-secondary bg-secondary/10 text-secondary'
+                              : 'border-gray-300 hover:border-secondary'
+                          }`}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {product.sizes?.length ? (
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-primary mb-2">Sizes</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-3 py-2 border rounded-full text-sm transition-colors ${
+                            selectedSize === size
+                              ? 'border-secondary bg-secondary/10 text-secondary'
+                              : 'border-gray-300 hover:border-secondary'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 <h3 className="text-xl font-bold text-primary mb-3">
                   Key Features
                 </h3>
@@ -200,7 +244,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
                 <div>
-                  <strong>Category:</strong> {product.category}
+                  <strong>Category:</strong> {product.category || 'N/A'}
                 </div>
                 <div>
                   <strong>Availability:</strong>{' '}

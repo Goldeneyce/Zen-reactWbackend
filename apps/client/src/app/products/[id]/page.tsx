@@ -3,7 +3,7 @@ import ProductDetailClient from './ProductDetailClient';
 import { Product } from '@/types';
 
 // This would normally come from an API/database
-const product: Product = {
+const product = {
   id: '1',
   name: 'UltraHD 4K LED Projector',
   description: 'Experience cinema-quality entertainment in the comfort of your home with our UltraHD 4K LED Projector. This state-of-the-art projector delivers stunning 4K resolution with HDR10 support, ensuring vibrant colors and exceptional detail. Perfect for movie nights, gaming, and presentations, this projector features smart connectivity, built-in streaming apps, and a long-lasting LED light source that provides up to 30,000 hours of viewing.',
@@ -17,6 +17,8 @@ const product: Product = {
     '/products/tvRemote.avif',
     '/products/fridge.avif',
   ],
+  sizes: ['Mini', 'Standard', 'Pro'],
+  colors: ['Black', 'Silver', 'Carbon'],
   rating: 4.5,
   reviews: 142,
   features: [
@@ -44,7 +46,7 @@ const product: Product = {
   ],
   inStock: true,
   badge: 'New',
-};
+} as Product;
 
 export async function generateMetadata({
   params,

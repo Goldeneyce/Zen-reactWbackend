@@ -43,7 +43,7 @@ export default function ProductsPage() {
       ],
       inStock: true,
       badge: 'New',
-    },
+    } as Product,
     {
       id: '2',
       name: 'Smart French Door Refrigerator',
@@ -68,7 +68,7 @@ export default function ProductsPage() {
       ],
       inStock: true,
       badge: 'Smart',
-    },
+    } as Product,
     {
       id: '3',
       name: 'Inverter Split AC 1.5 Ton',
@@ -92,8 +92,8 @@ export default function ProductsPage() {
         { key: 'Wi-Fi', value: 'Yes' },
       ],
       inStock: true,
-      badge: 'Energy Efficient',
-    },
+      badge: 'EnergyEfficient',
+    } as Product,
     {
       id: '4',
       name: '4-Slice Stainless Steel Toaster',
@@ -117,7 +117,7 @@ export default function ProductsPage() {
         { key: 'Power', value: '1800W' },
       ],
       inStock: true,
-    },
+    } as Product,
     {
       id: '5',
       name: 'Smart Robot Vacuum Cleaner',
@@ -141,8 +141,8 @@ export default function ProductsPage() {
         { key: 'App', value: 'Mobile App Control' },
       ],
       inStock: true,
-      badge: 'Best Seller',
-    },
+      badge: 'BestSeller',
+    } as Product,
     {
       id: '6',
       name: '9kg Front Load Washing Machine',
@@ -167,7 +167,7 @@ export default function ProductsPage() {
       ],
       inStock: true,
       badge: 'Smart',
-    },
+    } as Product,
     {
       id: '7',
       name: '25L Convection Microwave Oven',
@@ -191,7 +191,7 @@ export default function ProductsPage() {
         { key: 'Control', value: 'Digital' },
       ],
       inStock: true,
-    },
+    } as Product,
     {
       id: '8',
       name: '4K Smart Security Camera',
@@ -215,8 +215,8 @@ export default function ProductsPage() {
         { key: 'Storage', value: 'Cloud & SD Card' },
       ],
       inStock: true,
-      badge: 'Top Rated',
-    },
+      badge: 'TopRated',
+    } as Product,
     {
       id: '9',
       name: 'Smart Programmable Coffee Maker',
@@ -241,7 +241,7 @@ export default function ProductsPage() {
       ],
       inStock: true,
       badge: 'Smart',
-    },
+    } as Product,
   ];
 
   const categories = [

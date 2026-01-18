@@ -10,27 +10,20 @@ import PaymentForm from '@/components/PaymentForm';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FieldErrors } from 'react-hook-form';
 import * as z from 'zod';
-import { ShippingFormData, PaymentFormData } from '@/types';
 
 const checkoutSchema = z.object({
-  shipping: z.object({
-    firstName: z.string().min(2, 'First name is required'),
-    lastName: z.string().min(2, 'Last name is required'),
-    email: z.string().email('Please enter a valid email'),
-    phone: z.string().min(10, 'Please enter a valid phone number'),
-    address: z.string().min(5, 'Please enter a valid address'),
-    city: z.string().min(2, 'Please enter a city'),
-    state: z.string().min(2, 'Please enter a state'),
-    zipCode: z.string().min(5, 'Please enter a valid zip code'),
-    country: z.string().min(2, 'Please enter a country'),
-  }),
   payment: z.object({
     cardNumber: z.string().min(16, 'Please enter a valid card number'),
     cardHolder: z.string().min(2, 'Please enter card holder name'),
-    expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Please enter a valid expiry date (MM/YY)'),
+    expiryDate: z
+      .string()
+      .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Please enter a valid expiry date (MM/YY)'),
     cvv: z.string().min(3, 'Please enter a valid CVV'),
   }),
 });
+
+type CheckoutFormData = z.infer<typeof checkoutSchema>;
+type PaymentFormData = CheckoutFormData['payment'];
 
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,20 +34,9 @@ export default function CheckoutPage() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      shipping: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: 'United States',
-      },
       payment: {
         cardNumber: '',
         cardHolder: '',
@@ -69,7 +51,7 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax;
 
-  const onSubmit = async (data: z.infer<typeof checkoutSchema>) => {
+  const onSubmit = async (data: CheckoutFormData) => {
     setIsSubmitting(true);
     try {
       // Simulate API call
@@ -161,11 +143,7 @@ export default function CheckoutPage() {
             {/* Checkout Form */}
             <div className="lg:col-span-2">
               {activeStep === 'shipping' && (
-                <ShippingForm 
-                  control={control}
-                  errors={(errors.shipping || {}) as FieldErrors<ShippingFormData>}
-                  onNext={() => setActiveStep('payment')}
-                />
+                <ShippingForm onNext={() => setActiveStep('payment')} />
               )}
               
               {activeStep === 'payment' && (

@@ -1,35 +1,15 @@
-// types.ts
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  _count?: {
-    products: number;
-  };
-}
+import { shippingFormSchema, type ShippingFormData, type ProductType, type CategoryType } from "@repo/types";
 
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  category: ProductCategory;
-  categories?: Category[];
-  image: string;
-  images?: string[];
-  rating: number;
-  reviews: number;
-  features: string[];
-  specifications: ProductSpecification[];
-  inStock: boolean;
-  badge?: 'New' | 'Best Seller' | 'Smart' | 'Energy Efficient' | 'Top Rated';
-}
-
-export interface ProductSpecification {
-  key: string;
-  value: string;
-}
+export type Product = ProductType & {
+  category?: ProductCategory; // UI field for category filtering; DB stores in many-to-many
+  specifications?: ProductSpecification[]; // UI field; DB has relationship via ProductSpecification
+  slug?: string;
+  sizes?: string[];
+  colors?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+export type Category = CategoryType;
 
 export type ProductCategory = 
   | 'all'
@@ -43,6 +23,13 @@ export type ProductCategory =
   | 'automation'
   | 'lighting';
 
+export type ProductSpecification = {
+  id?: string;
+  key: string;
+  value: string;
+  productId?: string;
+};
+
 export interface CartItem {
   id: string;
   productId: string;
@@ -50,6 +37,8 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 export interface Service {
@@ -93,33 +82,9 @@ export interface ContactFormData {
 export interface LoginFormData {
   email: string;
   password: string;
-  rememberMe: boolean;
+  rememberMe?: boolean;
 }
 
-export interface ShippingFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-}
+export { shippingFormSchema };
+export type ShippingFormInputs = ShippingFormData;
 
-export interface PaymentFormData {
-  cardNumber: string;
-  cardHolder: string;
-  expiryDate: string;
-  cvv: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
-
-export type Theme = 'light' | 'dark';

@@ -43,6 +43,8 @@ export const createProduct = async (req: Request, res: Response) => {
 			originalPrice: body.originalPrice,
 			image: body.image,
 			images: body.images,
+			sizes: body.sizes ?? [],
+			colors: body.colors ?? [],
 			rating: body.rating,
 			reviews: body.reviews,
 			features: body.features,
@@ -212,6 +214,8 @@ export const updateProduct = async (req: Request, res: Response) => {
 		where: { id },
 		data: {
 			...body,
+			...(body.sizes ? { sizes: body.sizes } : {}),
+			...(body.colors ? { colors: body.colors } : {}),
 			...(slugUpdate ? { slug: slugUpdate } : {}),
 		},
 		include: {

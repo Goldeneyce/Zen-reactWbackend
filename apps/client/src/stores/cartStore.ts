@@ -6,7 +6,7 @@ import { CartItem, Product } from '@/types';
 interface CartStore {
   items: CartItem[];
   hasHydrated: boolean;
-  addItem: (product: Product, quantity?: number) => void;
+  addItem: (product: Product, quantity?: number, options?: { size?: string; color?: string }) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -20,14 +20,23 @@ export const useCartStore = create<CartStore>()(
       items: [],
       hasHydrated: false,
       
-      addItem: (product, quantity = 1) => {
+      addItem: (product, quantity = 1, options) => {
         set((state) => {
-          const existingItem = state.items.find(item => item.productId === product.id);
+          const size = options?.size;
+          const color = options?.color;
+          const existingItem = state.items.find(
+            item =>
+              item.productId === product.id &&
+              item.selectedSize === size &&
+              item.selectedColor === color
+          );
           
           if (existingItem) {
             return {
               items: state.items.map(item =>
-                item.productId === product.id
+                item.productId === product.id &&
+                item.selectedSize === size &&
+                item.selectedColor === color
                   ? { ...item, quantity: item.quantity + quantity }
                   : item
               ),
@@ -38,12 +47,14 @@ export const useCartStore = create<CartStore>()(
             items: [
               ...state.items,
               {
-                id: `${product.id}-${Date.now()}`,
+                id: `${product.id}-${size ?? 'any'}-${color ?? 'any'}-${Date.now()}`,
                 productId: product.id,
                 productName: product.name,
                 price: product.price,
                 quantity,
                 image: product.image,
+                selectedSize: size,
+                selectedColor: color,
               },
             ],
           };

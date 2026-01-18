@@ -144,6 +144,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.70.0(react@19.2.1))
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       next:
         specifier: ^16.0.10
         version: 16.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -160,8 +163,8 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       zod:
-        specifier: ^3.22.0
-        version: 3.25.76
+        specifier: ^4.3.5
+        version: 4.3.5
       zustand:
         specifier: ^5.0.9
         version: 5.0.9(@types/react@19.2.7)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1))
@@ -239,6 +242,9 @@ importers:
       hono:
         specifier: ^4.11.3
         version: 4.11.3
+      stripe:
+        specifier: ^20.2.0
+        version: 20.2.0(@types/node@20.19.27)
     devDependencies:
       '@repo/types':
         specifier: workspace:*
@@ -362,6 +368,13 @@ importers:
         version: 4.21.0
 
   packages/types:
+    dependencies:
+      '@repo/product-db':
+        specifier: workspace:*
+        version: link:../product-db
+      zod:
+        specifier: ^4.3.5
+        version: 4.3.5
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -3566,6 +3579,15 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+  stripe@20.2.0:
+    resolution: {integrity: sha512-m8niTfdm3nPP/yQswRWMwQxqEUcTtB3RTJQ9oo6NINDzgi7aPOadsH/fPXIIfL1Sc5+lqQFKSk7WiO6CXmvaeA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   styled-jsx@5.1.6:
     resolution: {integrity: sha512-qSVyDTeMotdvQYoHWLNGwRFJHC+i+ZvdBRYosOFgC+Wg1vx4frN2/RG/NA7SYqqvKNLf39P2LSRA2pu6n0XYZA==}
     engines: {node: '>= 12.0.0'}
@@ -3838,6 +3860,9 @@ packages:
 
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  zod@4.3.5:
+    resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
 
   zustand@5.0.9:
     resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
@@ -7224,6 +7249,12 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
+  stripe@20.2.0(@types/node@20.19.27):
+    dependencies:
+      qs: 6.14.1
+    optionalDependencies:
+      '@types/node': 20.19.27
+
   styled-jsx@5.1.6(react@19.2.1):
     dependencies:
       client-only: 0.0.1
@@ -7500,6 +7531,8 @@ snapshots:
       grammex: 3.1.12
 
   zod@3.25.76: {}
+
+  zod@4.3.5: {}
 
   zustand@5.0.9(@types/react@19.2.7)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1)):
     optionalDependencies:

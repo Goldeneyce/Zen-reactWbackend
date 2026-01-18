@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, Control, FieldErrors } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -17,6 +16,8 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [activeStep, setActiveStep] = useState<number>(1); // 1: Cart, 2: Shipping, 3: Payment
   const router = useRouter();
+  const [shippingData, setShippingData] = useState<any>(null);
+
   const formatOrderId = () => {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -25,34 +26,6 @@ export default function CartPage() {
     const rand = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     return `ZEN-${yyyy}${mm}${dd}-${rand}`;
   };
-  type CheckoutFormValues = {
-    address: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone: string;
-      address: string;
-      city: string;
-      state: string;
-      zipCode: string;
-      country: string;
-    };
-    payment: {
-      cardNumber: string;
-      cardHolder: string;
-      expiryDate: string;
-      cvv: string;
-    };
-  };
-
-  const { control, formState: { errors }, getValues } = useForm<CheckoutFormValues>({
-    defaultValues: {
-      address: {
-        firstName: '', lastName: '', email: '', phone: '', address: '', city: '', state: '', zipCode: '', country: 'United States'
-      },
-      payment: { cardNumber: '', cardHolder: '', expiryDate: '', cvv: '' }
-    }
-  });
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -68,18 +41,22 @@ export default function CartPage() {
     }
   };
 
+  const handleShippingNext = () => {
+    // TODO: capture shipping data from ShippingForm if needed
+    setActiveStep(3);
+  };
+
   const handleCheckout = () => {
     setIsCheckingOut(true);
     // Simulate checkout process
     setTimeout(() => {
-      const values = getValues();
       const orderId = formatOrderId();
       const order = {
         id: orderId,
         method: 'card' as const,
         items: items.map(i => ({ id: i.id, name: i.productName, qty: i.quantity, price: i.price })),
         totals: { subtotal, shipping, tax, total },
-        address: values.address,
+        shippingData,
       };
       try { localStorage.setItem('last-order', JSON.stringify(order)); } catch {}
       toast.success('Checkout completed! Thank you for your order.');
@@ -92,14 +69,13 @@ export default function CartPage() {
   const handleCashOnDelivery = () => {
     setIsCheckingOut(true);
     setTimeout(() => {
-      const values = getValues();
       const orderId = formatOrderId();
       const order = {
         id: orderId,
         method: 'cod' as const,
         items: items.map(i => ({ id: i.id, name: i.productName, qty: i.quantity, price: i.price })),
         totals: { subtotal, shipping, tax, total },
-        address: values.address,
+        shippingData,
       };
       try { localStorage.setItem('last-order', JSON.stringify(order)); } catch {}
       toast.info('Order placed with Pay on Delivery. You will pay upon delivery.');
@@ -284,7 +260,7 @@ export default function CartPage() {
               {activeStep === 2 && (
                 <div className="bg-white dark:bg-white-dark rounded-lg shadow-custom dark:shadow-dark-custom p-6">
                   <h2 className="text-2xl font-bold text-primary mb-6">Address Details</h2>
-                  <ShippingForm control={control as Control<CheckoutFormValues>} errors={errors as FieldErrors<CheckoutFormValues>} onNext={() => setActiveStep(3)} />
+                  <ShippingForm onNext={handleShippingNext} />
                   <div className="mt-6 flex justify-start">
                     <button className="btn btn-outline" onClick={() => setActiveStep(1)}>Back to Cart</button>
                   </div>
@@ -296,12 +272,10 @@ export default function CartPage() {
                 <div className="bg-white dark:bg-white-dark rounded-lg shadow-custom dark:shadow-dark-custom p-6">
                   <h2 className="text-2xl font-bold text-primary mb-6">Payment</h2>
                   <PaymentForm
-                    control={control as Control<CheckoutFormValues>}
-                    errors={errors as FieldErrors<CheckoutFormValues>}
                     onBack={() => setActiveStep(2)}
                     onNext={handleCheckout}
-                      onPayOnDelivery={handleCashOnDelivery}
-                      codAvailable={subtotal < 50000}
+                    onPayOnDelivery={handleCashOnDelivery}
+                    codAvailable={subtotal < 50000}
                   />
                   {isCheckingOut && (
                     <p className="text-sm text-secondary mt-4">Processing...</p>
