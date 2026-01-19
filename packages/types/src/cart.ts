@@ -1,6 +1,17 @@
 import { z } from "zod";
 import type { Product } from "@repo/product-db";
 
+export interface CartItem {
+    id: string;
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+    image: string;
+    selectedSize?: string;
+    selectedColor?: string;
+}
+
 export type CartItemType = Product & {
     quantity: number;
     selectedSize?: string;

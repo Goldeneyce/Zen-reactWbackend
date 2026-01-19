@@ -4,7 +4,7 @@
 import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ShippingFormInputs, shippingFormSchema } from "@/types";
+import { shippingFormSchema, type ShippingFormData as ShippingFormInputs } from "@repo/types";
 
 const NIGERIA_STATES = [
   "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno",

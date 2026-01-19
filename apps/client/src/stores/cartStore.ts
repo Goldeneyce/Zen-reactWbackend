@@ -1,12 +1,12 @@
 // stores/cartStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem, Product } from '@/types';
+import type { CartItem, ProductType } from '@repo/types';
 
 interface CartStore {
   items: CartItem[];
   hasHydrated: boolean;
-  addItem: (product: Product, quantity?: number, options?: { size?: string; color?: string }) => void;
+  addItem: (product: ProductType, quantity?: number, options?: { size?: string; color?: string }) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -21,7 +21,7 @@ export const useCartStore = create<CartStore>()(
       hasHydrated: false,
       
       addItem: (product, quantity = 1, options) => {
-        set((state) => {
+        set((state: CartStore) => {
           const size = options?.size;
           const color = options?.color;
           const existingItem = state.items.find(
@@ -43,20 +43,19 @@ export const useCartStore = create<CartStore>()(
             };
           }
           
+          const newItem: CartItem = {
+            id: `${product.id}-${size ?? 'any'}-${color ?? 'any'}-${Date.now()}`,
+            productId: product.id,
+            productName: product.name,
+            price: product.price,
+            quantity,
+            image: product.image,
+            selectedSize: size,
+            selectedColor: color,
+          };
+          
           return {
-            items: [
-              ...state.items,
-              {
-                id: `${product.id}-${size ?? 'any'}-${color ?? 'any'}-${Date.now()}`,
-                productId: product.id,
-                productName: product.name,
-                price: product.price,
-                quantity,
-                image: product.image,
-                selectedSize: size,
-                selectedColor: color,
-              },
-            ],
+            items: [...state.items, newItem],
           };
         });
       },
