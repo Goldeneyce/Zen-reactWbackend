@@ -1,36 +1,36 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Product } from '@/types'
+import type { ProductType } from '@repo/types'
 
 interface WishlistStore {
-  items: Product[]
-  addItem: (product: Product) => void
+  items: ProductType[]
+  addItem: (ProductType: ProductType) => void
   removeItem: (productId: string) => void
   clearWishlist: () => void
   isInWishlist: (productId: string) => boolean
-  toggleItem: (product: Product) => void
+  toggleItem: (ProductType: ProductType) => void
   getItemCount: () => number
 }
 
 const useWishlistStore = create<WishlistStore>()(
     persist(
         (set, get) => ({
-            items: [] as Product[],
+            items: [] as ProductType[],
 
-            addItem: (product: Product): void => {
+            addItem: (ProductType: ProductType): void => {
                 set((state: WishlistStore) => {
-                    if (state.items.some((item: Product) => item.id === product.id)) {
+                    if (state.items.some((item: ProductType) => item.id === ProductType.id)) {
                         return state // Item already exists
                     }
                     return {
-                        items: [...state.items, product]
+                        items: [...state.items, ProductType]
                     }
                 })
             },
 
             removeItem: (productId: string): void => {
                 set((state: WishlistStore) => ({
-                    items: state.items.filter((item: Product) => item.id !== productId)
+                    items: state.items.filter((item: ProductType) => item.id !== productId)
                 }))
             },
 
@@ -39,14 +39,14 @@ const useWishlistStore = create<WishlistStore>()(
             },
 
             isInWishlist: (productId: string): boolean => {
-                return get().items.some((item: Product) => item.id === productId)
+                return get().items.some((item: ProductType) => item.id === productId)
             },
 
-            toggleItem: (product: Product): void => {
-                if (get().isInWishlist(product.id)) {
-                    get().removeItem(product.id)
+            toggleItem: (ProductType: ProductType): void => {
+                if (get().isInWishlist(ProductType.id)) {
+                    get().removeItem(ProductType.id)
                 } else {
-                    get().addItem(product)
+                    get().addItem(ProductType)
                 }
             },
 

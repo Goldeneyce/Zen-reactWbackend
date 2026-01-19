@@ -2,11 +2,11 @@
 'use client';
 
 import React from 'react';
-import { Product } from '@/types';
+import { ProductType } from '@repo/types';
 import { PlusIcon, MinusIcon, HeartIcon, HeartOutlineIcon } from './Icons';
 
 interface ProductInteractionProps {
-  product: Product;
+  product: ProductType;
   quantity: number;
   onQuantityChange: (quantity: number) => void;
   onAddToCart: () => void;

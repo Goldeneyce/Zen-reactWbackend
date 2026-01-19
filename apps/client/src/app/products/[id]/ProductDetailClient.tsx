@@ -8,7 +8,7 @@ import { useCartStore } from '@/stores/cartStore';
 import Searchbar from '@/components/Searchbar';
 import ProductInteraction from '@/components/ProductInteraction';
 import CTA from '@/components/CTA';
-import { Product } from '@/types';
+import type { ProductType } from '@repo/types';
 import {
   StarIcon,
   StarHalfIcon,
@@ -17,7 +17,7 @@ import {
   ShareIcon,
 } from '@/components/Icons';
 
-export default function ProductDetailClient({ product }: { product: Product }) {
+export default function ProductDetailClient({ product }: { product: ProductType }) {
   const [selectedImage, setSelectedImage] = useState(product.images?.[0] ?? product.image);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(product.sizes?.[0]);
@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </div>
               
               <div className="flex gap-2">
-                {product.images?.map((image, index) => (
+                {product.images?.map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(image)}
@@ -119,7 +119,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             <div className="space-y-6">
               <div>
                 <span className="text-secondary font-medium">
-                  {product.category ? (product.category.charAt(0).toUpperCase() + product.category.slice(1)) : 'Product'}
+                  Product
                 </span>
                 <h1 className="text-3xl md:text-4xl font-bold text-primary mt-1">
                   {product.name}
@@ -183,7 +183,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   <div className="mb-4">
                     <h4 className="font-semibold text-primary mb-2">Colors</h4>
                     <div className="flex flex-wrap gap-2">
-                      {product.colors.map((color) => (
+                      {product.colors.map((color: string) => (
                         <button
                           key={color}
                           onClick={() => setSelectedColor(color)}
@@ -204,7 +204,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   <div className="mb-4">
                     <h4 className="font-semibold text-primary mb-2">Sizes</h4>
                     <div className="flex flex-wrap gap-2">
-                      {product.sizes.map((size) => (
+                      {product.sizes.map((size: string) => (
                         <button
                           key={size}
                           onClick={() => setSelectedSize(size)}
@@ -225,7 +225,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   Key Features
                 </h3>
                 <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
+                  {product.features.map((feature: string, index: number) => (
                     <li key={index} className="flex items-start gap-2 text-gray-600 dark:text-gray-300">
                       <span className="text-secondary mt-1">•</span>
                       <span>{feature}</span>
@@ -244,7 +244,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
                 <div>
-                  <strong>Category:</strong> {product.category || 'N/A'}
+                  <strong>Category:</strong> N/A
                 </div>
                 <div>
                   <strong>Availability:</strong>{' '}

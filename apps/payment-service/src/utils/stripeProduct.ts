@@ -18,7 +18,7 @@ export const createStripeProduct = async (item:StripeProductType) => {
     }
 };
 
-export const createStripeProductPrice = async (productId: number) => {
+export const createStripeProductPrice = async (productId: string) => {
     try {
         const res = await stripe.prices.list({
             product: productId,

@@ -2,11 +2,11 @@
 'use client';
 
 import React from 'react';
-import { Product } from '@/types';
+import type { ProductType } from '@repo/types';
 import ProductCard from './ProductCard';
 
 interface ProductListProps {
-  products: Product[];
+  products: ProductType[];
 }
 
 export default function ProductList({ products }: ProductListProps) {

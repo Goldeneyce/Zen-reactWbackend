@@ -1,12 +1,12 @@
 // components/ProductCard.tsx
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
-import { Product } from '@/types';
+import type { ProductType, CategoryType } from '@repo/types';
 import {
   StarIcon,
   StarHalfIcon,
@@ -16,7 +16,11 @@ import {
 } from './Icons';
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductType & {
+    categories?: Array<{
+      category: CategoryType;
+    }>;
+  };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -100,7 +104,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-6">
         <Link href={`/products/${product.id}`}>
           <span className="text-secondary text-sm font-medium block mb-1">
-            {product.category ? (product.category.charAt(0).toUpperCase() + product.category.slice(1)) : 'N/A'}
+            {product.categories && product.categories.length > 0 && product.categories[0]?.category
+              ? product.categories[0].category.name.charAt(0).toUpperCase() + product.categories[0].category.name.slice(1)
+              : 'N/A'}
           </span>
           <h3 className="text-lg font-semibold text-primary mb-2 hover:text-secondary transition-colors">
             {product.name}
