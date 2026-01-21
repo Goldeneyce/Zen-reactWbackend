@@ -26,3 +26,8 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# TypeScript compiled outputs (should be in dist/)
+src/**/*.js
+src/**/*.d.ts
+src/**/*.d.ts.map
