@@ -2,7 +2,6 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { clerkMiddleware} from '@hono/clerk-auth'
 import { shouldBeUser } from './middleware/authMiddleware.js';
-import stripe from './utils/stripe.js';
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
@@ -15,7 +14,24 @@ app.get('/health', (c) => {
   });
 });
 
-// app.post('/create-stripe-product', async (c) => {
+//getting product price from product db and not cart page.
+// app.get("/pay", shouldBeUser, async (c) => {
+
+//   const {products} = await c.req.json()
+
+//   const totalPrice = await Promise.all(
+//     products.map(async (product:any)=>{
+//       const productsInDb:any = await fetch ("Localhost:8000/products{product.id}");
+//       return productsInDb.price * product.quantity;
+//     })
+//   );
+
+//     return c.json({
+//       message: "Payment service is Authenticated", userId:c.get("userId")
+//     })
+// });
+
+// app.post('/create-payment-page', async (c) => {
 
 //   const res = await stripe.products.create({
 //     id:"234",

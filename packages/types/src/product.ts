@@ -4,7 +4,7 @@ export type ProductType = Product;
 
 export type ProductsType = ProductType[];
 
-export type StripeProductType = {
+export type PaystackProductType = {
   id: string;
   name: string;
     price: number;
