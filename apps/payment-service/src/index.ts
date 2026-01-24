@@ -1,10 +1,12 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { clerkMiddleware} from '@hono/clerk-auth'
-import { shouldBeUser } from './middleware/authMiddleware.js';
+import sessionRoute from './routes/session.route.ts';
+import { cors } from 'hono/cors';
 
 const app = new Hono()
-app.use('*', clerkMiddleware())
+app.use('*', clerkMiddleware());
+app.use('*', cors({ origin: ["http://localhost:3002"] }));
 
 app.get('/health', (c) => {
   return c.json({
@@ -13,6 +15,8 @@ app.get('/health', (c) => {
     timestamp: Date.now(),
   });
 });
+
+app.route('/session', sessionRoute);
 
 //getting product price from product db and not cart page.
 // app.get("/pay", shouldBeUser, async (c) => {

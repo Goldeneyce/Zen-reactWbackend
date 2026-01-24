@@ -113,7 +113,7 @@ export default function ShippingForm({ onNext }: ShippingFormProps) {
           </label>
           <input
             {...register("city")}
-            placeholder="Lagos"
+            placeholder="Asaba"
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
           />
           {errors.city && (
