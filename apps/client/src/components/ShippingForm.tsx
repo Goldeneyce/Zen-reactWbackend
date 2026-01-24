@@ -15,7 +15,7 @@ const NIGERIA_STATES = [
 ];
 
 interface ShippingFormProps {
-  onNext: () => void;
+  onNext: (data: ShippingFormInputs) => void;
 }
 
 export default function ShippingForm({ onNext }: ShippingFormProps) {
@@ -37,8 +37,7 @@ export default function ShippingForm({ onNext }: ShippingFormProps) {
   });
 
   const onSubmit: SubmitHandler<ShippingFormInputs> = (data) => {
-    // TODO: persist data to store if needed
-    onNext();
+    onNext(data);
   };
 
   return (

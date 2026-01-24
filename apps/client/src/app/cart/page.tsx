@@ -10,13 +10,14 @@ import { useCartStore } from '@/stores/cartStore';
 import { MinusIcon, PlusIcon, TrashIcon } from '@/components/Icons';
 import ShippingForm from '@/components/ShippingForm';
 import PaymentForm from '@/components/PaymentForm';
+import type { ShippingFormData } from '@repo/types';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCartStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [activeStep, setActiveStep] = useState<number>(1); // 1: Cart, 2: Shipping, 3: Payment
   const router = useRouter();
-  const [shippingData, setShippingData] = useState<any>(null);
+  const [shippingData, setShippingData] = useState<ShippingFormData | null>(null);
 
   const formatOrderId = () => {
     const d = new Date();
@@ -41,8 +42,8 @@ export default function CartPage() {
     }
   };
 
-  const handleShippingNext = () => {
-    // TODO: capture shipping data from ShippingForm if needed
+  const handleShippingNext = (data: ShippingFormData) => {
+    setShippingData(data);
     setActiveStep(3);
   };
 
