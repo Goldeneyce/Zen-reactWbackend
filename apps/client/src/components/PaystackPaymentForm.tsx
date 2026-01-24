@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePaystackPayment } from "react-paystack";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 import { ShippingFormData } from "@repo/types";
@@ -54,40 +53,19 @@ export default function PaystackPaymentForm({
 }: PaystackPaymentFormProps) {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const { getToken } = useAuth();
 
+  // Ensure component only renders on client
   useEffect(() => {
-    getToken().then((token) => setToken(token));
-  }, [getToken]);
+    setMounted(true);
+  }, []);
 
-  // Configure Paystack payment hook
-  const config = {
-    reference: `ref_${Date.now()}`,
-    email: shippingData.email,
-    amount: amount * 100, // Convert to kobo
-    publicKey: PAYSTACK_PUBLIC_KEY,
-    onSuccess: (response: any) => {
-      // Handle successful payment
-      toast.success("Payment successful!");
-      console.log("Payment reference:", response);
-      setLoading(false);
-      
-      if (onSuccess) {
-        onSuccess(response.reference);
-      }
-    },
-    onClose: () => {
-      // Handle payment modal close
-      toast.info("Payment cancelled");
-      setLoading(false);
-      
-      if (onClose) {
-        onClose();
-      }
-    },
-  };
-
-  const initializePaystackPayment = usePaystackPayment(config);
+  useEffect(() => {
+    if (mounted) {
+      getToken().then((token) => setToken(token));
+    }
+  }, [getToken, mounted]);
 
   /**
    * Fetch checkout session from backend and open Paystack popup
@@ -103,8 +81,37 @@ export default function PaystackPaymentForm({
       const data = await fetchPaystackSession(shippingData, amount, token);
 
       if (data.success && data.access_code) {
-        // Open Paystack popup
-        initializePaystackPayment(onSuccess as any);
+        // Dynamically import and use Paystack
+        const { usePaystackPayment } = await import("react-paystack");
+        
+        const config = {
+          reference: data.session_id || `ref_${Date.now()}`,
+          email: shippingData.email,
+          amount: amount * 100, // Convert to kobo
+          publicKey: PAYSTACK_PUBLIC_KEY,
+        };
+
+        const initializePaystackPayment = usePaystackPayment(config);
+        
+        initializePaystackPayment({
+          onSuccess: (response: any) => {
+            toast.success("Payment successful!");
+            console.log("Payment reference:", response);
+            setLoading(false);
+            
+            if (onSuccess) {
+              onSuccess(response.reference);
+            }
+          },
+          onClose: () => {
+            toast.info("Payment cancelled");
+            setLoading(false);
+            
+            if (onClose) {
+              onClose();
+            }
+          },
+        });
       } else {
         throw new Error("Invalid response from server");
       }
@@ -115,7 +122,8 @@ export default function PaystackPaymentForm({
     }
   };
 
-  if (!token) {
+  // Don't render until mounted on client
+  if (!mounted || !token) {
     return <div className="w-full text-center py-3">Loading...</div>;
   }
 
