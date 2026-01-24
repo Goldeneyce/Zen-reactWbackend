@@ -17,7 +17,7 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [activeStep, setActiveStep] = useState<number>(1); // 1: Cart, 2: Shipping, 3: Payment
   const router = useRouter();
-  const [shippingData, setShippingData] = useState<ShippingFormData | null>(null);
+  const [shippingData, setShippingData] = useState<ShippingFormData | undefined>(undefined);
 
   const formatOrderId = () => {
     const d = new Date();
@@ -279,6 +279,7 @@ export default function CartPage() {
                     codAvailable={subtotal < 50000}
                     shippingData={shippingData}
                     amount={total}
+                    cartItems={items}
                   />
                   {isCheckingOut && (
                     <p className="text-sm text-secondary mt-4">Processing...</p>

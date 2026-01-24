@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
 import { initializePaystackTransaction, verifyPaystackTransaction } from "../utils/paystack.js";
+import { calculateOrderTotal } from "../utils/productService.js";
 
 const sessionRoute = new Hono();
 
@@ -10,17 +11,37 @@ const sessionRoute = new Hono();
  * Initialize a Paystack checkout session
  */
 sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, async (c) => {
+
+    const userId = c.get("userId");
+
     try {
         const auth = getAuth(c);
         const body = await c.req.json();
         
-        const { email, amount, metadata } = body;
+        const { email, metadata, cart } = body;
         const customerName = metadata?.fullName || email; // Use fullName from metadata or fallback to email
 
         // Validate required fields
-        if (!email || !amount) {
-            return c.json({ error: "Email and amount are required" }, 400);
+        if (!email || !cart || !Array.isArray(cart) || cart.length === 0) {
+            return c.json({ error: "Email and cart items are required" }, 400);
         }
+
+        // ⚠️ SECURITY: Calculate amount from backend, NOT from frontend
+        // Use productService utility to fetch real prices and calculate total
+        console.log("Calculating amount from product service...");
+        
+        // Transform cart format from { id, quantity } to { productId, quantity }
+        const cartItems = cart.map((item: any) => ({
+            productId: item.id,
+            quantity: item.quantity
+        }));
+        
+        // Calculate total using productService utility
+        const calculatedAmount = await calculateOrderTotal(cartItems);
+        console.log(`Total calculated amount: ₦${calculatedAmount}`);
+        
+        // Use the calculated amount instead of the one from frontend
+        const amount = calculatedAmount;
 
         // Generate unique reference for this transaction
         const reference = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -28,15 +49,30 @@ sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, a
         // Construct callback URL with session_id
         const callback_url = `http://localhost:3002/return?session_id=${reference}`;
 
-        // Initialize Paystack transaction
+        // Initialize Paystack transaction with cart data in metadata
+        const enrichedMetadata = {
+            ...metadata,
+            userId,
+            cart: cart || [],
+            orderDate: new Date().toISOString(),
+        };
+
         const response = await initializePaystackTransaction(
             email,
             amount,
             customerName,
             callback_url,
             reference,
-            metadata
+            enrichedMetadata
         );
+
+        console.log("Paystack response:", JSON.stringify(response, null, 2));
+
+        // Check if response is valid
+        if (!response || !response.status || !response.data) {
+            console.error("Invalid Paystack response structure:", response);
+            return c.json({ error: "Invalid response from payment gateway", details: response }, 500);
+        }
 
         // Return the access code and reference
         return c.json({

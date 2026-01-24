@@ -15,6 +15,13 @@ interface PaymentFormProps {
   codAvailable: boolean;
   shippingData?: ShippingFormData;
   amount?: number;
+  cartItems?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+  }>;
 }
 
 export default function PaymentForm({ 
@@ -25,7 +32,8 @@ export default function PaymentForm({
   onPayOnDelivery, 
   codAvailable,
   shippingData,
-  amount = 0
+  amount = 0,
+  cartItems
 }: PaymentFormProps) {
   
   const handlePaymentSuccess = (reference: string) => {
@@ -54,6 +62,7 @@ export default function PaymentForm({
             <PaystackPaymentForm
               shippingData={shippingData}
               amount={amount}
+              cartItems={cartItems}
               onSuccess={handlePaymentSuccess}
               onClose={handlePaymentClose}
             />

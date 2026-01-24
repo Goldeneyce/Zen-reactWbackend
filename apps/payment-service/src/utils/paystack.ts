@@ -1,6 +1,6 @@
-import Paystack = require("paystack");
+import { default as Paystack } from "paystack";
 
-// Initialize Paystack client
+// Initialize Paystack client with secret key
 const paystack = Paystack(process.env.PAYSTACK_SECRET_KEY as string);
 
 /**
@@ -24,14 +24,26 @@ export const initializePaystackTransaction = async (
     try {
         const transactionRef = reference || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
+        console.log("Initializing Paystack transaction with:", {
+            email,
+            amount: Math.round(amount * 100),
+            reference: transactionRef,
+            callback_url,
+            metadata: { ...metadata, customer_name: name }
+        });
+
         const res = await paystack.transaction.initialize({
             email,
-            amount: amount * 100, // Convert to kobo (Paystack uses kobo for NGN)
+            amount: Math.round(amount * 100), // Convert to kobo and ensure integer
             reference: transactionRef,
-            name, // Customer's full name
             callback_url,
-            metadata,
+            metadata: {
+                ...metadata,
+                customer_name: name, // Add name to metadata instead
+            },
         });
+        
+        console.log("Paystack initialization result:", res);
         return res;
     } catch (error) {
         console.error("Error initializing Paystack transaction:", error);

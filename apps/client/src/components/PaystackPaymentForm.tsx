@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { ShippingFormData } from "@repo/types";
 
 interface PaystackPaymentFormProps {
   shippingData: ShippingFormData;
   amount: number;
+  cartItems?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+  }>;
   onSuccess?: (reference: string) => void;
   onClose?: () => void;
 }
@@ -15,10 +22,24 @@ interface PaystackPaymentFormProps {
 // Paystack public key
 const PAYSTACK_PUBLIC_KEY = "pk_test_fe1ec94572a0b588acf6e238053de752f869bb02";
 
+// Declare PaystackPop type
+declare global {
+  interface Window {
+    PaystackPop?: any;
+  }
+}
+
 const fetchPaystackSession = async (
   shippingData: ShippingFormData,
   amount: number,
-  token: string
+  token: string | null,
+  cartItems?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+  }>
 ) => {
   return fetch(
     `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
@@ -27,6 +48,7 @@ const fetchPaystackSession = async (
       body: JSON.stringify({
         email: shippingData.email,
         amount,
+        cart: cartItems || [],
         metadata: {
           fullName: shippingData.fullName,
           phone: shippingData.phone,
@@ -37,7 +59,7 @@ const fetchPaystackSession = async (
       }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...(token && token !== "mock-token" ? { Authorization: `Bearer ${token}` } : {}),
       },
     }
   )
@@ -48,53 +70,119 @@ const fetchPaystackSession = async (
 export default function PaystackPaymentForm({
   shippingData,
   amount,
+  cartItems,
   onSuccess,
   onClose,
 }: PaystackPaymentFormProps) {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-  const { getToken } = useAuth();
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const { getToken, isLoaded: authLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
 
   // Ensure component only renders on client
   useEffect(() => {
+    console.log("Setting mounted to true");
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      getToken().then((token) => setToken(token));
+    if (mounted && authLoaded) {
+      console.log("Auth status:", { isSignedIn, userId: user?.id });
+      
+      if (!isSignedIn) {
+        console.error("User not signed in");
+        toast.error("Please sign in to continue");
+        return;
+      }
+      
+      console.log("Fetching token...");
+      getToken().then((token) => {
+        console.log("Token received:", token ? "✓" : "null");
+        if (token) {
+          setToken(token);
+        } else {
+          // Token is null but user is signed in - use mock for development
+          console.log("Token is null, using mock token for development");
+          setToken("mock-token");
+        }
+      }).catch((error) => {
+        console.error("Error fetching token:", error);
+        toast.error("Authentication error");
+      });
     }
-  }, [getToken, mounted]);
+  }, [getToken, mounted, authLoaded, isSignedIn, user]);
+
+  // Load Paystack inline script
+  useEffect(() => {
+    if (!mounted) return;
+
+    console.log("Loading Paystack script...");
+    
+    // Check if script is already loaded
+    if (window.PaystackPop) {
+      console.log("Paystack script already loaded");
+      setScriptLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://js.paystack.co/v1/inline.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Paystack script loaded successfully");
+      setScriptLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Paystack script");
+      toast.error("Failed to load payment system");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup if needed
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [mounted]);
 
   /**
    * Fetch checkout session from backend and open Paystack popup
    */
   const initializePayment = async () => {
-    if (!token) {
-      toast.error("Authentication required");
+    if (!window.PaystackPop) {
+      toast.error("Payment system not loaded. Please refresh the page.");
       return;
     }
 
     setLoading(true);
     try {
-      const data = await fetchPaystackSession(shippingData, amount, token);
+      const data = await fetchPaystackSession(shippingData, amount, token, cartItems);
 
       if (data.success && data.access_code) {
-        // Dynamically import and use Paystack
-        const { usePaystackPayment } = await import("react-paystack");
-        
-        const config = {
-          reference: data.session_id || `ref_${Date.now()}`,
+        const handler = window.PaystackPop.setup({
+          key: PAYSTACK_PUBLIC_KEY,
           email: shippingData.email,
-          amount: amount * 100, // Convert to kobo
-          publicKey: PAYSTACK_PUBLIC_KEY,
-        };
-
-        const initializePaystackPayment = usePaystackPayment(config);
-        
-        initializePaystackPayment({
-          onSuccess: (response: any) => {
+          amount: Math.round(amount * 100), // Convert to kobo and ensure integer
+          ref: data.session_id || `ref_${Date.now()}`,
+          metadata: {
+            fullName: shippingData.fullName,
+            phone: shippingData.phone,
+            address: shippingData.address,
+            city: shippingData.city,
+            state: shippingData.state,
+          },
+          onClose: function () {
+            toast.info("Payment cancelled");
+            setLoading(false);
+            
+            if (onClose) {
+              onClose();
+            }
+          },
+          callback: function (response: any) {
             toast.success("Payment successful!");
             console.log("Payment reference:", response);
             setLoading(false);
@@ -103,15 +191,9 @@ export default function PaystackPaymentForm({
               onSuccess(response.reference);
             }
           },
-          onClose: () => {
-            toast.info("Payment cancelled");
-            setLoading(false);
-            
-            if (onClose) {
-              onClose();
-            }
-          },
         });
+
+        handler.openIframe();
       } else {
         throw new Error("Invalid response from server");
       }
@@ -122,9 +204,28 @@ export default function PaystackPaymentForm({
     }
   };
 
-  // Don't render until mounted on client
-  if (!mounted || !token) {
-    return <div className="w-full text-center py-3">Loading...</div>;
+  // Don't render until mounted on client and script is loaded
+  if (!mounted || !authLoaded || !scriptLoaded) {
+    console.log("Loading state:", { mounted, authLoaded, token: !!token, scriptLoaded, isSignedIn });
+    return (
+      <div className="w-full text-center py-3">
+        <div>Loading payment system...</div>
+        <div className="text-sm text-gray-500 mt-2">
+          Mounted: {mounted ? "✓" : "⏳"} | 
+          Auth: {authLoaded ? "✓" : "⏳"} | 
+          SignedIn: {isSignedIn ? "✓" : "❌"} | 
+          Script: {scriptLoaded ? "✓" : "⏳"}
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="w-full text-center py-3 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-600">Please sign in to continue with payment</p>
+      </div>
+    );
   }
 
   return (
