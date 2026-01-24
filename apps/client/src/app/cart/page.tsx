@@ -41,8 +41,9 @@ export default function CartPage() {
     }
   };
 
-  const handleShippingNext = () => {
-    // TODO: capture shipping data from ShippingForm if needed
+  const handleShippingNext = (data: any) => {
+    // Capture shipping data from ShippingForm
+    setShippingData(data);
     setActiveStep(3);
   };
 
@@ -276,6 +277,8 @@ export default function CartPage() {
                     onNext={handleCheckout}
                     onPayOnDelivery={handleCashOnDelivery}
                     codAvailable={subtotal < 50000}
+                    shippingData={shippingData}
+                    amount={total}
                   />
                   {isCheckingOut && (
                     <p className="text-sm text-secondary mt-4">Processing...</p>

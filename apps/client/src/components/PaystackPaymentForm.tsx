@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { usePaystackPayment } from "react-paystack";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
+import { ShippingFormData } from "@repo/types";
 
 interface PaystackPaymentFormProps {
-  email: string;
+  shippingData: ShippingFormData;
   amount: number;
-  metadata?: Record<string, any>;
   onSuccess?: (reference: string) => void;
   onClose?: () => void;
 }
@@ -17,9 +17,8 @@ interface PaystackPaymentFormProps {
 const PAYSTACK_PUBLIC_KEY = "pk_test_fe1ec94572a0b588acf6e238053de752f869bb02";
 
 const fetchPaystackSession = async (
-  email: string,
+  shippingData: ShippingFormData,
   amount: number,
-  metadata: Record<string, any> | undefined,
   token: string
 ) => {
   return fetch(
@@ -27,9 +26,15 @@ const fetchPaystackSession = async (
     {
       method: "POST",
       body: JSON.stringify({
-        email,
+        email: shippingData.email,
         amount,
-        metadata,
+        metadata: {
+          fullName: shippingData.fullName,
+          phone: shippingData.phone,
+          address: shippingData.address,
+          city: shippingData.city,
+          state: shippingData.state,
+        },
       }),
       headers: {
         "Content-Type": "application/json",
@@ -42,9 +47,8 @@ const fetchPaystackSession = async (
 };
 
 export default function PaystackPaymentForm({
-  email,
+  shippingData,
   amount,
-  metadata,
   onSuccess,
   onClose,
 }: PaystackPaymentFormProps) {
@@ -59,7 +63,7 @@ export default function PaystackPaymentForm({
   // Configure Paystack payment hook
   const config = {
     reference: `ref_${Date.now()}`,
-    email,
+    email: shippingData.email,
     amount: amount * 100, // Convert to kobo
     publicKey: PAYSTACK_PUBLIC_KEY,
     onSuccess: (response: any) => {
@@ -96,7 +100,7 @@ export default function PaystackPaymentForm({
 
     setLoading(true);
     try {
-      const data = await fetchPaystackSession(email, amount, metadata, token);
+      const data = await fetchPaystackSession(shippingData, amount, token);
 
       if (data.success && data.access_code) {
         // Open Paystack popup

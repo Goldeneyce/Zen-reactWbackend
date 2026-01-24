@@ -15,6 +15,7 @@ sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, a
         const body = await c.req.json();
         
         const { email, amount, metadata } = body;
+        const customerName = metadata?.fullName || email; // Use fullName from metadata or fallback to email
 
         // Validate required fields
         if (!email || !amount) {
@@ -31,6 +32,7 @@ sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, a
         const response = await initializePaystackTransaction(
             email,
             amount,
+            customerName,
             callback_url,
             reference,
             metadata

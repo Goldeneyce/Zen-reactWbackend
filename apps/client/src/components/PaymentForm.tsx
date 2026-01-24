@@ -4,6 +4,7 @@
 import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import PaystackPaymentForm from './PaystackPaymentForm';
+import { ShippingFormData } from '@repo/types';
 
 interface PaymentFormProps {
   control?: Control<any>;
@@ -12,9 +13,8 @@ interface PaymentFormProps {
   onNext: () => void;
   onPayOnDelivery: () => void;
   codAvailable: boolean;
-  email?: string;
+  shippingData?: ShippingFormData;
   amount?: number;
-  metadata?: Record<string, any>;
 }
 
 export default function PaymentForm({ 
@@ -24,9 +24,8 @@ export default function PaymentForm({
   onNext, 
   onPayOnDelivery, 
   codAvailable,
-  email = "customer@example.com",
-  amount = 0,
-  metadata 
+  shippingData,
+  amount = 0
 }: PaymentFormProps) {
   
   const handlePaymentSuccess = (reference: string) => {
@@ -51,13 +50,17 @@ export default function PaymentForm({
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Amount to pay: ₦{amount?.toLocaleString() || '0'}
           </p>
-          <PaystackPaymentForm
-            email={email}
-            amount={amount}
-            metadata={metadata}
-            onSuccess={handlePaymentSuccess}
-            onClose={handlePaymentClose}
-          />
+          {shippingData && (
+            <PaystackPaymentForm
+              shippingData={shippingData}
+              amount={amount}
+              onSuccess={handlePaymentSuccess}
+              onClose={handlePaymentClose}
+            />
+          )}
+          {!shippingData && (
+            <p className="text-sm text-red-500">Please complete shipping information first.</p>
+          )}
         </div>
       </div>
       
