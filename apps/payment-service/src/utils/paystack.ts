@@ -7,6 +7,7 @@ const paystack = Paystack(process.env.PAYSTACK_SECRET_KEY as string);
  * Initialize a Paystack transaction for a product purchase
  * @param email - Customer's email address
  * @param amount - Amount in Naira (will be converted to kobo)
+ * @param callback_url - URL to redirect to after payment (optional)
  * @param reference - Unique transaction reference (optional, will be auto-generated if not provided)
  * @param metadata - Additional data to attach to the transaction (productId, etc.)
  * @returns Transaction initialization response with authorization URL
@@ -14,6 +15,7 @@ const paystack = Paystack(process.env.PAYSTACK_SECRET_KEY as string);
 export const initializePaystackTransaction = async (
     email: string,
     amount: number,
+    callback_url?: string,
     reference?: string,
     metadata?: Record<string, any>
 ) => {
@@ -24,8 +26,8 @@ export const initializePaystackTransaction = async (
             email,
             amount: amount * 100, // Convert to kobo (Paystack uses kobo for NGN)
             reference: transactionRef,
-            name: email, // Using email as name, can be customized
-            ...metadata,
+            callback_url,
+            metadata,
         });
         return res;
     } catch (error) {

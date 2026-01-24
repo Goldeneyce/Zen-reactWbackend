@@ -16,7 +16,7 @@ app.get('/health', (c) => {
   });
 });
 
-app.route('/session', sessionRoute);
+app.route('/sessions', sessionRoute);
 
 //getting product price from product db and not cart page.
 // app.get("/pay", shouldBeUser, async (c) => {
