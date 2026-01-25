@@ -3,18 +3,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { ShippingFormData } from "@repo/types";
+import { ShippingFormData, CartItem } from "@repo/types";
 
 interface PaystackPaymentFormProps {
   shippingData: ShippingFormData;
   amount: number;
-  cartItems?: Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image?: string;
-  }>;
+  cartItems?: CartItem[];
   onSuccess?: (reference: string) => void;
   onClose?: () => void;
 }
@@ -33,13 +27,7 @@ const fetchPaystackSession = async (
   shippingData: ShippingFormData,
   amount: number,
   token: string | null,
-  cartItems?: Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image?: string;
-  }>
+  cartItems?: CartItem[]
 ) => {
   return fetch(
     `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
@@ -48,7 +36,11 @@ const fetchPaystackSession = async (
       body: JSON.stringify({
         email: shippingData.email,
         amount,
-        cart: cartItems || [],
+        cart: cartItems?.map(item => ({
+          id: item.productId,
+          quantity: item.quantity,
+          price: item.price  // Include price as fallback for placeholder products
+        })) || [],
         metadata: {
           fullName: shippingData.fullName,
           phone: shippingData.phone,
@@ -63,8 +55,21 @@ const fetchPaystackSession = async (
       },
     }
   )
-    .then((response) => response.json())
-    .then((json) => json);
+    .then((response) => {
+      console.log("Fetch response status:", response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("Parsed JSON response:", json);
+      return json;
+    })
+    .catch((error) => {
+      console.error("Fetch error:", error);
+      throw error;
+    });
 };
 
 export default function PaystackPaymentForm({
@@ -160,41 +165,52 @@ export default function PaystackPaymentForm({
     setLoading(true);
     try {
       const data = await fetchPaystackSession(shippingData, amount, token, cartItems);
+      
+      console.log("Backend response:", data);
+      console.log("Access code:", data.access_code);
 
       if (data.success && data.access_code) {
-        const handler = window.PaystackPop.setup({
-          key: PAYSTACK_PUBLIC_KEY,
-          email: shippingData.email,
-          amount: Math.round(amount * 100), // Convert to kobo and ensure integer
-          ref: data.session_id || `ref_${Date.now()}`,
-          metadata: {
-            fullName: shippingData.fullName,
-            phone: shippingData.phone,
-            address: shippingData.address,
-            city: shippingData.city,
-            state: shippingData.state,
-          },
-          onClose: function () {
-            toast.info("Payment cancelled");
-            setLoading(false);
-            
-            if (onClose) {
-              onClose();
-            }
-          },
-          callback: function (response: any) {
-            toast.success("Payment successful!");
-            console.log("Payment reference:", response);
-            setLoading(false);
-            
-            if (onSuccess) {
-              onSuccess(response.reference);
-            }
-          },
-        });
+        // Use authorization_url to redirect instead of inline popup
+        // The inline popup seems to have compatibility issues
+        if (data.authorization_url) {
+          console.log("Redirecting to Paystack checkout:", data.authorization_url);
+          window.location.href = data.authorization_url;
+        } else {
+          // Fallback to inline popup if no authorization_url
+          const paystackConfig = {
+            key: PAYSTACK_PUBLIC_KEY,
+            access_code: data.access_code,
+            onClose: function () {
+              toast.info("Payment cancelled");
+              setLoading(false);
+              
+              if (onClose) {
+                onClose();
+              }
+            },
+            callback: function (response: any) {
+              toast.success("Payment successful!");
+              console.log("Payment reference:", response);
+              setLoading(false);
+              
+              if (onSuccess) {
+                onSuccess(response.reference);
+              }
+            },
+          };
 
-        handler.openIframe();
+          console.log("Paystack config:", paystackConfig);
+          const handler = window.PaystackPop.setup(paystackConfig);
+          
+          // Try newTransaction() method for access_code
+          if (handler.newTransaction) {
+            handler.newTransaction();
+          } else {
+            handler.openIframe();
+          }
+        }
       } else {
+        console.error("Invalid backend response:", data);
         throw new Error("Invalid response from server");
       }
     } catch (error) {

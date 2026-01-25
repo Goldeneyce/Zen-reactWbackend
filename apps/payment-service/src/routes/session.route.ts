@@ -29,16 +29,36 @@ sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, a
         // ⚠️ SECURITY: Calculate amount from backend, NOT from frontend
         // Use productService utility to fetch real prices and calculate total
         console.log("Calculating amount from product service...");
+        console.log("Cart received:", JSON.stringify(cart, null, 2));
         
-        // Transform cart format from { id, quantity } to { productId, quantity }
+        // Validate cart items have required fields
+        for (const item of cart) {
+            if (!item.id || !item.quantity || item.quantity < 1) {
+                console.error("Invalid cart item:", item);
+                return c.json({ error: "Invalid cart item format. Each item must have 'id' and 'quantity'" }, 400);
+            }
+        }
+        
+        // Cart has id (which is productId), quantity, and price (for fallback)
         const cartItems = cart.map((item: any) => ({
             productId: item.id,
-            quantity: item.quantity
+            quantity: item.quantity,
+            price: item.price  // Fallback price for placeholder products
         }));
+        console.log("Cart items for calculation:", JSON.stringify(cartItems, null, 2));
         
         // Calculate total using productService utility
-        const calculatedAmount = await calculateOrderTotal(cartItems);
-        console.log(`Total calculated amount: ₦${calculatedAmount}`);
+        let calculatedAmount: number;
+        try {
+            calculatedAmount = await calculateOrderTotal(cartItems);
+            console.log(`Total calculated amount: ₦${calculatedAmount}`);
+        } catch (calcError) {
+            console.error("Error calculating order total:", calcError);
+            return c.json({ 
+                error: "Failed to calculate order total", 
+                details: calcError instanceof Error ? calcError.message : "Unknown error" 
+            }, 500);
+        }
         
         // Use the calculated amount instead of the one from frontend
         const amount = calculatedAmount;

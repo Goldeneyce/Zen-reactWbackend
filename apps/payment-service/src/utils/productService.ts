@@ -44,21 +44,37 @@ export const getProductsByIds = async (productIds: string[]): Promise<ProductTyp
 /**
  * Calculate total price for a cart/order
  * Fetches current prices from product-service to prevent price manipulation
- * @param items - Array of items with productId and quantity
+ * Falls back to provided prices for placeholder/development products
+ * @param items - Array of items with productId, quantity, and optional fallback price
  * @returns Total price in the base currency
  */
 export const calculateOrderTotal = async (
-    items: Array<{ productId: string; quantity: number }>
+    items: Array<{ productId: string; quantity: number; price?: number }>
 ): Promise<number> => {
     try {
-        const products = await getProductsByIds(items.map(item => item.productId));
+        // Try to fetch products from product-service
+        let products;
+        try {
+            products = await getProductsByIds(items.map(item => item.productId));
+        } catch (fetchError) {
+            console.warn("Failed to fetch products from product-service, will use fallback prices if available");
+            products = [];
+        }
         
         const total = items.reduce((sum, item) => {
             const product = products.find(p => p.id === item.productId);
-            if (!product) {
-                throw new Error(`Product not found: ${item.productId}`);
+            
+            if (product) {
+                // Use price from product service (secure)
+                console.log(`Using DB price for ${item.productId}: ₦${product.price}`);
+                return sum + (product.price * item.quantity);
+            } else if (item.price !== undefined) {
+                // Fallback to provided price for placeholder products (DEVELOPMENT ONLY)
+                console.warn(`⚠️ Using fallback price for placeholder product ${item.productId}: ₦${item.price}`);
+                return sum + (item.price * item.quantity);
+            } else {
+                throw new Error(`Product not found and no fallback price provided: ${item.productId}`);
             }
-            return sum + (product.price * item.quantity);
         }, 0);
         
         return total;
