@@ -1,6 +1,7 @@
 services:
   kafka-broker-1:
-    image: bitnami/kafka:latest
+    image: apache/kafka:latest # Changed from bitnami/kafka:latest
+    platform: linux/amd64 # Added this line
     container_name: kafka-broker-1
     environment:
       KAFKA_ENABLE_KRAFT: "yes"
@@ -19,7 +20,8 @@ services:
     networks:
       - kafka-network
   kafka-broker-2:
-    image: bitnami/kafka:latest
+    image: apache/kafka:latest # Changed from bitnami/kafka:latest
+    platform: linux/amd64 # Added this line
     container_name: kafka-broker-2
     environment:
       KAFKA_ENABLE_KRAFT: "yes"
@@ -38,7 +40,8 @@ services:
     networks:
       - kafka-network
   kafka-broker-3:
-    image: bitnami/kafka:latest
+    image: apache/kafka:latest # Changed from bitnami/kafka:latest
+    platform: linux/amd64 # Added this line
     container_name: kafka-broker-3
     environment:
       KAFKA_ENABLE_KRAFT: "yes"
