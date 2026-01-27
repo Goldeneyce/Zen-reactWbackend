@@ -6,17 +6,16 @@ import { SearchIcon } from './Icons';
 
 interface SearchbarProps {
   className?: string;
+  onSearch?: (query: string) => void;
 }
 
-export default function Searchbar({ className = '' }: SearchbarProps) {
+export default function Searchbar({ className = '', onSearch }: SearchbarProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      // Implement search functionality
-      console.log('Searching for:', searchQuery);
-      // You would typically redirect to search results page or filter products
+    if (searchQuery.trim() && onSearch) {
+      onSearch(searchQuery.trim());
     }
   };
 

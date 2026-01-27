@@ -174,17 +174,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           >
             Buy Now
           </button>
-          {/* <button
-            onClick={toggleWishlist}
-            className="btn btn-icon"
-            aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          >
-            {isWishlisted ? (
-              <HeartIcon className="w-5 h-5 text-secondary" />
-            ) : (
-              <HeartOutlineIcon className="w-5 h-5" />
-            )}
-          </button> */}
         </div>
       </div>
     </div>
