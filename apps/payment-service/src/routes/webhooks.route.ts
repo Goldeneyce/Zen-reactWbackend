@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import crypto from "crypto";
+import { producer } from "../utils/kafka.ts";
 
 const webhookSecret = process.env.PAYSTACK_SECRET_KEY as string;
 const webhookRoute = new Hono();
@@ -59,7 +60,7 @@ webhookRoute.post("/paystack", async (c) => {
 
       // TODO: CREATE ORDER IN DATABASE
       // You can send this to a Kafka queue or directly create an order
-      /*
+      
       producer.send("payment.successful", {
         value: {
           userId: metadata.userId,
@@ -82,7 +83,6 @@ webhookRoute.post("/paystack", async (c) => {
           })),
         },
       });
-      */
 
       console.log("Order details:", {
         userId: metadata.userId,

@@ -243,5 +243,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 		where: { id },
 	});
 
+	producer.send("product.deleted", { value: JSON.stringify({ id }) });
+
 	res.status(200).json({ message: "Product deleted successfully" });
 };
