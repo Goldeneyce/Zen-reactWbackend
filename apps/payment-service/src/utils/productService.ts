@@ -1,4 +1,5 @@
 import { ProductType } from "@repo/types";
+import { productCache } from "./productCache.ts";
 
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || "http://localhost:8000";
 
@@ -9,6 +10,15 @@ const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || "http://localhost
  * @returns Product details including current price
  */
 export const getProductById = async (productId: string): Promise<ProductType> => {
+    // Try cache first
+    const cachedProduct = productCache.get(productId);
+    if (cachedProduct) {
+        console.log(`💨 Cache hit for product: ${productId}`);
+        return cachedProduct;
+    }
+
+    // Cache miss - fetch from product-service
+    console.log(`🌐 Cache miss for product: ${productId} - fetching from product-service`);
     try {
         const response = await fetch(`${PRODUCT_SERVICE_URL}/products/${productId}`);
         
@@ -17,6 +27,10 @@ export const getProductById = async (productId: string): Promise<ProductType> =>
         }
         
         const product = await response.json();
+        
+        // Update cache for future requests
+        productCache.set(product);
+        
         return product;
     } catch (error) {
         console.error(`Error fetching product ${productId} from product-service:`, error);
@@ -31,10 +45,20 @@ export const getProductById = async (productId: string): Promise<ProductType> =>
  */
 export const getProductsByIds = async (productIds: string[]): Promise<ProductType[]> => {
     try {
-        const products = await Promise.all(
-            productIds.map(id => getProductById(id))
+        // Check which products are in cache
+        const cachedProducts = productCache.getMany(productIds);
+        const cachedIds = new Set(cachedProducts.map(p => p.id));
+        const missingIds = productIds.filter(id => !cachedIds.has(id));
+
+        console.log(`📊 Cache stats: ${cachedProducts.length} hits, ${missingIds.length} misses`);
+
+        // Fetch missing products from product-service
+        const fetchedProducts = await Promise.all(
+            missingIds.map(id => getProductById(id))
         );
-        return products;
+
+        // Combine cached and fetched products
+        return [...cachedProducts, ...fetchedProducts];
     } catch (error) {
         console.error("Error fetching products from product-service:", error);
         throw error;
@@ -53,7 +77,7 @@ export const calculateOrderTotal = async (
 ): Promise<number> => {
     try {
         // Try to fetch products from product-service
-        let products;
+        let products: ProductType[];
         try {
             products = await getProductsByIds(items.map(item => item.productId));
         } catch (fetchError) {

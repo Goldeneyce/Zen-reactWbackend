@@ -5,6 +5,7 @@ import { shouldBeUser } from "./middleware/authMiddleware.js";
 import productRouter from "./routes/product.route.js";
 import productSpecificationRouter from "./routes/productSpecification.route.js";
 import categoryRouter from "./routes/category.route.js";
+import { consumer, producer } from "./utils/kafka.ts";
 
 const app = express();
 app.use(
@@ -43,6 +44,16 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 	});
 });
 
-app.listen(8000, () => {
-	console.log("Product service is running on port 8000");
-});
+const start = async () => {
+	try {
+		await Promise.all([consumer.connect(), producer.connect()]);
+		app.listen(8000, () => {
+			console.log("Product service listening on port 8000");
+		});
+	} catch (error) {
+		console.error("Error connecting to Kafka:", error);
+		process.exit(1);
+	}
+};
+
+start();

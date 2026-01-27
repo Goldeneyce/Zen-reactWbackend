@@ -4,6 +4,7 @@ import { clerkMiddleware} from '@hono/clerk-auth'
 import sessionRoute from './routes/session.route.js';
 import webhookRoute from './routes/webhooks.route.js';
 import { cors } from 'hono/cors';
+import { consumer, producer, } from './utils/kafka.ts';
 
 const app = new Hono()
 app.use('*', clerkMiddleware());
@@ -22,10 +23,14 @@ app.route('/webhooks', webhookRoute);
 
 const start = async () => {
   try {
-    serve({
-      fetch: app.fetch,
-      port: 8002
-    }, (info) => {
+    	await Promise.all([
+        consumer.connect(), 
+        producer.connect()]
+      );
+      serve({
+        fetch: app.fetch,
+        port: 8002
+      }, (info) => {
       console.log(`Payment service is running on ${info.address}:${info.port}`);
     });
   } catch (error) {

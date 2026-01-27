@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { prisma, Prisma } from "@repo/product-db";
+import { producer } from "../utils/kafka.ts";
+import { ProductType } from "@repo/types";
 
 const slugify = (value: string) =>
 	value
@@ -63,6 +65,9 @@ export const createProduct = async (req: Request, res: Response) => {
 			specifications: true,
 		},
 	});
+
+	const productEvent: ProductType = product;
+	producer.send("product.created", { value: JSON.stringify(productEvent) });
 	res.status(201).json(product);
 };
 
