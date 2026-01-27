@@ -4,19 +4,21 @@ const PRODUCT_SERVICE_URL = process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL || "http
 
 /**
  * Fetch all products from the product-service
- * @param options - Optional query parameters (search, category, limit)
+ * @param options - Optional query parameters (search, category, limit, sort)
  * @returns Array of products
  */
 export async function getProducts(options?: {
   search?: string;
   category?: string;
   limit?: number;
+  sort?: 'newest' | 'oldest' | 'price-asc' | 'price-desc';
 }): Promise<ProductType[]> {
   try {
     const params = new URLSearchParams();
     if (options?.search) params.append("search", options.search);
     if (options?.category) params.append("category", options.category);
     if (options?.limit) params.append("limit", options.limit.toString());
+    if (options?.sort) params.append("sort", options.sort);
 
     const url = `${PRODUCT_SERVICE_URL}/products${params.toString() ? `?${params}` : ""}`;
     const response = await fetch(url, {

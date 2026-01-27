@@ -14,7 +14,7 @@ interface PaystackPaymentFormProps {
 }
 
 // Paystack public key
-const PAYSTACK_PUBLIC_KEY = "pk_test_fe1ec94572a0b588acf6e238053de752f869bb02";
+const PAYSTACK_PUBLIC_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "";
 
 // Declare PaystackPop type
 declare global {

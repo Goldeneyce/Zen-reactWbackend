@@ -72,7 +72,7 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 export const getProducts = async (req: Request, res: Response) => {
-	const { search, limit, category } = req.query;
+	const { search, limit, category, sort } = req.query;
 
 	// Validate search parameter
 	let validatedSearch: string | undefined;
@@ -122,6 +122,45 @@ export const getProducts = async (req: Request, res: Response) => {
 		validatedLimit = DEFAULT_LIMIT;
 	}
 
+	// Validate and set sort parameter
+	type SortOption = 'newest' | 'oldest' | 'price-asc' | 'price-desc';
+	const validSortOptions: SortOption[] = ['newest', 'oldest', 'price-asc', 'price-desc'];
+	let validatedSort: SortOption = 'newest'; // Default sort
+
+	if (sort) {
+		if (typeof sort !== "string") {
+			res.status(400).json({ error: "Sort parameter must be a string" });
+			return;
+		}
+		if (validSortOptions.includes(sort as SortOption)) {
+			validatedSort = sort as SortOption;
+		} else {
+			res.status(400).json({ 
+				error: `Invalid sort option. Must be one of: ${validSortOptions.join(', ')}` 
+			});
+			return;
+		}
+	}
+
+	// Build orderBy based on sort option
+	let orderBy: any = {};
+	switch (validatedSort) {
+		case 'newest':
+			orderBy = { createdAt: 'desc' };
+			break;
+		case 'oldest':
+			orderBy = { createdAt: 'asc' };
+			break;
+		case 'price-asc':
+			orderBy = { price: 'asc' };
+			break;
+		case 'price-desc':
+			orderBy = { price: 'desc' };
+			break;
+		default:
+			orderBy = { createdAt: 'desc' };
+	}
+
 	const products = await prisma.product.findMany({
 		where: {
 			...(validatedSearch ? { name: { contains: validatedSearch, mode: "insensitive" } } : {}),
@@ -137,6 +176,7 @@ export const getProducts = async (req: Request, res: Response) => {
 				  }
 				: {}),
 		},
+		orderBy,
 		take: validatedLimit,
 		include: {
 			categories: {

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Searchbar from '@/components/Searchbar';
 import ProductList from '@/components/ProductList';
 import Filter from '@/components/Filter';
+import SortDropdown from '@/components/SortDropdown';
 import CTA from '@/components/CTA';
 import type { ProductType } from '@repo/types';
 import { getProducts } from '@/lib/api';
@@ -12,6 +13,7 @@ import { getProducts } from '@/lib/api';
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedSort, setSelectedSort] = useState<string>('newest');
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +36,8 @@ export default function ProductsPage() {
         setError(null);
         const data = await getProducts({
           category: selectedCategory === 'all' ? undefined : selectedCategory,
-          search: searchQuery || undefined
+          search: searchQuery || undefined,
+          sort: selectedSort as 'newest' | 'oldest' | 'price-asc' | 'price-desc'
         });
         setProducts(data);
       } catch (err) {
@@ -46,7 +49,7 @@ export default function ProductsPage() {
     }
 
     fetchProducts();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, selectedSort]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -74,6 +77,11 @@ export default function ProductsPage() {
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
+          <SortDropdown
+            selectedSort={selectedSort}
+            onSelectSort={setSelectedSort}
+          />
+          
           
           {loading && (
             <div className="text-center py-12">
