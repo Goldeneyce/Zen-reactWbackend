@@ -10,7 +10,14 @@ import { consumer, producer } from "./utils/kafka.ts";
 const app = express();
 app.use(
 	cors({
-		origin: ["http://localhost:3002", "http://localhost:3003", "http://localhost:3004"],
+		origin: [
+			"http://localhost:3002", 
+			"http://localhost:3003", 
+			"http://localhost:3004",
+			"http://192.168.0.152:3002",
+			"http://192.168.0.152:3003",
+			"http://192.168.0.152:3004"
+		],
 		credentials: true,
 	})
 );
@@ -47,7 +54,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 const start = async () => {
 	try {
 		await Promise.all([consumer.connect(), producer.connect()]);
-		app.listen(8000, () => {
+		app.listen(8000, "0.0.0.0", () => {
 			console.log("Product service listening on port 8000");
 		});
 	} catch (error) {
