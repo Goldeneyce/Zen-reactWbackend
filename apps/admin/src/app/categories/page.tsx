@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2Icon, Loader2Icon } from "@/components/icons";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -81,7 +81,7 @@ export default function CategoriesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2Icon className="h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -126,10 +126,10 @@ export default function CategoriesPage() {
                           disabled={deleting === category.id}
                         >
                           {deleting === category.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2Icon className="h-4 w-4 animate-spin" />
                           ) : (
                             <>
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash2Icon className="h-4 w-4 mr-2" />
                               Delete
                             </>
                           )}

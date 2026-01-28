@@ -1,16 +1,16 @@
 import {
-  Home,
-  Inbox,
-  Calendar,
-  Search,
-  Settings,
-  User2,
-  ChevronUp,
-  Plus,
-  Shirt,
-  User,
-  ShoppingBasket,
-} from "lucide-react";
+  HomeIcon,
+  InboxIcon,
+  CalendarIcon,
+  SearchIcon,
+  SettingsIcon,
+  User2Icon,
+  ChevronUpIcon,
+  PlusIcon,
+  ShirtIcon,
+  UserIcon,
+  ShoppingBasketIcon,
+} from "@/components/icons";
 import {
   Sidebar,
   SidebarContent,
@@ -109,14 +109,14 @@ const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Products</SidebarGroupLabel>
           <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add Product</span>
+            <PlusIcon /> <span className="sr-only">Add Product</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/products">
-                    <Shirt />
+                    <ShirtIcon />
                     See All Products
                   </Link>
                 </SidebarMenuButton>
@@ -127,7 +127,7 @@ const AppSidebar = () => {
                     <SheetTrigger asChild>
                       <SidebarMenuButton asChild>
                         <Link href="#">
-                          <Plus />
+                          <PlusIcon />
                           Add Product
                         </Link>
                       </SidebarMenuButton>
@@ -139,7 +139,7 @@ const AppSidebar = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/categories">
-                    <Shirt />
+                    <ShirtIcon />
                     See All Categories
                   </Link>
                 </SidebarMenuButton>
@@ -150,7 +150,7 @@ const AppSidebar = () => {
                     <SheetTrigger asChild>
                       <SidebarMenuButton asChild>
                         <Link href="#">
-                          <Plus />
+                          <PlusIcon />
                           Add Category
                         </Link>
                       </SidebarMenuButton>
@@ -165,14 +165,14 @@ const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Users</SidebarGroupLabel>
           <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add User</span>
+            <PlusIcon /> <span className="sr-only">Add User</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/users">
-                    <User />
+                    <UserIcon />
                     See All Users
                   </Link>
                 </SidebarMenuButton>
@@ -183,7 +183,7 @@ const AppSidebar = () => {
                     <SheetTrigger asChild>
                       <SidebarMenuButton asChild>
                         <Link href="#">
-                          <Plus />
+                          <PlusIcon />
                           Add User
                         </Link>
                       </SidebarMenuButton>
@@ -198,14 +198,14 @@ const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Orders / Payments</SidebarGroupLabel>
           <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add Order</span>
+            <PlusIcon /> <span className="sr-only">Add Order</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/users">
-                    <ShoppingBasket />
+                    <ShoppingBasketIcon />
                     See All Transactions
                   </Link>
                 </SidebarMenuButton>
@@ -216,7 +216,7 @@ const AppSidebar = () => {
                     <SheetTrigger asChild>
                       <SidebarMenuButton asChild>
                         <Link href="#">
-                          <Plus />
+                          <PlusIcon />
                           Add Order
                         </Link>
                       </SidebarMenuButton>
@@ -235,7 +235,7 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> John Doe <ChevronUp className="ml-auto" />
+                  <User2Icon /> John Doe <ChevronUpIcon className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">

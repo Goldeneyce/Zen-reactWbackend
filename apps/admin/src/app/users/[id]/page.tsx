@@ -12,7 +12,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Progress } from "@/components/ui/progress";
-import { BadgeCheck, Candy, Citrus, Shield } from "lucide-react";
+import { BadgeCheckIcon, CandyIcon, CitrusIcon, ShieldIcon } from "@/components/icons";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
@@ -47,7 +47,7 @@ const SingleUserPage = () => {
             <div className="flex gap-4 mt-4">
               <HoverCard>
                 <HoverCardTrigger>
-                  <BadgeCheck
+                  <BadgeCheckIcon
                     size={36}
                     className="rounded-full bg-blue-500/30 border-1 border-blue-500/50 p-2"
                   />
@@ -61,7 +61,7 @@ const SingleUserPage = () => {
               </HoverCard>
               <HoverCard>
                 <HoverCardTrigger>
-                  <Shield
+                  <ShieldIcon
                     size={36}
                     className="rounded-full bg-green-800/30 border-1 border-green-800/50 p-2"
                   />
@@ -76,7 +76,7 @@ const SingleUserPage = () => {
               </HoverCard>
               <HoverCard>
                 <HoverCardTrigger>
-                  <Candy
+                  <CandyIcon
                     size={36}
                     className="rounded-full bg-yellow-500/30 border-1 border-yellow-500/50 p-2"
                   />
@@ -90,7 +90,7 @@ const SingleUserPage = () => {
               </HoverCard>
               <HoverCard>
                 <HoverCardTrigger>
-                  <Citrus
+                  <CitrusIcon
                     size={36}
                     className="rounded-full bg-orange-500/30 border-1 border-orange-500/50 p-2"
                   />

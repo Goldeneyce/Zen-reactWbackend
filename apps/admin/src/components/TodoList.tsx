@@ -6,7 +6,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon } from "@/components/icons";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 
