@@ -1,0 +1,311 @@
+[
+  {
+    "name": "UltraHD 4K LED Projector",
+    "slug": "ultrahd-4k-led-projector",
+    "description": "Experience cinema-quality entertainment in the comfort of your home with our UltraHD 4K LED Projector. This state-of-the-art projector delivers stunning 4K resolution with HDR10 support, ensuring vibrant colors and exceptional detail. Perfect for movie nights, gaming, and presentations, this projector features smart connectivity, built-in streaming apps, and a long-lasting LED light source that provides up to 30,000 hours of viewing.",
+    "price": 349.99,
+    "originalPrice": 499.99,
+    "image": "/products/laptop.avif",
+    "images": [
+      "/products/laptop.avif",
+      "/products/tab.avif",
+      "/products/tvRemote.avif",
+      "/products/fridge.avif"
+    ],
+    "sizes": ["Mini", "Standard", "Pro"],
+    "colors": ["Black", "Silver", "White"],
+    "rating": 4.5,
+    "reviews": 142,
+    "features": [
+      "Native 4K UHD Resolution (3840 x 2160)",
+      "HDR10 Support for Enhanced Color & Contrast",
+      "Smart TV with Built-in Android OS",
+      "3,500 Lumens Brightness",
+      "1,000,000:1 Dynamic Contrast Ratio",
+      "Wi-Fi & Bluetooth Connectivity",
+      "Multiple HDMI & USB Ports",
+      "Built-in 20W Stereo Speakers",
+      "LED Light Source with 30,000 Hour Lifespan",
+      "Keystone Correction & Auto Focus"
+    ],
+    "inStock": true,
+    "badge": "New",
+    "categories": [
+      { "id": 3 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Resolution", "value": "4K UHD (3840x2160)" },
+        { "key": "Brightness", "value": "3,500 Lumens" },
+        { "key": "Contrast Ratio", "value": "1,000,000:1" },
+        { "key": "Light Source", "value": "LED (30,000 hours)" },
+        { "key": "Connectivity", "value": "Wi-Fi, Bluetooth, 3x HDMI, 2x USB" },
+        { "key": "Sound", "value": "Built-in 20W Stereo Speakers" },
+        { "key": "Throw Ratio", "value": "1.2:1" },
+        { "key": "Dimensions", "value": "12.6 x 9.8 x 4.7 inches" },
+        { "key": "Weight", "value": "8.8 lbs" }
+      ]
+    }
+  },
+  {
+    "name": "5000W Solar Inverter System",
+    "slug": "5000w-solar-inverter-system",
+    "description": "Harness the power of the sun with our high-efficiency 5000W Solar Inverter System. This complete solution includes a pure sine wave inverter, MPPT charge controller, and comprehensive battery management. Perfect for off-grid living, backup power, and reducing electricity costs. Built with industrial-grade components for maximum reliability and longevity.",
+    "price": 1299.99,
+    "originalPrice": 1799.99,
+    "image": "/products/fridge.avif",
+    "images": [
+      "/products/fridge.avif",
+      "/products/laptop.avif"
+    ],
+    "sizes": ["3kW", "5kW", "8kW"],
+    "colors": ["Gray"],
+    "rating": 4.8,
+    "reviews": 89,
+    "features": [
+      "5000W Pure Sine Wave Output",
+      "MPPT Solar Charge Controller",
+      "Smart Battery Management System",
+      "LCD Display with Real-time Monitoring",
+      "Multiple Protection Features",
+      "Grid-tie & Off-grid Capable",
+      "WiFi Remote Monitoring",
+      "10-Year Warranty"
+    ],
+    "inStock": true,
+    "badge": "BestSeller",
+    "categories": [
+      { "id": 7 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Power Output", "value": "5000W Continuous" },
+        { "key": "Peak Power", "value": "10000W" },
+        { "key": "Input Voltage", "value": "24-48V DC" },
+        { "key": "Output Voltage", "value": "220-240V AC" },
+        { "key": "Efficiency", "value": "95%" },
+        { "key": "MPPT Range", "value": "60-450V" },
+        { "key": "Dimensions", "value": "24 x 18 x 8 inches" },
+        { "key": "Weight", "value": "45 lbs" }
+      ]
+    }
+  },
+  {
+    "name": "Smart Security Camera Pro",
+    "slug": "smart-security-camera-pro",
+    "description": "Keep your property secure with our AI-powered Smart Security Camera Pro. Features 4K resolution, night vision, motion detection with person/vehicle recognition, two-way audio, and weatherproof design. Cloud and local storage options available. Perfect for homes, offices, and commercial properties.",
+    "price": 199.99,
+    "originalPrice": 299.99,
+    "image": "/products/tvRemote.avif",
+    "images": [
+      "/products/tvRemote.avif",
+      "/products/tab.avif"
+    ],
+    "sizes": ["Single", "2-Pack", "4-Pack"],
+    "colors": ["White", "Black"],
+    "rating": 4.6,
+    "reviews": 234,
+    "features": [
+      "4K Ultra HD Resolution",
+      "AI-Powered Motion Detection",
+      "Color Night Vision",
+      "Two-Way Audio Communication",
+      "IP66 Weatherproof Rating",
+      "Cloud & Local Storage",
+      "Smart Alerts to Your Phone",
+      "Works with Alexa & Google Home"
+    ],
+    "inStock": true,
+    "badge": "TopRated",
+    "categories": [
+      { "id": 5 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Resolution", "value": "4K (3840x2160)" },
+        { "key": "Field of View", "value": "130 degree Wide Angle" },
+        { "key": "Night Vision", "value": "Up to 50ft" },
+        { "key": "Storage", "value": "Cloud or MicroSD up to 256GB" },
+        { "key": "Connectivity", "value": "WiFi 802.11ac, Ethernet" },
+        { "key": "Power", "value": "PoE or 12V DC" },
+        { "key": "Dimensions", "value": "4.5 x 3 x 3 inches" },
+        { "key": "Weight", "value": "1.2 lbs" }
+      ]
+    }
+  },
+  {
+    "name": "Smart Home Automation Hub",
+    "slug": "smart-home-automation-hub",
+    "description": "Control your entire smart home from one central hub. Compatible with over 200+ brands and thousands of devices. Voice control with Alexa and Google Assistant. Create custom automation routines, schedules, and scenes. Easy setup with intuitive mobile app. Transform your house into an intelligent, energy-efficient smart home.",
+    "price": 149.99,
+    "originalPrice": 219.99,
+    "image": "/products/tab.avif",
+    "images": [
+      "/products/tab.avif",
+      "/products/laptop.avif"
+    ],
+    "sizes": ["Standard"],
+    "colors": ["Black", "White"],
+    "rating": 4.7,
+    "reviews": 178,
+    "features": [
+      "Controls 200+ Smart Home Brands",
+      "Voice Control Compatible",
+      "Custom Automation Routines",
+      "Energy Monitoring Dashboard",
+      "Remote Access Anywhere",
+      "Local & Cloud Processing",
+      "Works Without Internet",
+      "Free Lifetime Updates"
+    ],
+    "inStock": true,
+    "badge": null,
+    "categories": [
+      { "id": 8 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Protocols", "value": "Zigbee, Z-Wave, WiFi, Bluetooth" },
+        { "key": "Range", "value": "Up to 300ft" },
+        { "key": "Max Devices", "value": "200+" },
+        { "key": "Processor", "value": "Quad-Core ARM" },
+        { "key": "Memory", "value": "2GB RAM, 8GB Storage" },
+        { "key": "Connectivity", "value": "WiFi, Ethernet" },
+        { "key": "Dimensions", "value": "5 x 5 x 1.5 inches" },
+        { "key": "Weight", "value": "0.8 lbs" }
+      ]
+    }
+  },
+  {
+    "name": "Energy-Efficient Smart Refrigerator",
+    "slug": "energy-efficient-smart-refrigerator",
+    "description": "Modern refrigeration meets smart technology. This Energy Star certified refrigerator features WiFi connectivity, touchscreen display, and smart temperature management. Multi-zone cooling, frost-free operation, and spacious interior design. Monitor and control from your smartphone. Save energy while keeping food fresher longer.",
+    "price": 899.99,
+    "originalPrice": 1299.99,
+    "image": "/products/fridge.avif",
+    "images": [
+      "/products/fridge.avif"
+    ],
+    "sizes": ["18 cu ft", "22 cu ft", "26 cu ft"],
+    "colors": ["Stainless Steel", "Black", "White"],
+    "rating": 4.4,
+    "reviews": 156,
+    "features": [
+      "Energy Star Certified",
+      "Smart Temperature Control",
+      "WiFi Connected with App",
+      "Multi-Zone Cooling System",
+      "Frost-Free Technology",
+      "LED Interior Lighting",
+      "Door Alarm & Notifications",
+      "Quiet Operation (38dB)"
+    ],
+    "inStock": true,
+    "badge": "EnergyEfficient",
+    "categories": [
+      { "id": 2 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Capacity", "value": "22 Cubic Feet" },
+        { "key": "Energy Rating", "value": "A+++" },
+        { "key": "Annual Energy", "value": "320 kWh/year" },
+        { "key": "Cooling Type", "value": "Multi-Zone Frost-Free" },
+        { "key": "Noise Level", "value": "38 dB" },
+        { "key": "Climate Class", "value": "SN-T" },
+        { "key": "Dimensions", "value": "70 x 33 x 28 inches" },
+        { "key": "Weight", "value": "220 lbs" }
+      ]
+    }
+  },
+  {
+    "name": "LED Smart Bulb 4-Pack",
+    "slug": "led-smart-bulb-4-pack",
+    "description": "Transform any room with color-changing LED smart bulbs. Choose from 16 million colors or warm to cool white. Control with voice commands or smartphone app. Set schedules, create scenes, and sync with music. Energy-efficient with 25,000-hour lifespan. No hub required - connects directly to WiFi.",
+    "price": 49.99,
+    "originalPrice": 79.99,
+    "image": "/products/laptop.avif",
+    "images": [
+      "/products/laptop.avif"
+    ],
+    "sizes": ["4-Pack", "8-Pack"],
+    "colors": ["Multicolor"],
+    "rating": 4.5,
+    "reviews": 312,
+    "features": [
+      "16 Million Color Options",
+      "Dimmable Warm to Cool White",
+      "Voice Control Compatible",
+      "No Hub Required - WiFi Direct",
+      "Music Sync Mode",
+      "Scheduling & Timers",
+      "Energy Efficient 9W (60W equivalent)",
+      "25,000 Hour Lifespan"
+    ],
+    "inStock": true,
+    "badge": "TopRated",
+    "categories": [
+      { "id": 9 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Wattage", "value": "9W (60W equivalent)" },
+        { "key": "Brightness", "value": "800 Lumens" },
+        { "key": "Color Temperature", "value": "2700K-6500K" },
+        { "key": "Colors", "value": "16 Million RGB" },
+        { "key": "Connectivity", "value": "WiFi 2.4GHz" },
+        { "key": "Lifespan", "value": "25,000 Hours" },
+        { "key": "Base Type", "value": "E26/E27" },
+        { "key": "Voltage", "value": "110-240V AC" }
+      ]
+    }
+  },
+  {
+    "name": "Smart WiFi Thermostat Pro",
+    "slug": "smart-wifi-thermostat-pro",
+    "description": "Control your home climate from anywhere with our advanced Smart WiFi Thermostat Pro. Features learning algorithms that adapt to your schedule, energy usage tracking, and compatibility with all major HVAC systems. Voice control support, geofencing, and multi-zone management. Save up to 23% on energy bills while maintaining perfect comfort.",
+    "price": 249.99,
+    "originalPrice": 349.99,
+    "image": "/products/tab.avif",
+    "images": [
+      "/products/tab.avif",
+      "/products/laptop.avif"
+    ],
+    "sizes": ["Standard", "Pro"],
+    "colors": ["White", "Black", "Silver"],
+    "rating": 4.7,
+    "reviews": 428,
+    "features": [
+      "Self-Learning Temperature Control",
+      "Energy Usage Reports & Insights",
+      "Multi-Zone Climate Management",
+      "Geofencing Auto-Adjustment",
+      "Voice Control Compatible",
+      "7-Day Programmable Schedule",
+      "Remote Control via App",
+      "Works with All HVAC Systems"
+    ],
+    "inStock": true,
+    "badge": "Smart",
+    "categories": [
+      { "id": 8 },
+      { "id": 6 },
+      { "id": 1 }
+    ],
+    "specifications": {
+      "create": [
+        { "key": "Display", "value": "3.5 inch Color Touchscreen" },
+        { "key": "Connectivity", "value": "WiFi 2.4GHz/5GHz, Bluetooth" },
+        { "key": "Compatibility", "value": "24V HVAC Systems" },
+        { "key": "Power", "value": "C-Wire or Battery Backup" },
+        { "key": "Temperature Range", "value": "45-90 degrees F" },
+        { "key": "Sensors", "value": "Temperature, Humidity, Occupancy" },
+        { "key": "Zones Supported", "value": "Up to 20 Zones" },
+        { "key": "Dimensions", "value": "4.5 x 4.5 x 1 inches" },
+        { "key": "Weight", "value": "0.6 lbs" }
+      ]
+    }
+  }
+]
+
+
