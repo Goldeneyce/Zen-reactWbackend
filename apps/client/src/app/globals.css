@@ -175,11 +175,11 @@
   }
 
   .search-bar {
-    @apply flex items-center bg-(--color-light) dark:bg-light-dark rounded px-0 min-w-50 max-w-125 mx-auto mt-4 self-center border border-gray overflow-hidden;
+    @apply flex items-center bg-(--color-light) dark:bg-light-dark rounded px-0 min-w-50 max-w-125 mx-auto mt-2 mb-2 self-center border border-gray overflow-hidden;
   }
 
   .search-bar input {
-    @apply border-none bg-transparent outline-none w-full px-3 py-2 text-sm text-dark dark:text-(--color-light) flex-1;
+    @apply border-none bg-transparent outline-none w-full px-3 py-1.5 text-sm text-dark dark:text-(--color-light) flex-1;
   }
 
   .search-bar input::placeholder {
@@ -191,7 +191,7 @@
   }
 
   .search-bar button {
-    @apply bg-primary border-l border-gray-300 dark:border-gray-600 text-white cursor-pointer px-3 py-3 transition-all duration-300 flex items-center justify-center min-w-11 hover:bg-secondary;
+    @apply bg-primary border-l border-gray-300 dark:border-gray-600 text-white cursor-pointer px-3 py-2 transition-all duration-300 flex items-center justify-center min-w-11 hover:bg-secondary;
   }
 
   .whatsapp-float {

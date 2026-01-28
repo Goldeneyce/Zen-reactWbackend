@@ -69,11 +69,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       navigator.share({
         title: product.name,
         text: product.description,
-        url: window.location.origin + `/products/${product.id}`,
+        url: window.location.origin + `/products/${product.slug}`,
       }).catch((error) => console.log('Error sharing', error));
     } else {
       // Fallback: copy link to clipboard
-      navigator.clipboard.writeText(window.location.origin + `/products/${product.id}`);
+      navigator.clipboard.writeText(window.location.origin + `/products/${product.slug}`);
       toast.success('Link copied to clipboard!');
     }
   };
@@ -88,7 +88,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       )}
       
       {/* Product Image */}
-      <Link href={`/products/${product.id}`} className="block">
+      <Link href={`/products/${product.slug}`} className="block">
         <div className="relative h-64 overflow-hidden group">
           <Image
             src={product.image}
@@ -102,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       {/* Product Content */}
       <div className="p-6">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${product.slug}`}>
           <span className="text-secondary text-sm font-medium block mb-1">
             {product.categories && product.categories.length > 0 && product.categories[0]?.category
               ? product.categories[0].category.name.charAt(0).toUpperCase() + product.categories[0].category.name.slice(1)

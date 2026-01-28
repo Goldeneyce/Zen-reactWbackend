@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Searchbar from '@/components/Searchbar';
 import ProductList from '@/components/ProductList';
 import Filter from '@/components/Filter';
@@ -11,12 +12,15 @@ import type { ProductType } from '@repo/types';
 import { getProducts } from '@/lib/api';
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSort, setSelectedSort] = useState<string>('newest');
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get search query from URL
+  const searchQuery = searchParams.get('search') || '';
 
   const categories = [
     { id: 'all', label: 'All Products' },
@@ -51,10 +55,6 @@ export default function ProductsPage() {
     fetchProducts();
   }, [selectedCategory, searchQuery, selectedSort]);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
   const filteredProducts = products;
 
   return (
@@ -70,7 +70,7 @@ export default function ProductsPage() {
             </p> */}
           </div>
           
-          <Searchbar className="mb-8" onSearch={handleSearch} />
+          <Searchbar className="mb-8" />
           
           <Filter
             categories={categories}

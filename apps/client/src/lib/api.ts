@@ -65,6 +65,33 @@ export async function getProductById(id: string): Promise<ProductType | null> {
 }
 
 /**
+ * Fetch a single product by slug
+ * @param slug - Product slug
+ * @returns Product details
+ */
+export async function getProductBySlug(slug: string): Promise<ProductType | null> {
+  try {
+    const response = await fetch(`${PRODUCT_SERVICE_URL}/products/${slug}`, {
+      cache: "no-store",
+    });
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch product: ${response.statusText}`);
+    }
+
+    const product = await response.json();
+    return product;
+  } catch (error) {
+    console.error(`Error fetching product ${slug}:`, error);
+    throw error;
+  }
+}
+
+/**
  * Search products by query string
  * @param query - Search query
  * @returns Array of matching products

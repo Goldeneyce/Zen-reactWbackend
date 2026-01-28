@@ -1,14 +1,15 @@
 // app/products/[id]/page.tsx
 import ProductDetailClient from './ProductDetailClient';
-import { getProductById } from '@/lib/api';
+import { getProductBySlug } from '@/lib/api';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const product = await getProductById(params.id);
+  const { id } = await params;
+  const product = await getProductBySlug(id);
   
   if (!product) {
     return {
@@ -22,8 +23,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = await getProductById(params.id);
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const product = await getProductBySlug(id);
 
   if (!product) {
     notFound();
