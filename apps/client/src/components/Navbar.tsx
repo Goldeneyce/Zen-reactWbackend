@@ -16,18 +16,22 @@ import {
   WhatsAppIcon,
   ShoppingCartIcon,
   ShoppingBagIcon,
+  HeartOutlineIcon,
   BellIcon,
   UserIcon,
+  SettingsIcon,
   MoonIcon,
   SunIcon,
   HamburgerIcon,
   ChevronDownIcon,
 } from '@/components/Icons';
 import ShoppingCartIconWithBadge from '@/components/ShoppingCartIcon';
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [user, setUser] = useState<null | { id: string }>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window === 'undefined') return false;
     const isDark = localStorage.getItem('theme') === 'dark' || 
@@ -44,6 +48,23 @@ export default function Navbar() {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  }, []);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
   }, []);
 
   const toggleDarkMode = () => {
@@ -75,20 +96,63 @@ export default function Navbar() {
     { href: '/contact', label: 'Contact' },
   ];
 
-  const ProfileButton = () => {
-    const pathName = usePathname();
-    return (
-      <UserButton>
-        <UserButton.MenuItems>
-          <UserButton.Action
-            label="See Orders"
-            labelIcon={<ShoppingBagIcon />}
-            onClick={() => window.location.assign('/orders')}
-          />
-        </UserButton.MenuItems>
-      </UserButton>
-    )
-  }
+  const handleSignOut = async () => {
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+  };
+
+  const ProfileButton = () => (
+    <div className="relative group">
+      <button
+        type="button"
+        className="flex items-center gap-2 rounded-full border border-gray-200/70 dark:border-gray-700/70 bg-white/80 dark:bg-white-dark/80 px-2 py-1.5 text-sm shadow-sm hover:shadow-md transition"
+        aria-label="Account menu"
+      >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10 text-secondary">
+          <UserIcon className="h-4 w-4" />
+        </span>
+        <span className="hidden lg:inline font-medium text-dark dark:text-gray-100">Account</span>
+        <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+      </button>
+      <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white dark:bg-white-dark shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <p className="text-xs uppercase tracking-wide text-gray-400">Signed in</p>
+          <p className="text-sm font-semibold text-dark dark:text-gray-100">Welcome back</p>
+        </div>
+        <div className="py-2">
+          <Link
+            href="/account"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <SettingsIcon className="h-4 w-4" />
+            Manage account
+          </Link>
+          <Link
+            href="/orders"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <ShoppingBagIcon className="h-4 w-4" />
+            Orders
+          </Link>
+          <Link
+            href="/wishlist"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <HeartOutlineIcon className="h-4 w-4" />
+            Wishlist
+          </Link>
+        </div>
+        <div className="border-t border-gray-100 dark:border-gray-800 p-2">
+          <button
+            onClick={handleSignOut}
+            className="w-full rounded-lg px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <header className="bg-white dark:bg-white-dark shadow-custom dark:shadow-dark-custom sticky top-0 z-50">
@@ -187,24 +251,23 @@ export default function Navbar() {
                 <span className="icon-badge">2</span>
               </Link>
               
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <ProfileButton />
-              </SignedIn>
+              {authReady && !user && (
+                <div className="flex items-center gap-3">
+                  <Link href="/login" className="btn btn-primary">Sign in</Link>
+                  <Link href="/sign-up" className="btn btn-outline">Sign up</Link>
+                </div>
+              )}
+              {authReady && user && <ProfileButton />}
             </div>
 
             {/* Mobile Menu Button and Cart */}
             <div className="md:hidden flex items-center gap-3">
               <ShoppingCartIconWithBadge />
               
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <ProfileButton />
-              </SignedIn>
+              {authReady && !user && (
+                <Link href="/login" className="btn btn-primary">Sign in</Link>
+              )}
+              {authReady && user && <ProfileButton />}
               
               <button
                 onClick={toggleMobileMenu}

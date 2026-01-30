@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
 import { initializePaystackTransaction, verifyPaystackTransaction } from "../utils/paystack.js";
 import { calculateOrderTotal } from "../utils/productService.js";
@@ -10,12 +9,11 @@ const sessionRoute = new Hono();
  * POST /create-checkout-session
  * Initialize a Paystack checkout session
  */
-sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, async (c) => {
+sessionRoute.post("/create-checkout-session", shouldBeUser, async (c) => {
 
     const userId = c.get("userId");
 
     try {
-        const auth = getAuth(c);
         const body = await c.req.json();
         
         const { email, metadata, cart } = body;
@@ -111,7 +109,7 @@ sessionRoute.post("/create-checkout-session", clerkMiddleware(), shouldBeUser, a
  * GET /verify-payment/:reference
  * Verify a Paystack payment transaction
  */
-sessionRoute.get("/verify-payment/:reference", clerkMiddleware(), shouldBeUser, async (c) => {
+sessionRoute.get("/verify-payment/:reference", shouldBeUser, async (c) => {
     try {
         const reference = c.req.param("reference");
 

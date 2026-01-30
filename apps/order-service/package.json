@@ -20,7 +20,7 @@
   },
   "packageManager": "pnpm@10.27.0",
   "dependencies": {
-    "@clerk/fastify": "^2.6.14",
+    "jose": "^5.2.4",
     "@fastify/cors": "^11.2.0",
     "@repo/order-db": "workspace:*",
     "dotenv": "^17.2.3",

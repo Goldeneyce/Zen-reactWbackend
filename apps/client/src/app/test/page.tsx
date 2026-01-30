@@ -1,34 +1,29 @@
-import { auth } from "@clerk/nextjs/server";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 const TestPage = async () => {
-    const {getToken} = await auth();
-    const token = await getToken({ template: "zentrics" });
+    const supabase = createSupabaseServerClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
 
-    console.log("Clerk token:", token);
+    console.log("Supabase token:", token);
     console.log(token);
     
     const resProduct = await fetch("http://localhost:8000/test", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     const dataProduct = await resProduct.json();
 
     console.log("Data from product service:", dataProduct);
 
     const resOrder = await fetch("http://localhost:8001/test", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     const dataOrder = await resOrder.json();
 
     console.log("Data from order service:", dataOrder);
 
     const resPayment = await fetch("http://localhost:8002/test", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     const dataPayment = await resPayment.json();
 

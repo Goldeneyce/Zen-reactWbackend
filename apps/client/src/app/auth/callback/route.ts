@@ -1,19 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export default async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
+export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
+    return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  let response = NextResponse.redirect(new URL("/", request.url));
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -29,16 +25,12 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getSession();
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
+
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code);
+  }
 
   return response;
 }
-
-export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
-};

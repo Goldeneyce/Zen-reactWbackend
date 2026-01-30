@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export default async function proxy(request: NextRequest) {
+const isAuthRoute = (pathname: string) =>
+  pathname.startsWith("/sign-in") || pathname.startsWith("/unauthorized");
+
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -29,7 +32,22 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getSession();
+  const { data: { session } } = await supabase.auth.getSession();
+  const { pathname } = request.nextUrl;
+
+  if (!session && !isAuthRoute(pathname)) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  if (session && !isAuthRoute(pathname)) {
+    const role =
+      (session.user.app_metadata as { role?: string } | undefined)?.role ||
+      (session.user.user_metadata as { role?: string } | undefined)?.role;
+
+    if (role !== "admin") {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+  }
 
   return response;
 }
@@ -41,4 +59,4 @@ export const config = {
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-};
+}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { ShippingFormData, CartItem } from "@repo/types";
 
 interface PaystackPaymentFormProps {
@@ -83,41 +83,35 @@ export default function PaystackPaymentForm({
   const [token, setToken] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const { getToken, isLoaded: authLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
-
-  // Ensure component only renders on client
+  const [authReady, setAuthReady] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   useEffect(() => {
     console.log("Setting mounted to true");
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && authLoaded) {
-      console.log("Auth status:", { isSignedIn, userId: user?.id });
-      
-      if (!isSignedIn) {
-        console.error("User not signed in");
-        toast.error("Please sign in to continue");
-        return;
-      }
-      
-      console.log("Fetching token...");
-      getToken().then((token) => {
-        console.log("Token received:", token ? "✓" : "null");
-        if (token) {
-          setToken(token);
-        } else {
-          // Token is null but user is signed in - use mock for development
-          console.log("Token is null, using mock token for development");
-          setToken("mock-token");
-        }
-      }).catch((error) => {
-        console.error("Error fetching token:", error);
-        toast.error("Authentication error");
-      });
-    }
-  }, [getToken, mounted, authLoaded, isSignedIn, user]);
+    if (!mounted) return;
+
+    const supabase = getSupabaseBrowserClient();
+
+    supabase.auth.getSession().then(({ data }) => {
+      const session = data.session;
+      setIsSignedIn(!!session?.user);
+      setToken(session?.access_token ?? null);
+      setAuthReady(true);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSignedIn(!!session?.user);
+      setToken(session?.access_token ?? null);
+      setAuthReady(true);
+    });
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
+  }, [mounted]);
 
   // Load Paystack inline script
   useEffect(() => {
@@ -221,14 +215,14 @@ export default function PaystackPaymentForm({
   };
 
   // Don't render until mounted on client and script is loaded
-  if (!mounted || !authLoaded || !scriptLoaded) {
-    console.log("Loading state:", { mounted, authLoaded, token: !!token, scriptLoaded, isSignedIn });
+  if (!mounted || !authReady || !scriptLoaded) {
+    console.log("Loading state:", { mounted, authReady, token: !!token, scriptLoaded, isSignedIn });
     return (
       <div className="w-full text-center py-3">
         <div>Loading payment system...</div>
         <div className="text-sm text-gray-500 mt-2">
           Mounted: {mounted ? "✓" : "⏳"} | 
-          Auth: {authLoaded ? "✓" : "⏳"} | 
+          Auth: {authReady ? "✓" : "⏳"} | 
           SignedIn: {isSignedIn ? "✓" : "❌"} | 
           Script: {scriptLoaded ? "✓" : "⏳"}
         </div>

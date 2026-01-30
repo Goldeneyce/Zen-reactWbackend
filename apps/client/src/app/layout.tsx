@@ -6,7 +6,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ClerkProvider } from '@clerk/nextjs';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -29,17 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
-        <body className="font-sans text-dark bg-light dark:text-dark-light dark:bg-light-dark transition-colors duration-300">
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <ToastContainer position="top-left" theme="light" />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
+      <body className="font-sans text-dark bg-light dark:text-dark-light dark:bg-light-dark transition-colors duration-300">
+        <Navbar />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
+        <ToastContainer position="top-left" theme="light" />
+      </body>
+    </html>
   );
 }
