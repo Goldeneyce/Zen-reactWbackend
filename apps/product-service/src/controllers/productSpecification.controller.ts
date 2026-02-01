@@ -1,22 +1,20 @@
 import { prisma, Prisma } from "@repo/product-db";
-import { Request, Response } from "express";
+import type { Context } from "hono";
 
-export const createProductSpecification = async (req: Request, res: Response) => {
-	const { productId, key, value } = req.body as {
+export const createProductSpecification = async (c: Context) => {
+	const { productId, key, value } = (await c.req.json()) as {
 		productId?: string;
 		key?: string;
 		value?: string;
 	};
 
 	if (!productId) {
-		res.status(400).json({ error: "productId is required" });
-		return;
+		return c.json({ error: "productId is required" }, 400);
 	}
 
 	const product = await prisma.product.findUnique({ where: { id: productId } });
 	if (!product) {
-		res.status(404).json({ error: "Product not found" });
-		return;
+		return c.json({ error: "Product not found" }, 404);
 	}
 
 	const productSpecification = await prisma.productSpecification.create({
@@ -27,31 +25,30 @@ export const createProductSpecification = async (req: Request, res: Response) =>
 		},
 	});
 
-	res.status(201).json(productSpecification);
+	return c.json(productSpecification, 201);
 };
 
-export const getProductSpecifications = async (req: Request, res: Response) => {
+export const getProductSpecifications = async (c: Context) => {
 	const productSpecifications = await prisma.productSpecification.findMany();
-	res.status(200).json(productSpecifications);
+	return c.json(productSpecifications, 200);
 };
 
-export const getProductSpecification = async (req: Request, res: Response) => {
-	const { id } = req.params;
+export const getProductSpecification = async (c: Context) => {
+	const id = c.req.param("id");
 	const productSpecification = await prisma.productSpecification.findUnique({
 		where: { id },
 	});
 
 	if (!productSpecification) {
-		res.status(404).json({ error: "Product specification not found" });
-		return;
+		return c.json({ error: "Product specification not found" }, 404);
 	}
 
-	res.status(200).json(productSpecification);
+	return c.json(productSpecification, 200);
 };
 
-export const updateProductSpecification = async (req: Request, res: Response) => {
-	const { id } = req.params;
-	const { productId, key, value } = req.body as {
+export const updateProductSpecification = async (c: Context) => {
+	const id = c.req.param("id");
+	const { productId, key, value } = (await c.req.json()) as {
 		productId?: string;
 		key?: string;
 		value?: string;
@@ -64,8 +61,7 @@ export const updateProductSpecification = async (req: Request, res: Response) =>
 	if (productId) {
 		const product = await prisma.product.findUnique({ where: { id: productId } });
 		if (!product) {
-			res.status(404).json({ error: "Product not found" });
-			return;
+			return c.json({ error: "Product not found" }, 404);
 		}
 		data.product = { connect: { id: productId } };
 	}
@@ -75,15 +71,15 @@ export const updateProductSpecification = async (req: Request, res: Response) =>
 		data,
 	});
 
-	res.status(200).json(productSpecification);
+	return c.json(productSpecification, 200);
 };
 
-export const deleteProductSpecification = async (req: Request, res: Response) => {
-	const { id } = req.params;
+export const deleteProductSpecification = async (c: Context) => {
+	const id = c.req.param("id");
 
 	await prisma.productSpecification.delete({
 		where: { id },
 	});
 
-	res.status(200).json({ message: "Product specification deleted successfully" });
+	return c.json({ message: "Product specification deleted successfully" }, 200);
 };

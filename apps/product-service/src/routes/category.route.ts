@@ -1,8 +1,8 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { createCategory, deleteCategory, getCategory, getCategoryBySlug, getCategories, updateCategory } from "../controllers/category.controller.js";
 import { shouldBeAdmin } from "../middleware/authMiddleware.js";
 
-const router: Router = Router();
+const router = new Hono();
 
 router.post("/", shouldBeAdmin, createCategory);
 router.get("/", getCategories);

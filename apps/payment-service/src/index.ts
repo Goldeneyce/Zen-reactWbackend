@@ -1,38 +1,37 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import sessionRoute from './routes/session.route.js';
-import webhookRoute from './routes/webhooks.route.js';
-import { cors } from 'hono/cors';
-import { consumer, producer, } from './utils/kafka.ts';
-import { runKafkaSubscriptions } from './utils/subscriptions.ts';
+import fastify from "fastify";
+import cors from "@fastify/cors";
+import sessionRoute from "./routes/session.route.js";
+import webhookRoute from "./routes/webhooks.route.js";
+import { consumer, producer } from './utils/kafka.js';
+import { runKafkaSubscriptions } from './utils/subscriptions.js';
 
-const app = new Hono()
-app.use('*', cors({ origin: ["http://localhost:3002"] }));
+const app = fastify({ logger: false });
 
-app.get('/health', (c) => {
-  return c.json({
+app.get("/health", async () => {
+  return {
     status: "ok",
     uptime: process.uptime(),
     timestamp: Date.now(),
-  });
+  };
 });
-
-app.route('/sessions', sessionRoute);
-app.route('/webhooks', webhookRoute);
 
 const start = async () => {
   try {
-    	await Promise.all([
-        consumer.connect(), 
-        producer.connect()]
-      );
-      await runKafkaSubscriptions();
-      serve({
-        fetch: app.fetch,
-        port: 8002
-      }, (info) => {
-      console.log(`Payment service is running on ${info.address}:${info.port}`);
-    });
+    // Register plugins
+    await app.register(cors, { origin: ["http://localhost:3002"] });
+    await app.register(sessionRoute, { prefix: "/sessions" });
+    await app.register(webhookRoute, { prefix: "/webhooks" });
+    
+    // Connect to Kafka
+    await Promise.all([
+      consumer.connect(), 
+      producer.connect()
+    ]);
+    await runKafkaSubscriptions();
+    
+    // Start server
+    await app.listen({ port: 8002, host: "0.0.0.0" });
+    console.log("Payment service is running on 0.0.0.0:8002");
   } catch (error) {
     console.error('Error starting the server:', error);
     process.exit(1);

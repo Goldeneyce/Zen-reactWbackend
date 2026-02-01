@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { createProductSpecification,
 	getProductSpecifications,
 	getProductSpecification,
@@ -7,7 +7,7 @@ import { createProductSpecification,
 } from "../controllers/productSpecification.controller.js";
 import { shouldBeAdmin } from "../middleware/authMiddleware.js";
 
-const router: Router = Router();
+const router = new Hono();
 
 router.post("/", shouldBeAdmin, createProductSpecification);
 router.get("/", getProductSpecifications);

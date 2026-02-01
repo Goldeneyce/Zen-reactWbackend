@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "jose": "^5.2.4",
-    "@hono/node-server": "^1.19.6",
-    "hono": "^4.11.3",
+    "@fastify/cors": "^10.0.0",
+    "fastify": "^5.2.0",
     "paystack": "^2.0.1",
     "@repo/kafka": "workspace:*"
   },

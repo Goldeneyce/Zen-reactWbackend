@@ -1,57 +1,45 @@
-import { Request, Response, NextFunction } from "express";
-import { CustomJwtSessionClaims } from "@repo/types";
+import { createMiddleware } from "hono/factory";
+import type { CustomJwtSessionClaims } from "@repo/types";
 import { jwtVerify } from "jose";
 
-declare global {
-    namespace Express {
-        interface Request {
-            userId?: string;
-        }
-    }
-}
+export const shouldBeUser = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next);
+});
 
-export const shouldBeUser = async (
-    req:Request, 
-    res:Response, 
-    next:NextFunction
-) => {
-  return verifySupabaseAuth(req, res, next);
-};
+export const shouldBeAdmin = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next, "admin");
+});
 
-export const shouldBeAdmin = async (
-    req:Request, 
-    res:Response, 
-    next:NextFunction
-) => {
-  return verifySupabaseAuth(req, res, next, "admin");
-};
-
-const getBearerToken = (req: Request) => {
-  const header = req.headers.authorization;
-  if (!header) return null;
-  const [type, token] = header.split(" ");
+const getBearerToken = (authorization: string | undefined) => {
+  if (!authorization) return null;
+  const [type, token] = authorization.split(" ");
   if (type !== "Bearer" || !token) return null;
   return token;
 };
 
 const verifySupabaseAuth = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  c: any,
+  next: () => Promise<void>,
   requiredRole?: "admin"
 ) => {
-  const token = getBearerToken(req);
+  const token = getBearerToken(c.req.header("Authorization"));
 
   if (!token) {
-    return res.status(401).json({
-      message: "You are not logged in!",
-    });
+    return c.json({ message: "You are not logged in!" }, 401);
   }
 
   try {
     const secret = process.env.SUPABASE_JWT_SECRET;
     if (!secret) {
-      return res.status(500).json({ message: "Auth secret not configured." });
+      return c.json({ message: "Auth secret not configured." }, 500);
     }
 
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
@@ -59,7 +47,7 @@ const verifySupabaseAuth = async (
     const userId = claims.sub || claims.userId;
 
     if (!userId) {
-      return res.status(401).json({ message: "You are not logged in!" });
+      return c.json({ message: "You are not logged in!" }, 401);
     }
 
     if (requiredRole) {
@@ -69,17 +57,15 @@ const verifySupabaseAuth = async (
         claims.role;
 
       if (role !== requiredRole) {
-        return res.status(403).json({
+        return c.json({
           message: "You are not authorized to access this resource!",
-        });
+        }, 403);
       }
     }
 
-    req.userId = userId;
-    return next();
+    c.set("userId", userId);
+    await next();
   } catch (error) {
-    return res.status(401).json({
-      message: "You are not logged in!",
-    });
+    return c.json({ message: "You are not logged in!" }, 401);
   }
 };

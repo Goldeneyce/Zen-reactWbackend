@@ -1,22 +1,28 @@
-import { createMiddleware } from "hono/factory";
 import type { CustomJwtSessionClaims } from "@repo/types";
 import { jwtVerify } from "jose";
 
-export const shouldBeUser = createMiddleware<{
- Variables: {
-    userId: string;
- }
-}>(async (c, next) =>{
-  return verifySupabaseAuth(c, next);
-});
+import type { FastifyReply, FastifyRequest } from "fastify";
 
-export const shouldBeAdmin = createMiddleware<{
- Variables: {
-    userId: string;
- }
-}>(async (c, next) =>{
-  return verifySupabaseAuth(c, next, "admin");
-});
+declare module "fastify" {
+  interface FastifyRequest {
+    userId?: string;
+    rawBody?: string;
+  }
+}
+
+export const shouldBeUser = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return verifySupabaseAuth(request, reply);
+};
+
+export const shouldBeAdmin = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return verifySupabaseAuth(request, reply, "admin");
+};
 
 const getBearerToken = (authorization: string | undefined) => {
   if (!authorization) return null;
@@ -26,20 +32,20 @@ const getBearerToken = (authorization: string | undefined) => {
 };
 
 const verifySupabaseAuth = async (
-  c: any,
-  next: () => Promise<void>,
-  requiredRole?: "admin"
+	request: FastifyRequest,
+	reply: FastifyReply,
+	requiredRole?: "admin"
 ) => {
-  const token = getBearerToken(c.req.header("Authorization"));
+	const token = getBearerToken(request.headers.authorization);
 
   if (!token) {
-    return c.json({ message: "You are not logged in!" }, 401);
+    return reply.code(401).send({ message: "You are not logged in!" });
   }
 
   try {
     const secret = process.env.SUPABASE_JWT_SECRET;
     if (!secret) {
-      return c.json({ message: "Auth secret not configured." }, 500);
+      return reply.code(500).send({ message: "Auth secret not configured." });
     }
 
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
@@ -47,7 +53,7 @@ const verifySupabaseAuth = async (
     const userId = claims.sub || claims.userId;
 
     if (!userId) {
-      return c.json({ message: "You are not logged in!" }, 401);
+      return reply.code(401).send({ message: "You are not logged in!" });
     }
 
     if (requiredRole) {
@@ -57,13 +63,13 @@ const verifySupabaseAuth = async (
         claims.role;
 
       if (role !== requiredRole) {
-        return c.json({ message: "You are not authorized!" }, 403);
+        return reply.code(403).send({ message: "You are not authorized!" });
       }
     }
 
-    c.set("userId", userId);
-    await next();
+    request.userId = userId;
+    return;
   } catch (error) {
-    return c.json({ message: "You are not logged in!" }, 401);
+    return reply.code(401).send({ message: "You are not logged in!" });
   }
 };
