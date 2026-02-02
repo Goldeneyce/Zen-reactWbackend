@@ -1,8 +1,9 @@
 export const dynamic = 'force-dynamic';
-import { Product, columns } from "./columns";
+import { ProductsType } from "@repo/types";
+import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-const getData = async (): Promise<Product[]> => {
+const getData = async (): Promise<ProductsType> => {
   try {
     const response = await fetch("http://localhost:8000/products?limit=100", {
       cache: "no-store",
@@ -13,7 +14,7 @@ const getData = async (): Promise<Product[]> => {
       name: string;
       description?: string;
       price: number;
-      categories?: Product["categories"];
+      categories?: ProductsType[number]["categories"];
     };
 
     const products: ApiProduct[] = await response.json();
@@ -31,7 +32,7 @@ const getData = async (): Promise<Product[]> => {
   }
 };
 
-const PaymentsPage = async () => {
+const ProductPage = async () => {
   const data = await getData();
   return (
     <div className="">
@@ -43,4 +44,4 @@ const PaymentsPage = async () => {
   );
 };
 
-export default PaymentsPage;
+export default ProductPage;
