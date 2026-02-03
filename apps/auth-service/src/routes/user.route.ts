@@ -1,5 +1,6 @@
 import {Router} from "fastify";
 import supabase from "../utils/supabase.ts";
+import { producer } from "../utils/kafka.ts";
 
 const router:Router = Router();
 
@@ -19,6 +20,13 @@ router.post("/", async (req, res) => {
     type CreateParams = Parameters<typeof supabase.supabaseClient.users.createUser>[0];
     const newUser: CreateParams = req.body;
     const user = await supabase.supabaseClient.users.createUser(newUser);
+    producer.send({"user.created", {
+            value: {
+                username: user.username,
+                email:user.emailAddresses[0]?.emailAddresses,
+            }
+        }
+    });
     res.status(200).json(user);
     return { message: "User route is working!" };
 });

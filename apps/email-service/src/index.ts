@@ -16,7 +16,7 @@ const start = async () => {
           if (email) {
             await sendMail({
               email,
-              subject: "Welcome to E-commerce App",
+              subject: "Welcome to ZenTrics",
               text: `Welcome ${username}. You account has been created!`,
             });
           }

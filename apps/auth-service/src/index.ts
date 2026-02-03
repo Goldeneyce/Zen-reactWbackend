@@ -4,6 +4,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { cors } from "hono/cors";
 import { shouldBeAdmin } from "./middleware/authMiddleware.js";
 import userRoute from "./routes/user.route.js";
+import { producer } from "./utils/kafka.ts";
 
 const app = new Hono();
 app.use(
@@ -40,6 +41,7 @@ app.onError((err, c) => {
 
 const start = async () => {
 	try {
+		await producer.connect();
 		
 		serve(
 			{

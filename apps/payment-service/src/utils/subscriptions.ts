@@ -3,7 +3,10 @@ import { ProductType } from "@repo/types";
 import { productCache } from "./productCache.ts";
 
 export const runKafkaSubscriptions = async () => {
-    consumer.subscribe("product.created", async (message) => {
+      consumer.subscribe([
+    {
+      topicName: "product.created",
+      topicHandler: async (message) => {
         try {
             const product = JSON.parse(message.value) as ProductType;
             console.log("📦 Received product.created event:", product.name);
@@ -13,9 +16,11 @@ export const runKafkaSubscriptions = async () => {
         } catch (error) {
             console.error("Error handling product.created event:", error);
         }
-    });
-
-    consumer.subscribe("product.updated", async (message) => {
+      },
+    },
+    {
+      topicName: "product.updated",
+      topicHandler: async (message) => {
         try {
             const product = JSON.parse(message.value) as ProductType;
             console.log("🔄 Received product.updated event:", product.name);
@@ -25,10 +30,12 @@ export const runKafkaSubscriptions = async () => {
         } catch (error) {
             console.error("Error handling product.updated event:", error);
         }
-    });
-
-    consumer.subscribe("product.deleted", async (message) => {
-        try {
+      },
+    },
+    {
+      topicName: "product.deleted",
+      topicHandler: async (message) => {
+         try {
             const productId = JSON.parse(message.value) as string;
             console.log("🗑️  Received product.deleted event:", productId);
             
@@ -37,7 +44,9 @@ export const runKafkaSubscriptions = async () => {
         } catch (error) {
             console.error("Error handling product.deleted event:", error);
         }
-    });
+      },
+    },
+  ]);
 
     console.log("🎧 Kafka subscriptions initialized - listening for product events");
 }
