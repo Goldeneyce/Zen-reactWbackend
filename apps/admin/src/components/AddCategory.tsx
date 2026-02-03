@@ -21,22 +21,20 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useState } from "react";
+import { CategoryformSchema } from "@repo/types";
 
-const formSchema = z.object({
-  name: z.string().min(1, { message: "Name is Required!" }),
-  slug: z.string().optional(),
-});
+
 
 const AddCategory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof CategoryformSchema>>({
+    resolver: zodResolver(CategoryformSchema),
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof CategoryformSchema>) => {
     try {
       setIsSubmitting(true);
-      const response = await fetch("http://localhost:8000/categories", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,8 +93,12 @@ const AddCategory = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit"}
+              <Button 
+              type="submit" 
+              disabled={mutation.isPending}
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {mutation.isPending ? "Submitting..." : "Submit"}
               </Button>
             </form>
           </Form>

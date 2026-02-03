@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 const isAuthRoute = (pathname: string) =>
   pathname.startsWith("/sign-in") || pathname.startsWith("/unauthorized");
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
