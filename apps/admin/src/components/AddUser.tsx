@@ -20,7 +20,10 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useMutation } from "@tanstack/react-query";
 import { UserFormSchema } from "@repo/types";
+import { toast } from "react-toastify";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 
 const AddUser = () => {
@@ -29,38 +32,44 @@ const AddUser = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
-      emailAddress: [""],
+      emailAddress: [],
       username: "",
       password: "",
     },
   });
 
-    const onSubmit = async (data: z.infer<typeof UserFormSchema>) => {
-      try {
-        setIsSubmitting(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`, {
+  const mutation = useMutation({
+    mutationFn: async (data: z.infer<typeof UserFormSchema>) => {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("No active session");
+      }
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`,
+        {
           method: "POST",
+          body: JSON.stringify(data),
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify(data),
-        });
-  
-        if (!response.ok) {
-          throw new Error("Failed to create user");
         }
-  
-        const result = await response.json();
-        console.log("Category created:", result);
-        form.reset();
-        // You can add a toast notification here
-      } catch (error) {
-        console.error("Error creating category:", error);
-        // You can add error handling here
-      } finally {
-        setIsSubmitting(false);
+      );
+      if (!res.ok) {
+        throw new Error("Failed to create user!");
       }
-    };
+    },
+    onSuccess: () => {
+      toast.success("User created successfully");
+      form.reset();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
 
   return (
@@ -69,7 +78,10 @@ const AddUser = () => {
         <SheetTitle className="mb-4">Add User</SheetTitle>
         <SheetDescription asChild>
           <Form {...form}>
-            <form className="space-y-8">
+            <form
+              className="space-y-8"
+              onSubmit={form.handleSubmit((data) => mutation.mutate(data))}
+            >
               <FormField
                 control={form.control}
                 name="firstName"
@@ -111,9 +123,7 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Enter user username.
-                    </FormDescription>
+                    <FormDescription>Enter username.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -125,12 +135,17 @@ const AddUser = () => {
                   <FormItem>
                     <FormLabel>Email Addresses</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="email@gmail.com, anotheremail@gmail.com"
-                      onChange={e=>{
-                        const emails = e.target.value.split(',').map(email => email.trim())
-                        .filter(email => email !== "");
-                        field.onChange(emails);
-                      }} />
+                      <Input
+                        {...field}
+                        placeholder="email1@gmail.com, email2@gmail.com"
+                        onChange={(e) => {
+                          const emails = e.target.value
+                            .split(",")
+                            .map((email) => email.trim())
+                            .filter((email) => email);
+                          field.onChange(emails);
+                        }}
+                      />
                     </FormControl>
                     <FormDescription>
                       Only admin can see your email.
@@ -148,17 +163,15 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} type="password" />
                     </FormControl>
-                    <FormDescription>
-                      Enter user password.
-                    </FormDescription>
+                    <FormDescription>Enter user password.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button 
-              type="submit" 
-              disabled={mutation.isPending}
-              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {mutation.isPending ? "Submitting..." : "Submit"}
               </Button>

@@ -4,8 +4,7 @@ import { shouldBeAdmin } from "../middleware/authMiddleware.js";
 
 const router = new Hono();
 
-// Temporarily disabled auth for testing - RE-ENABLE IN PRODUCTION!
-router.post("/", createProduct);
+router.post("/", shouldBeAdmin, createProduct);
 router.get("/", getProducts);
 router.get("/:slug", getProductBySlug);
 router.get("/:id", getProduct);

@@ -14,21 +14,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontalIcon } from "@/components/icons";
 import Image from "next/image";
 import Link from "next/link";
+import { ProductType } from "@repo/types";
 
-export type Product = {
-  id: string | number;
-  price: number;
-  name: string;
-  shortDescription?: string;
-  description?: string;
-  sizes?: string[];
-  colors?: string[];
-  images?: Record<string, string>;
-  categories?: Array<{ productId: string; categoryId: number; category: { id: number; name: string; slug: string } }>;
-  categoryNames?: string[];
-};
-
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<ProductType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -52,12 +40,11 @@ export const columns: ColumnDef<Product>[] = [
     header: "Image",
     cell: ({ row }) => {
       const product = row.original;
-      const imageSrc = product.images?.[product.id.toString()];
       return (
         <div className="w-9 h-9 relative">
-          {imageSrc && (
+          {product.image && (
             <Image
-              src={imageSrc}
+              src={product.image}
               alt={product.name}
               fill
               className="rounded-full object-cover"
@@ -86,17 +73,27 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: "shortDescription",
+    accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      const description = row.original.description;
+      return (
+        <span className="text-sm line-clamp-2">
+          {description?.substring(0, 100) || "No description"}
+        </span>
+      );
+    },
   },
   {
     id: "categories",
     header: "Categories",
     cell: ({ row }) => {
-      const product = row.original;
-      const categoryNames = product.categories
-        ?.map((pc) => pc.category.name)
-        .join(", ") || "No categories";
+      const product = row.original as ProductType & {
+        categories?: Array<{ category: { id: number; name: string; slug: string } }>;
+      };
+      const categoryNames =
+        product.categories?.map((pc) => pc.category.name).join(", ") ||
+        "No categories";
       return <span className="text-sm">{categoryNames}</span>;
     },
   },

@@ -36,6 +36,7 @@ export const initializePaystackTransaction = async (
             email,
             amount: Math.round(amount * 100), // Convert to kobo and ensure integer
             reference: transactionRef,
+            name,
             callback_url,
             metadata: {
                 ...metadata,

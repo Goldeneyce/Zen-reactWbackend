@@ -20,43 +20,51 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { CategoryformSchema } from "@repo/types";
-
-
+import { toast } from "react-toastify";
+import { useAuth } from "@clerk/nextjs";
 
 const AddCategory = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { getToken } = useAuth();
+  
   const form = useForm<z.infer<typeof CategoryformSchema>>({
     resolver: zodResolver(CategoryformSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+    },
   });
 
-  const onSubmit = async (data: z.infer<typeof CategoryformSchema>) => {
-    try {
-      setIsSubmitting(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+  const mutation = useMutation({
+    mutationFn: async (data: z.infer<typeof CategoryformSchema>) => {
+      const token = await getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to create category");
       }
 
-      const result = await response.json();
-      console.log("Category created:", result);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast.success("Category created successfully");
       form.reset();
-      // You can add a toast notification here
-    } catch (error) {
-      console.error("Error creating category:", error);
-      // You can add error handling here
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <SheetContent>
@@ -64,7 +72,10 @@ const AddCategory = () => {
         <SheetTitle className="mb-4">Add Category</SheetTitle>
         <SheetDescription asChild>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              onSubmit={form.handleSubmit((data) => mutation.mutate(data))}
+              className="space-y-8"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -86,17 +97,20 @@ const AddCategory = () => {
                   <FormItem>
                     <FormLabel>Slug (Optional)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="leave empty to auto-generate" />
+                      <Input
+                        {...field}
+                        placeholder="leave empty to auto-generate"
+                      />
                     </FormControl>
                     <FormDescription>URL-friendly identifier.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button 
-              type="submit" 
-              disabled={mutation.isPending}
-              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {mutation.isPending ? "Submitting..." : "Submit"}
               </Button>

@@ -1,60 +1,51 @@
-import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { cors } from "hono/cors";
+import fastify, { type FastifyError } from "fastify";
+import cors from "@fastify/cors";
 import { shouldBeAdmin } from "./middleware/authMiddleware.js";
 import userRoute from "./routes/user.route.js";
 import { producer } from "./utils/kafka.ts";
 
-const app = new Hono();
-app.use(
-	"*",
-	cors({
-		origin: [
-			"http://localhost:3003",
-			"http://192.168.0.152:3003",
-		],
-		credentials: true,
-	})
-);
+const app = fastify({
+	logger: true,
+});
 
-app.get("/health", (c) => {
-	return c.json({
+await app.register(cors, {
+	origin: [
+		"http://localhost:3003",
+		"http://192.168.0.152:3003",
+	],
+	credentials: true,
+});
+
+app.get("/health", async (request, reply) => {
+	return reply.send({
 		status: "ok",
 		uptime: process.uptime(),
 		timestamp: Date.now(),
 	});
 });
 
-app.route("/users", shouldBeAdmin, userRoute);
+app.register(userRoute, { prefix: "/users" });
 
-app.onError((err, c) => {
-	console.log(err);
-	const status = ((err as { status?: number })?.status ?? 500) as ContentfulStatusCode;
-	return c.json(
-		{
-			message: (err as Error)?.message || "Internal Server Error",
-		},
-		status
-	);
+app.setErrorHandler((error: FastifyError, request, reply) => {
+	console.log(error);
+	const status = error.statusCode ?? 500;
+	reply.status(status).send({
+		message: error.message || "Internal Server Error",
+	});
 });
 
 const start = async () => {
 	try {
 		await producer.connect();
 		
-		serve(
-			{
-				fetch: app.fetch,
-				port: 8003,
-				hostname: "0.0.0.0",
-			},
-			(info) => {
-				console.log(`Auth service listening on ${info.address}:${info.port}`);
-			}
-		);
+		await app.listen({
+			port: 8003,
+			host: "0.0.0.0",
+		});
+		
+		console.log(`Auth service listening on 0.0.0.0:8003`);
 	} catch (error) {
-		console.error("Error connecting to Kafka:", error);
+		console.error("Error starting server:", error);
 		process.exit(1);
 	}
 };

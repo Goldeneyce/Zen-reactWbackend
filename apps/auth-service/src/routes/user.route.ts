@@ -1,40 +1,56 @@
-import {Router} from "fastify";
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import supabase from "../utils/supabase.ts";
 import { producer } from "../utils/kafka.ts";
+import { shouldBeAdmin } from "../middleware/authMiddleware.js";
 
-const router:Router = Router();
+export default async function userRoute(fastify: FastifyInstance) {
+    // Apply admin middleware to all routes in this plugin
+    fastify.addHook("onRequest", shouldBeAdmin);
 
-router.get("/", async (req, res) => {
-    const users = await supabase.supabaseClient.users.getUserList();
-    res.status(200).json(users);
-});
-
-router.get("/:id", async (req, res) => {
-    const {id} = req.params as {id: string};
-    const user = await supabase.supabaseClient.users.getUser(id);
-    res.status(200).json(user);
-    return { message: "User route is working!" };
-});
-
-router.post("/", async (req, res) => {
-    type CreateParams = Parameters<typeof supabase.supabaseClient.users.createUser>[0];
-    const newUser: CreateParams = req.body;
-    const user = await supabase.supabaseClient.users.createUser(newUser);
-    producer.send({"user.created", {
-            value: {
-                username: user.username,
-                email:user.emailAddresses[0]?.emailAddresses,
-            }
-        }
+    fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
+        const users = await supabase.supabaseClient.auth.admin.listUsers();
+        return reply.send(users);
     });
-    res.status(200).json(user);
-    return { message: "User route is working!" };
-});
 
-router.delete("/:id", async (req, res) => {
-    const {id} = req.params as {id: string};
-    const user = await supabase.supabaseClient.users.deleteUser(id);
-    res.status(200).json(user);
-    return { message: "User route is working!" };
-});
-export default router;
+    fastify.get<{
+        Params: { id: string };
+    }>("/:id", async (request, reply) => {
+        const { id } = request.params;
+        const { data: user, error } = await supabase.supabaseClient.auth.admin.getUserById(id);
+        if (error) {
+            return reply.status(404).send({ message: "User not found", error });
+        }
+        return reply.send(user);
+    });
+
+    fastify.post("/", async (request: FastifyRequest, reply: FastifyReply) => {
+        const newUser = request.body as any;
+        const { data: user, error } = await supabase.supabaseClient.auth.admin.createUser(newUser);
+        
+        if (error) {
+            return reply.status(400).send({ message: "Failed to create user", error });
+        }
+
+        await producer.send("user.created", {
+            value: JSON.stringify({
+                username: user.user?.email?.split('@')[0],
+                email: user.user?.email,
+            }),
+        });
+
+        return reply.send(user);
+    });
+
+    fastify.delete<{
+        Params: { id: string };
+    }>("/:id", async (request, reply) => {
+        const { id } = request.params;
+        const { data: user, error } = await supabase.supabaseClient.auth.admin.deleteUser(id);
+        
+        if (error) {
+            return reply.status(400).send({ message: "Failed to delete user", error });
+        }
+        
+        return reply.send(user);
+    });
+}
