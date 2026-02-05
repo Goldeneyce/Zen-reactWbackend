@@ -23,10 +23,14 @@ import { Button } from "./ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { CategoryformSchema } from "@repo/types";
 import { toast } from "react-toastify";
-import { useAuth } from "@clerk/nextjs";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 const AddCategory = () => {
-  const { getToken } = useAuth();
+  const getToken = async () => {
+    const supabase = getSupabaseBrowserClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token;
+  };
   
   const form = useForm<z.infer<typeof CategoryformSchema>>({
     resolver: zodResolver(CategoryformSchema),

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { OrderType } from "@repo/types";
+import { toast } from "react-toastify";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState<OrderType[]>([]);
@@ -35,14 +37,55 @@ const OrdersPage = () => {
     fetchOrders();
   }, []);
 
+  const handlePayForOrder = async (orderId: string) => {
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        toast.error('Please sign in to make payment.');
+        return;
+      }
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders/${orderId}/pay`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to process payment');
+      }
+
+      toast.success('Payment confirmed! Thank you.');
+      // Refresh orders
+      setOrders(prev =>
+        prev.map(o => o._id === orderId ? { ...o, status: 'paid' } : o)
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Payment failed');
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
+      case "paid":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
+      case "unpaid":
+        return "bg-orange-100 text-orange-800";
+      case "delivered":
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -187,10 +230,30 @@ const OrdersPage = () => {
                   </div>
                 </div>
 
-                {/* Placeholder for future action buttons */}
+                {/* Action buttons */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex gap-3">
-                    {/* Future: Book Installation & Request Repair buttons will go here */}
+                  <div className="flex items-center gap-3">
+                    {/* Show payment method badge */}
+                    {(order as any).paymentMethod === 'cod' && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                        Pay on Delivery
+                      </span>
+                    )}
+                    {/* Pay button for delivered COD orders */}
+                    {(order as any).paymentMethod === 'cod' && order.status === 'delivered' && (
+                      <button
+                        onClick={() => handlePayForOrder(order._id)}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                      >
+                        Pay Now
+                      </button>
+                    )}
+                    {/* Show unpaid notice for COD orders awaiting delivery */}
+                    {(order as any).paymentMethod === 'cod' && order.status === 'unpaid' && (
+                      <span className="text-sm text-gray-500">
+                        Payment due upon delivery
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

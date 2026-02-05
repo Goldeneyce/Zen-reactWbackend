@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { OrderType, ProductsType } from "@repo/types";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 // const popularProducts = [
 //   {
@@ -126,8 +127,9 @@ const CardList = async ({ title }: { title: string }) => {
   let products:ProductsType = [];
   let orders:OrderType[] = [];
 
-  const {getToken} = await auth();
-  const token = await getToken();
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
 
   if (title === "Popular Products") {
     products = await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`

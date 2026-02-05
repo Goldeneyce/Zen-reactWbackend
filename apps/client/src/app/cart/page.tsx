@@ -11,6 +11,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from '@/components/Icons';
 import ShippingForm from '@/components/ShippingForm';
 import PaymentForm from '@/components/PaymentForm';
 import type { ShippingFormData } from '@repo/types';
+import { getSupabaseBrowserClient } from '@/lib/supabaseClient';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCartStore();
@@ -67,29 +68,95 @@ export default function CartPage() {
     }, 1000);
   };
 
-  const handleCashOnDelivery = () => {
+  const handleCashOnDelivery = async () => {
     setIsCheckingOut(true);
-    setTimeout(() => {
+    try {
       const orderId = formatOrderId();
+
+      // Get auth token for the API call
+      const supabase = getSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        toast.error('Please sign in to place an order.');
+        setIsCheckingOut(false);
+        return;
+      }
+
+      // Create COD order via order service
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders/cod`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            email: shippingData?.email || '',
+            amount: total,
+            products: items.map(i => ({
+              name: i.productName,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+            shippingAddress: shippingData
+              ? `${shippingData.address}, ${shippingData.city}, ${shippingData.state}`
+              : '',
+            shippingDetails: shippingData
+              ? {
+                  fullName: shippingData.fullName,
+                  phone: shippingData.phone,
+                  address: shippingData.address,
+                  city: shippingData.city,
+                  state: shippingData.state,
+                }
+              : undefined,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to create order');
+      }
+
+      const savedOrder = await res.json();
+
+      // Save to localStorage for confirmation page
       const order = {
-        id: orderId,
+        id: savedOrder._id || orderId,
         method: 'cod' as const,
         items: items.map(i => ({ id: i.id, name: i.productName, qty: i.quantity, price: i.price })),
         totals: { subtotal, shipping, tax, total },
         shippingData,
       };
       try { localStorage.setItem('last-order', JSON.stringify(order)); } catch {}
+
       toast.info('Order placed with Pay on Delivery. You will pay upon delivery.');
       clearCart();
+      router.push(`/order-confirmation?method=cod&id=${encodeURIComponent(savedOrder._id || orderId)}`);
+    } catch (error) {
+      console.error('COD order error:', error);
+      toast.error('Failed to place order. Please try again.');
+    } finally {
       setIsCheckingOut(false);
-      router.push(`/order-confirmation?method=cod&id=${encodeURIComponent(orderId)}`);
-    }, 1000);
+    }
   };
 
   const subtotal = getTotalPrice();
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.1; // 10% tax
   const total = subtotal + shipping + tax;
+
+  // OLD PAY ON DELIVERY LOGIC (commented out):
+  // const codAvailable = subtotal < 50000;
+
+  // NEW PAY ON DELIVERY LOGIC:
+  // POD is only available if ALL items in the cart have payOnDelivery enabled.
+  // If any item does not support POD, pay on delivery is disabled entirely.
+  const allItemsSupportPOD = items.length > 0 && items.every(item => item.payOnDelivery === true);
+  const codAvailable = allItemsSupportPOD;
 
   if (items.length === 0) {
     return (
@@ -276,7 +343,7 @@ export default function CartPage() {
                     onBack={() => setActiveStep(2)}
                     onNext={handleCheckout}
                     onPayOnDelivery={handleCashOnDelivery}
-                    codAvailable={subtotal < 50000}
+                    codAvailable={codAvailable}
                     shippingData={shippingData}
                     amount={total}
                     cartItems={items}

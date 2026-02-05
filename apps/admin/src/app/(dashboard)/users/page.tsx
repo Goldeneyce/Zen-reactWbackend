@@ -1,12 +1,14 @@
 import type { User } from "@supabase/supabase-js";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-const getData = async (): Promise<data:User[]; totalCount:number> => {
-  const {getToken} = await auth()
-  const token = await getToken({ template: "supabase" });
+const getData = async (): Promise<{data:User[]; totalCount:number}> => {
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/users`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",

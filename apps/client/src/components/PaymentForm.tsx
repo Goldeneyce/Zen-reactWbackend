@@ -102,7 +102,7 @@ export default function PaymentForm({
           </>
         ) : (
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Pay on Delivery is available only for orders below ₦50,000.
+            Pay on Delivery is not available. One or more items in your cart do not support pay on delivery.
           </p>
         )}
       </div>

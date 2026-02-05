@@ -21,9 +21,9 @@ import {
 import { DataTablePagination } from "@/components/TablePagination";
 import { useState } from "react";
 import { Trash2Icon } from "@/components/icons";
-import { useAuth } from "@clerk/nextjs";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useMutation } from "@tanstack/react-query";
-import { User } from "@clerk/nextjs/server";
+import { User } from "@supabase/supabase-js";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -53,8 +53,13 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const { getToken } = useAuth();
   const router = useRouter()
+
+  const getToken = async () => {
+    const supabase = getSupabaseBrowserClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token;
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {

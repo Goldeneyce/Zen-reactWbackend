@@ -17,6 +17,7 @@ export const ProductFormSchema = z.object({
   sizes: z.string().optional(),
   colors: z.string().optional(),
   images: z.string(),
+  payOnDelivery: z.boolean().default(false),
 });
 
 

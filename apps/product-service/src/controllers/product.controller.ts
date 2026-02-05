@@ -51,6 +51,7 @@ export const createProduct = async (c: Context) => {
 			reviews: body.reviews,
 			features: body.features,
 			inStock: body.inStock,
+			payOnDelivery: body.payOnDelivery ?? false,
 			badge: body.badge,
 			slug,
 			...categoriesData,

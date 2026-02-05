@@ -49,11 +49,13 @@ export const columns: ColumnDef<User>[] = [
     header: "Avatar",
     cell: ({ row }) => {
       const user = row.original;
+      const avatarUrl = (user.user_metadata as any)?.avatar_url || "";
+      const displayName = (user.user_metadata as any)?.full_name || (user.user_metadata as any)?.first_name || user.email?.split('@')[0] || "-";
       return (
         <div className="w-9 h-9 relative">
           <Image
-            src={user.imageUrl}
-            alt={user.firstName || user.username || "-"}
+            src={avatarUrl || "/users/default-avatar.png"}
+            alt={displayName}
             fill
             className="rounded-full object-cover"
           />
@@ -62,11 +64,12 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "firstName",
+    accessorKey: "user_metadata",
     header: "User",
     cell: ({ row }) => {
       const user = row.original;
-      return <div className="">{user.firstName || user.username || "-"}</div>
+      const displayName = (user.user_metadata as any)?.full_name || (user.user_metadata as any)?.first_name || user.email?.split('@')[0] || "-";
+      return <div className="">{displayName}</div>
     },
   },
   {
@@ -84,7 +87,7 @@ export const columns: ColumnDef<User>[] = [
     },
     cell: ({ row }) => {
       const user = row.original;
-      return <div className="">{user.emailAddresses[0]?.emailAddress}</div>
+      return <div className="">{user.email || "-"}</div>
     },
   },
   {
@@ -92,7 +95,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Status",
     cell: ({ row }) => {
       const user = row.original;
-      const status = user.banned ? "banned" : "active";
+      const status = user.banned_until ? "banned" : "active";
 
       return (
         <div

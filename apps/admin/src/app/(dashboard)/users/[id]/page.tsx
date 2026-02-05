@@ -19,12 +19,14 @@ import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
 import { User } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-const getData = async (id: string): Promise<User || null> => {
-  const {getToken} = await auth()
-  const token = await getToken({ template: "supabase" });
+const getData = async (id: string): Promise<User | null> => {
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
@@ -65,7 +67,7 @@ const SingleUserPage = async ({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{(data?.firstName + " " + data?.lastName) || data?.username || "User"}</BreadcrumbPage>
+            <BreadcrumbPage>{(data?.user_metadata as any)?.full_name || (data?.user_metadata as any)?.first_name || data?.email?.split('@')[0] || "User"}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -140,10 +142,10 @@ const SingleUserPage = async ({
           <div className="bg-primary-foreground p-4 rounded-lg space-y-2">
             <div className="flex items-center gap-2">
               <Avatar className="size-12">
-                <AvatarImage src={data.imageUrl} />
-                <AvatarFallback>{data?.firstName?.charAt(0) || data?.username?.charAt(0) || "User"}</AvatarFallback>
+                <AvatarImage src={(data?.user_metadata as any)?.avatar_url || ""} />
+                <AvatarFallback>{(data?.user_metadata as any)?.full_name?.charAt(0) || data?.email?.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold">{(data?.firstName + " " + data?.lastName) || data?.username || "User"}</h1>
+              <h1 className="text-xl font-semibold">{(data?.user_metadata as any)?.full_name || (data?.user_metadata as any)?.first_name || data?.email?.split('@')[0] || "User"}</h1>
             </div>
             <p className="text-sm text-muted-foreground">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel
@@ -172,7 +174,7 @@ const SingleUserPage = async ({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Full name:</span>
-                <span>{(data?.firstName + " " + data?.lastName) || data?.username || "User"}</span>
+                <span>{(data?.user_metadata as any)?.full_name || (data?.user_metadata as any)?.first_name || data?.email?.split('@')[0] || "User"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Email:</span>
@@ -180,19 +182,19 @@ const SingleUserPage = async ({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Phone:</span>
-                <span>{data?.phoneNumber?.[0] || "Not provided"}</span>
+                <span>{data?.phone || "Not provided"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Role:</span>
-                <span>{String(data.publicMetadata?.role) || "user"}</span>
+                <span>{String((data?.app_metadata as any)?.role || (data?.user_metadata as any)?.role || "user")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Status:</span>
-                <span>{data.banned ? "banned" : "active"}</span>
+                <span>{data?.banned_until ? "banned" : "active"}</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Joined on {new Date(data.createdAt).toLocaleDateString()}
+              Joined on {new Date(data?.created_at || "").toLocaleDateString()}
             </p>
           </div>
         </div>

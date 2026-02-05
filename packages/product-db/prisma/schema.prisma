@@ -39,6 +39,7 @@ model Product {
   features        String[]
   specifications  ProductSpecification[]
   inStock         Boolean
+  payOnDelivery   Boolean                 @default(false)
   badge           ProductBadge?
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt

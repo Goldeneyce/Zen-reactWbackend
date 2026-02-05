@@ -3,10 +3,12 @@ import AppBarChart from "@/components/AppBarChart";
 import AppPieChart from "@/components/AppPieChart";
 import CardList from "@/components/CardList";
 import TodoList from "@/components/TodoList";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 const Homepage = async () => {
-const {getToken} = await auth();
-const token = await getToken();
+const supabase = await createSupabaseServerClient();
+const { data: { session } } = await supabase.auth.getSession();
+const token = session?.access_token;
   const orderChartData = fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`, {
     headers: {
       Authorization: `Bearer ${token}`

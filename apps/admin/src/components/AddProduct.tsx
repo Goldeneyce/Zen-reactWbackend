@@ -29,7 +29,11 @@ import {
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { ScrollArea } from "./ui/scroll-area";
+import { Switch } from "./ui/switch";
 import { ProductFormSchema } from "../../../../packages/types/src/product";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 // const categories = [
 //   "all",
@@ -69,6 +73,7 @@ const AddProduct = () => {
       sizes: "",
       colors: "",
       images: "",
+      payOnDelivery: false,
     },
   });
 
@@ -77,7 +82,11 @@ const AddProduct = () => {
     queryFn: fetchCategories,
   });
 
-    const { getToken } = useAuth();
+    const getToken = async () => {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      return session?.access_token;
+    };
 
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof ProductFormSchema>) => {
@@ -247,7 +256,26 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
-
+                <FormField
+                  control={form.control}
+                  name="payOnDelivery"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Pay on Delivery</FormLabel>
+                        <FormDescription>
+                          Allow customers to pay for this product on delivery.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="images"

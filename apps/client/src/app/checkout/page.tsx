@@ -153,7 +153,9 @@ export default function CheckoutPage() {
                   onBack={() => setActiveStep('shipping')}
                   onNext={() => setActiveStep('review')}
                   onPayOnDelivery={() => {}}
-                  codAvailable={false}
+                  // OLD: codAvailable={false}
+                  // NEW: POD only if ALL cart items support it
+                  codAvailable={items.length > 0 && items.every(item => item.payOnDelivery === true)}
                 />
               )}
               
