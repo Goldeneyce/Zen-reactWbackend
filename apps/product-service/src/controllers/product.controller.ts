@@ -262,7 +262,42 @@ export const updateProduct = async (c: Context) => {
 		},
 	});
 
+	const productEvent: ProductType = product;
+	producer.send("product.updated", { value: JSON.stringify(productEvent) });
+
 	return c.json(product, 200);
+};
+
+export const getProductsByIds = async (c: Context) => {
+	const idsParam = c.req.query("ids");
+
+	if (!idsParam) {
+		return c.json({ error: "ids query parameter is required" }, 400);
+	}
+
+	const ids = idsParam.split(",").map((id) => id.trim()).filter(Boolean);
+
+	if (ids.length === 0) {
+		return c.json({ error: "At least one product id is required" }, 400);
+	}
+
+	if (ids.length > 100) {
+		return c.json({ error: "Cannot fetch more than 100 products at once" }, 400);
+	}
+
+	const products = await prisma.product.findMany({
+		where: { id: { in: ids } },
+		include: {
+			categories: {
+				include: {
+					category: true,
+				},
+			},
+			specifications: true,
+		},
+	});
+
+	return c.json(products, 200);
 };
 
 export const deleteProduct = async (c: Context) => {
