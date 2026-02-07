@@ -9,3 +9,9 @@ export const HISTORY_SERVICE_URL =
 
 export const CART_SERVICE_URL =
   process.env.CART_SERVICE_URL ?? "http://localhost:8004";
+
+export const WISHLIST_SERVICE_URL =
+  process.env.WISHLIST_SERVICE_URL ?? "http://localhost:8006";
+
+export const INVENTORY_SERVICE_URL =
+  process.env.INVENTORY_SERVICE_URL ?? "http://localhost:8010";

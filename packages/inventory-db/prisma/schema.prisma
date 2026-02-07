@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Each row tracks the stock level for a single product (or product+variant).
+model InventoryItem {
+  id          String   @id @default(uuid())
+  productId   String
+  sku         String   @unique
+  variantName String?                     // e.g. "Black / XL"
+  quantity    Int      @default(0)
+  reserved    Int      @default(0)         // held by in-progress orders
+  lowStockAt  Int      @default(5)         // threshold for alerts
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  movements   StockMovement[]
+
+  @@unique([productId, variantName])
+  @@index([productId])
+}
+
+enum MovementType {
+  INBOUND        // goods received / restock
+  OUTBOUND       // order fulfilled / shipped
+  RESERVATION    // hold for an in-progress checkout
+  RELEASE        // undo a reservation (payment failed, timeout, etc.)
+  ADJUSTMENT     // manual correction by admin
+}
+
+/// Append-only audit log — never update, never delete.
+model StockMovement {
+  id              String        @id @default(uuid())
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  type            MovementType
+  delta           Int           // positive = inbound, negative = outbound
+  reason          String?       // free-text explanation
+  referenceId     String?       // orderId, shipmentId, etc.
+  createdAt       DateTime      @default(now())
+
+  @@index([inventoryItemId])
+  @@index([referenceId])
+}

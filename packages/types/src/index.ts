@@ -4,3 +4,4 @@ export * from './cart.ts';
 export * from './order.ts';
 export * from './user.ts';
 export * from './gateway.ts';
+export * from './review.ts';

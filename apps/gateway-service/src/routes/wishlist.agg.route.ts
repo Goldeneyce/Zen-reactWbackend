@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
-import { HISTORY_SERVICE_URL } from "../utils/services.js";
+import { WISHLIST_SERVICE_URL } from "../utils/services.js";
 import { fetchProductsByIds } from "../utils/hydrate.js";
 
 const router = new Hono();
@@ -9,15 +9,15 @@ const router = new Hono();
  * GET /api/wishlist
  *
  * Gateway Aggregator pattern:
- *  1. Fetch product IDs from history-service's wishlist endpoint
+ *  1. Fetch product IDs from wishlist-service
  *  2. Bulk-fetch full product data from product-service
  *  3. Merge and return one clean JSON payload to the frontend
  */
 router.get("/", shouldBeUser, async (c) => {
   const authHeader = c.req.header("Authorization") ?? "";
 
-  // 1 ─ Fetch wishlist product IDs from history-service
-  const wishlistRes = await fetch(`${HISTORY_SERVICE_URL}/wishlist`, {
+  // 1 ─ Fetch wishlist product IDs from wishlist-service
+  const wishlistRes = await fetch(`${WISHLIST_SERVICE_URL}/wishlist`, {
     headers: { Authorization: authHeader },
   });
 
@@ -49,13 +49,13 @@ router.get("/", shouldBeUser, async (c) => {
 });
 
 /**
- * POST /api/wishlist  → proxy add to history-service
+ * POST /api/wishlist  → proxy add to wishlist-service
  */
 router.post("/", shouldBeUser, async (c) => {
   const authHeader = c.req.header("Authorization") ?? "";
   const body = await c.req.json();
 
-  const res = await fetch(`${HISTORY_SERVICE_URL}/wishlist`, {
+  const res = await fetch(`${WISHLIST_SERVICE_URL}/wishlist`, {
     method: "POST",
     headers: { Authorization: authHeader, "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -72,7 +72,7 @@ router.delete("/:productId", shouldBeUser, async (c) => {
   const authHeader = c.req.header("Authorization") ?? "";
   const productId = c.req.param("productId");
 
-  const res = await fetch(`${HISTORY_SERVICE_URL}/wishlist/${productId}`, {
+  const res = await fetch(`${WISHLIST_SERVICE_URL}/wishlist/${productId}`, {
     method: "DELETE",
     headers: { Authorization: authHeader },
   });
