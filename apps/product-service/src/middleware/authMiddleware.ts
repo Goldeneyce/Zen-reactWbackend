@@ -18,6 +18,14 @@ export const shouldBeAdmin = createMiddleware<{
   return verifySupabaseAuth(c, next, "admin");
 });
 
+export const shouldBeProductAdmin = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next, "productAdmin");
+});
+
 const getBearerToken = (authorization: string | undefined) => {
   if (!authorization) return null;
   const [type, token] = authorization.split(" ");
@@ -28,7 +36,7 @@ const getBearerToken = (authorization: string | undefined) => {
 const verifySupabaseAuth = async (
   c: any,
   next: () => Promise<void>,
-  requiredRole?: "admin"
+  requiredRole?: "admin" | "productAdmin"
 ) => {
   const token = getBearerToken(c.req.header("Authorization"));
 
@@ -56,7 +64,13 @@ const verifySupabaseAuth = async (
         claims.user_metadata?.role ||
         claims.role;
 
-      if (role !== requiredRole) {
+      if (requiredRole === "productAdmin") {
+        if (role !== "productAdmin" && role !== "admin") {
+          return c.json({
+            message: "You are not authorized to access this resource!",
+          }, 403);
+        }
+      } else if (role !== requiredRole) {
         return c.json({
           message: "You are not authorized to access this resource!",
         }, 403);

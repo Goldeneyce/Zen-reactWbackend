@@ -118,8 +118,14 @@ export const columns: ColumnDef<ProductType>[] = [
               Copy product ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={`/products/${product.id}`}>View product</Link>
+            <DropdownMenuItem asChild>
+              <Link href={`/products/${product.id}`}>View & Edit Product</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/products/${product.id}#specs`}>Manage Specs</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/products/${product.id}#inventory`}>Manage Inventory</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

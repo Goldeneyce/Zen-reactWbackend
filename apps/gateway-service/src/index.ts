@@ -7,6 +7,7 @@ import wishlistAggRouter from "./routes/wishlist.agg.route.js";
 import cartAggRouter from "./routes/cart.agg.route.js";
 import historyAggRouter from "./routes/history.agg.route.js";
 import inventoryAggRouter from "./routes/inventory.agg.route.js";
+import productAdminAggRouter from "./routes/productAdmin.agg.route.js";
 
 const app = new Hono();
 
@@ -45,6 +46,7 @@ app.route("/api/wishlist", wishlistAggRouter);
 app.route("/api/cart", cartAggRouter);
 app.route("/api/history", historyAggRouter);
 app.route("/api/inventory", inventoryAggRouter);
+app.route("/api/product-admin", productAdminAggRouter);
 
 app.onError((err, c) => {
   console.error(err);

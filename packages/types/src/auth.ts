@@ -5,10 +5,10 @@ export interface CustomJwtSessionClaims {
   userId?: string;
   role?: string;
   app_metadata?: {
-    role?: 'user' | 'admin';
+    role?: 'user' | 'admin' | 'productAdmin';
   };
   user_metadata?: {
-    role?: 'user' | 'admin';
+    role?: 'user' | 'admin' | 'productAdmin';
   };
 }
 

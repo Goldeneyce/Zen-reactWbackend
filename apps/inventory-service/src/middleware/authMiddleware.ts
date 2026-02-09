@@ -22,6 +22,13 @@ export const shouldBeAdmin = async (
   return verifySupabaseAuth(request, reply, "admin");
 };
 
+export const shouldBeProductAdmin = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return verifySupabaseAuth(request, reply, "productAdmin");
+};
+
 const getBearerToken = (request: FastifyRequest) => {
   const header = request.headers.authorization;
   if (!header) return null;
@@ -33,7 +40,7 @@ const getBearerToken = (request: FastifyRequest) => {
 const verifySupabaseAuth = async (
   request: FastifyRequest,
   reply: FastifyReply,
-  requiredRole?: "admin"
+  requiredRole?: "admin" | "productAdmin"
 ) => {
   const token = getBearerToken(request);
 
@@ -63,7 +70,14 @@ const verifySupabaseAuth = async (
         claims.app_metadata?.role ||
         claims.user_metadata?.role ||
         claims.role;
-      if (role !== requiredRole) {
+
+      if (requiredRole === "productAdmin") {
+        if (role !== "productAdmin" && role !== "admin") {
+          return reply
+            .status(403)
+            .send({ message: "You do not have permission!" });
+        }
+      } else if (role !== requiredRole) {
         return reply
           .status(403)
           .send({ message: "You do not have permission!" });

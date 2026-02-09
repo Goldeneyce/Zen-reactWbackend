@@ -10,6 +10,8 @@ import {
   ShirtIcon,
   UserIcon,
   ShoppingBasketIcon,
+  PackageIcon,
+  WarehouseIcon,
 } from "@/components/icons";
 import {
   Sidebar,
@@ -157,6 +159,21 @@ const AppSidebar = () => {
                     </SheetTrigger>
                     <AddCategory />
                   </Sheet>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Inventory</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/inventory">
+                    <WarehouseIcon />
+                    Stock Overview
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

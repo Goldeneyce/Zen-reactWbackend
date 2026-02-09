@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { shouldBeUser, shouldBeAdmin } from "../middleware/authMiddleware.ts";
+import { shouldBeUser, shouldBeProductAdmin } from "../middleware/authMiddleware.ts";
 import {
   getAvailableStock,
   getInventoryItem,
@@ -31,7 +31,7 @@ export function inventoryRoutes(fastify: FastifyInstance) {
   /** GET /inventory — paginated list */
   fastify.get<{ Querystring: { page?: string; pageSize?: string } }>(
     "/inventory",
-    { preHandler: shouldBeAdmin },
+    { preHandler: shouldBeProductAdmin },
     async (
       request: FastifyRequest<{ Querystring: { page?: string; pageSize?: string } }>,
       reply: FastifyReply
@@ -46,7 +46,7 @@ export function inventoryRoutes(fastify: FastifyInstance) {
   /** GET /inventory/:productId — full detail with recent movements */
   fastify.get<{ Params: { productId: string } }>(
     "/inventory/:productId",
-    { preHandler: shouldBeAdmin },
+    { preHandler: shouldBeProductAdmin },
     async (
       request: FastifyRequest<{ Params: { productId: string } }>,
       reply: FastifyReply
@@ -68,7 +68,7 @@ export function inventoryRoutes(fastify: FastifyInstance) {
     };
   }>(
     "/inventory",
-    { preHandler: shouldBeAdmin },
+    { preHandler: shouldBeProductAdmin },
     async (
       request: FastifyRequest<{
         Body: {
@@ -96,7 +96,7 @@ export function inventoryRoutes(fastify: FastifyInstance) {
   /** PATCH /inventory/:productId/restock — add stock */
   fastify.patch<{ Params: { productId: string }; Body: { quantity: number; reason?: string } }>(
     "/inventory/:productId/restock",
-    { preHandler: shouldBeAdmin },
+    { preHandler: shouldBeProductAdmin },
     async (
       request: FastifyRequest<{
         Params: { productId: string };
@@ -117,7 +117,7 @@ export function inventoryRoutes(fastify: FastifyInstance) {
   /** PATCH /inventory/:productId/adjust — manual correction */
   fastify.patch<{ Params: { productId: string }; Body: { delta: number; reason: string } }>(
     "/inventory/:productId/adjust",
-    { preHandler: shouldBeAdmin },
+    { preHandler: shouldBeProductAdmin },
     async (
       request: FastifyRequest<{
         Params: { productId: string };

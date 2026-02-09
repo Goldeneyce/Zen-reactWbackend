@@ -309,7 +309,7 @@ const AddProduct = () => {
                                       formData.append("file", file);
                                       formData.append(
                                         "upload_preset",
-                                        "ecommerce"
+                                        "zentrics"
                                       );
 
                                       const res = await fetch(

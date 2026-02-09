@@ -46,7 +46,7 @@ export default async function middleware(request: NextRequest) {
       (session.user.app_metadata as { role?: string } | undefined)?.role ||
       (session.user.user_metadata as { role?: string } | undefined)?.role;
 
-    if (role !== "admin") {
+    if (role !== "admin" && role !== "productAdmin") {
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
   }
