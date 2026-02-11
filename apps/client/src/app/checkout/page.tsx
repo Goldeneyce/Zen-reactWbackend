@@ -9,7 +9,7 @@ import ShippingForm from '@/components/ShippingForm';
 import PaymentForm from '@/components/PaymentForm';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FieldErrors } from 'react-hook-form';
-import * as z from 'zod';
+import { z } from 'zod';
 
 const checkoutSchema = z.object({
   payment: z.object({

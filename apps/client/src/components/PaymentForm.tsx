@@ -4,7 +4,7 @@
 import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import PaystackPaymentForm from './PaystackPaymentForm';
-import { ShippingFormData } from '@repo/types';
+import { ShippingFormData, CartItem } from '@repo/types';
 
 interface PaymentFormProps {
   control?: Control<any>;
@@ -15,13 +15,7 @@ interface PaymentFormProps {
   codAvailable: boolean;
   shippingData?: ShippingFormData;
   amount?: number;
-  cartItems?: Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image?: string;
-  }>;
+  cartItems?: CartItem[];
 }
 
 export default function PaymentForm({ 

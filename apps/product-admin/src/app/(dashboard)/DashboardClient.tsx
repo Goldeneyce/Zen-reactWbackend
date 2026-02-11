@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ShirtIcon, WarehouseIcon, AlertTriangleIcon, TrendingUpIcon } from "@/components/icons";
+import { ShirtIcon, WarehouseIcon, AlertTriangleIcon, TrendingUpIcon, TagIcon, BarChart3Icon } from "@/components/icons";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 

@@ -66,7 +66,7 @@ const AddUser = () => {
       toast.success("User created successfully");
       form.reset();
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message);
     },
   });

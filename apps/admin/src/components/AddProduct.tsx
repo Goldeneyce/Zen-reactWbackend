@@ -30,10 +30,11 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { ScrollArea } from "./ui/scroll-area";
 import { Switch } from "./ui/switch";
-import { ProductFormSchema } from "../../../../packages/types/src/product";
+import { ProductFormSchema, CategoryType, ProductBadgeValues } from "../../../../packages/types/src/product";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
+import { Plus, Trash2 } from "lucide-react";
 
 // const categories = [
 //   "all",
@@ -63,17 +64,24 @@ const fetchCategories = async () => {
 
 const AddProduct = () => {
   const form = useForm<z.infer<typeof ProductFormSchema>>({
-    resolver: zodResolver(ProductFormSchema),
+    resolver: zodResolver(ProductFormSchema) as any,
     defaultValues: {
       name: "",
-      shortDescription: "",
       description: "",
       price: 0,
+      originalPrice: undefined,
       categorySlug: "",
-      sizes: "",
-      colors: "",
-      images: "",
+      image: "",
+      images: [],
+      sizes: [],
+      colors: [],
+      features: [],
+      specifications: [],
+      inStock: true,
       payOnDelivery: false,
+      badge: undefined,
+      rating: 0,
+      reviews: 0,
     },
   });
 
@@ -109,7 +117,7 @@ const AddProduct = () => {
     onSuccess: () => {
       toast.success("Product created successfully");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message);
     },
   });
@@ -134,22 +142,6 @@ const AddProduct = () => {
                       </FormControl>
                       <FormDescription>
                         Enter the name of the product.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="shortDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Short Description</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Enter the short description of the product.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -189,6 +181,29 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="originalPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Original Price (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Original price before discount"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Set to show a strikethrough price (e.g. for sales).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 {data && (
                   <FormField
                     control={form.control}
@@ -211,13 +226,150 @@ const AddProduct = () => {
                           </Select>
                         </FormControl>
                         <FormDescription>
-                          Enter the category of the product.
+                          Select the category of the product.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 )}
+                <FormField
+                  control={form.control}
+                  name="badge"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Badge (Optional)</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value ?? ""}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a badge" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ProductBadgeValues.map((badge) => (
+                              <SelectItem key={badge} value={badge}>
+                                {badge}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>
+                        Optionally assign a badge like New, BestSeller, etc.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Main Image</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                try {
+                                  const formData = new FormData();
+                                  formData.append("file", file);
+                                  formData.append("upload_preset", "zentrics");
+                                  const res = await fetch(
+                                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                                    { method: "POST", body: formData }
+                                  );
+                                  const data = await res.json();
+                                  if (data.secure_url) {
+                                    field.onChange(data.secure_url);
+                                  }
+                                } catch (error) {
+                                  console.log(error);
+                                  toast.error("Upload failed!");
+                                }
+                              }
+                            }}
+                          />
+                          {field.value && (
+                            <span className="text-green-600 text-sm">Image uploaded</span>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Upload the main product image.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Additional Images (Optional)</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                try {
+                                  const formData = new FormData();
+                                  formData.append("file", file);
+                                  formData.append("upload_preset", "zentrics");
+                                  const res = await fetch(
+                                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                                    { method: "POST", body: formData }
+                                  );
+                                  const data = await res.json();
+                                  if (data.secure_url) {
+                                    const current = form.getValues("images") || [];
+                                    form.setValue("images", [...current, data.secure_url]);
+                                  }
+                                } catch (error) {
+                                  console.log(error);
+                                  toast.error("Upload failed!");
+                                }
+                              }
+                            }}
+                          />
+                          {field.value && field.value.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {field.value.map((url, idx) => (
+                                <div key={idx} className="relative group">
+                                  <img src={url} alt={`image-${idx}`} className="w-16 h-16 object-cover rounded" />
+                                  <button
+                                    type="button"
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                    onClick={() => {
+                                      const current = form.getValues("images") || [];
+                                      form.setValue("images", current.filter((_, i) => i !== idx));
+                                    }}
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Upload additional product images.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="sizes"
@@ -258,6 +410,124 @@ const AddProduct = () => {
                 />
                 <FormField
                   control={form.control}
+                  name="features"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Features (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Waterproof, Wireless, Bluetooth"
+                          value={field.value?.join(", ") ?? ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            field.onChange(
+                              val ? val.split(",").map((s) => s.trim()).filter(Boolean) : []
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter product features separated by commas.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Specifications (Optional)</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const current = form.getValues("specifications") || [];
+                        form.setValue("specifications", [
+                          ...current,
+                          { key: "", name: "", value: "" },
+                        ]);
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-1" /> Add Spec
+                    </Button>
+                  </div>
+                  {form.watch("specifications")?.map((_, index) => (
+                    <div key={index} className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`specifications.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-xs">Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Weight" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`specifications.${index}.key`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-xs">Key</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., weight" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`specifications.${index}.value`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-xs">Value</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., 2.5 kg" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const current = form.getValues("specifications") || [];
+                          form.setValue(
+                            "specifications",
+                            current.filter((_, i) => i !== index)
+                          );
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <FormField
+                  control={form.control}
+                  name="inStock"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">In Stock</FormLabel>
+                        <FormDescription>
+                          Is this product currently in stock?
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="payOnDelivery"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -272,82 +542,6 @@ const AddProduct = () => {
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="images"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Images</FormLabel>
-                      <FormControl>
-                        <div className="">
-                          {form.watch("colors")?.map((color) => (
-                            <div
-                              className="mb-4 flex items-center gap-4"
-                              key={color}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: color }}
-                                />
-                                <span className="text-sm font-medium min-w-[80px]">
-                                  {color}:
-                                </span>
-                              </div>
-                              <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={async (e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    try {
-                                      const formData = new FormData();
-                                      formData.append("file", file);
-                                      formData.append(
-                                        "upload_preset",
-                                        "zentrics"
-                                      );
-
-                                      const res = await fetch(
-                                        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-                                        {
-                                          method: "POST",
-                                          body: formData,
-                                        }
-                                      );
-                                      const data = await res.json();
-
-                                      if (data.secure_url) {
-                                        const currentImages =
-                                          form.getValues("images") || {};
-                                        form.setValue("images", {
-                                          ...currentImages,
-                                          [color]: data.secure_url,
-                                        });
-                                      }
-                                    } catch (error) {
-                                      console.log(error);
-                                      toast.error("Upload failed!");
-                                    }
-                                  }
-                                }}
-                              />
-                              {field.value?.[color] ? (
-                                <span className="text-green-600 text-sm">
-                                  Image selected
-                                </span>
-                              ) : (
-                                <span className="text-red-600 text-sm">
-                                  Image required
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
                       </FormControl>
                     </FormItem>
                   )}

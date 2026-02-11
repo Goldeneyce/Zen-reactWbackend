@@ -82,7 +82,8 @@ const SingleUserPage = async ({
               <HoverCard>
                 <HoverCardTrigger>
                   <BadgeCheckIcon
-                    size={36}
+                    width={36}
+                    height={36}
                     className="rounded-full bg-blue-500/30 border-1 border-blue-500/50 p-2"
                   />
                 </HoverCardTrigger>
@@ -96,7 +97,8 @@ const SingleUserPage = async ({
               <HoverCard>
                 <HoverCardTrigger>
                   <ShieldIcon
-                    size={36}
+                    width={36}
+                    height={36}
                     className="rounded-full bg-green-800/30 border-1 border-green-800/50 p-2"
                   />
                 </HoverCardTrigger>
@@ -111,7 +113,8 @@ const SingleUserPage = async ({
               <HoverCard>
                 <HoverCardTrigger>
                   <CandyIcon
-                    size={36}
+                    width={36}
+                    height={36}
                     className="rounded-full bg-yellow-500/30 border-1 border-yellow-500/50 p-2"
                   />
                 </HoverCardTrigger>
@@ -125,7 +128,8 @@ const SingleUserPage = async ({
               <HoverCard>
                 <HoverCardTrigger>
                   <CitrusIcon
-                    size={36}
+                    width={36}
+                    height={36}
                     className="rounded-full bg-orange-500/30 border-1 border-orange-500/50 p-2"
                   />
                 </HoverCardTrigger>

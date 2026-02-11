@@ -6,18 +6,26 @@ import TodoList from "@/components/TodoList";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 const Homepage = async () => {
-const supabase = await createSupabaseServerClient();
-const { data: { session } } = await supabase.auth.getSession();
-const token = session?.access_token;
-  const orderChartData = fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  let orderChartData: any[] = [];
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.ok) {
+      orderChartData = await res.json();
     }
-  }).then((res) => res.json());
+  } catch {
+    // Order service unavailable — continue with empty data
+  }
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4">
       <div className="bg-primary-foreground p-4 rounded-lg lg:col-span-2 xl:col-span-1 2xl:col-span-2">
-        <AppBarChart dataPromise={orderChartData}/>
+        <AppBarChart dataPromise={Promise.resolve(orderChartData)}/>
       </div>
       <div className="bg-primary-foreground p-4 rounded-lg">
         <CardList title="Latest Transactions" />

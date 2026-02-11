@@ -132,15 +132,27 @@ const CardList = async ({ title }: { title: string }) => {
   const token = session?.access_token;
 
   if (title === "Popular Products") {
-    products = await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`
-    ).then((res) => res.json());
-  }else{
-    orders = await fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,{
-      headers: { 
-        Authorization: `Bearer ${token}` 
-      },
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`);
+      if (res.ok) {
+        products = await res.json();
+      }
+    } catch {
+      // Product service unavailable
     }
-    ).then((res) => res.json());
+  }else{
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,{
+        headers: { 
+          Authorization: `Bearer ${token}` 
+        },
+      });
+      if (res.ok) {
+        orders = await res.json();
+      }
+    } catch {
+      // Order service unavailable
+    }
   }
 
 

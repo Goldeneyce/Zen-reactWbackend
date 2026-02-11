@@ -21,6 +21,7 @@ export const createProductSpecification = async (c: Context) => {
 		data: {
 			key: key ?? "",
 			value: value ?? "",
+			name: key ?? "",
 			product: { connect: { id: productId } },
 		},
 	});

@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 const isAuthRoute = (pathname: string) =>
   pathname.startsWith("/sign-in") || pathname.startsWith("/unauthorized");
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -33,18 +33,18 @@ export default async function middleware(request: NextRequest) {
   });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  if (!session && !isAuthRoute(pathname)) {
+  if (!user && !isAuthRoute(pathname)) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  if (session && !isAuthRoute(pathname)) {
+  if (user && !isAuthRoute(pathname)) {
     const role =
-      (session.user.app_metadata as { role?: string } | undefined)?.role ||
-      (session.user.user_metadata as { role?: string } | undefined)?.role;
+      (user.app_metadata as { role?: string } | undefined)?.role ||
+      (user.user_metadata as { role?: string } | undefined)?.role;
 
     if (role !== "productAdmin" && role !== "admin") {
       return NextResponse.redirect(new URL("/unauthorized", request.url));

@@ -29,21 +29,24 @@
       "Keystone Correction & Auto Focus"
     ],
     "inStock": true,
+    "payOnDelivery": true,
     "badge": "New",
-    "categories": [
-      { "id": 3 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 3, "name": "UltraHD 4K LED Projector", "categoryName": "Entertainment" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Resolution", "value": "4K UHD (3840x2160)" },
-        { "key": "Brightness", "value": "3,500 Lumens" },
-        { "key": "Contrast Ratio", "value": "1,000,000:1" },
-        { "key": "Light Source", "value": "LED (30,000 hours)" },
-        { "key": "Connectivity", "value": "Wi-Fi, Bluetooth, 3x HDMI, 2x USB" },
-        { "key": "Sound", "value": "Built-in 20W Stereo Speakers" },
-        { "key": "Throw Ratio", "value": "1.2:1" },
-        { "key": "Dimensions", "value": "12.6 x 9.8 x 4.7 inches" },
-        { "key": "Weight", "value": "8.8 lbs" }
+        { "key": "resolution", "name": "Resolution", "value": "4K UHD (3840x2160)" },
+        { "key": "brightness", "name": "Brightness", "value": "3,500 Lumens" },
+        { "key": "contrast_ratio", "name": "Contrast Ratio", "value": "1,000,000:1" },
+        { "key": "light_source", "name": "Light Source", "value": "LED (30,000 hours)" },
+        { "key": "connectivity", "name": "Connectivity", "value": "Wi-Fi, Bluetooth, 3x HDMI, 2x USB" },
+        { "key": "sound", "name": "Sound", "value": "Built-in 20W Stereo Speakers" },
+        { "key": "throw_ratio", "name": "Throw Ratio", "value": "1.2:1" },
+        { "key": "dimensions", "name": "Dimensions", "value": "12.6 x 9.8 x 4.7 inches" },
+        { "key": "weight", "name": "Weight", "value": "8.8 lbs" }
       ]
     }
   },
@@ -73,20 +76,23 @@
       "10-Year Warranty"
     ],
     "inStock": true,
+    "payOnDelivery": false,
     "badge": "BestSeller",
-    "categories": [
-      { "id": 7 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 7, "name": "5000W Solar Inverter System", "categoryName": "Solar" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Power Output", "value": "5000W Continuous" },
-        { "key": "Peak Power", "value": "10000W" },
-        { "key": "Input Voltage", "value": "24-48V DC" },
-        { "key": "Output Voltage", "value": "220-240V AC" },
-        { "key": "Efficiency", "value": "95%" },
-        { "key": "MPPT Range", "value": "60-450V" },
-        { "key": "Dimensions", "value": "24 x 18 x 8 inches" },
-        { "key": "Weight", "value": "45 lbs" }
+        { "key": "power_output", "name": "Power Output", "value": "5000W Continuous" },
+        { "key": "peak_power", "name": "Peak Power", "value": "10000W" },
+        { "key": "input_voltage", "name": "Input Voltage", "value": "24-48V DC" },
+        { "key": "output_voltage", "name": "Output Voltage", "value": "220-240V AC" },
+        { "key": "efficiency", "name": "Efficiency", "value": "95%" },
+        { "key": "mppt_range", "name": "MPPT Range", "value": "60-450V" },
+        { "key": "dimensions", "name": "Dimensions", "value": "24 x 18 x 8 inches" },
+        { "key": "weight", "name": "Weight", "value": "45 lbs" }
       ]
     }
   },
@@ -116,20 +122,23 @@
       "Works with Alexa & Google Home"
     ],
     "inStock": true,
+    "payOnDelivery": true,
     "badge": "TopRated",
-    "categories": [
-      { "id": 5 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 5, "name": "Smart Security Camera Pro", "categoryName": "Security" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Resolution", "value": "4K (3840x2160)" },
-        { "key": "Field of View", "value": "130 degree Wide Angle" },
-        { "key": "Night Vision", "value": "Up to 50ft" },
-        { "key": "Storage", "value": "Cloud or MicroSD up to 256GB" },
-        { "key": "Connectivity", "value": "WiFi 802.11ac, Ethernet" },
-        { "key": "Power", "value": "PoE or 12V DC" },
-        { "key": "Dimensions", "value": "4.5 x 3 x 3 inches" },
-        { "key": "Weight", "value": "1.2 lbs" }
+        { "key": "resolution", "name": "Resolution", "value": "4K (3840x2160)" },
+        { "key": "field_of_view", "name": "Field of View", "value": "130 degree Wide Angle" },
+        { "key": "night_vision", "name": "Night Vision", "value": "Up to 50ft" },
+        { "key": "storage", "name": "Storage", "value": "Cloud or MicroSD up to 256GB" },
+        { "key": "connectivity", "name": "Connectivity", "value": "WiFi 802.11ac, Ethernet" },
+        { "key": "power", "name": "Power", "value": "PoE or 12V DC" },
+        { "key": "dimensions", "name": "Dimensions", "value": "4.5 x 3 x 3 inches" },
+        { "key": "weight", "name": "Weight", "value": "1.2 lbs" }
       ]
     }
   },
@@ -159,20 +168,23 @@
       "Free Lifetime Updates"
     ],
     "inStock": true,
+    "payOnDelivery": false,
     "badge": null,
-    "categories": [
-      { "id": 8 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 8, "name": "Smart Home Automation Hub", "categoryName": "Automation" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Protocols", "value": "Zigbee, Z-Wave, WiFi, Bluetooth" },
-        { "key": "Range", "value": "Up to 300ft" },
-        { "key": "Max Devices", "value": "200+" },
-        { "key": "Processor", "value": "Quad-Core ARM" },
-        { "key": "Memory", "value": "2GB RAM, 8GB Storage" },
-        { "key": "Connectivity", "value": "WiFi, Ethernet" },
-        { "key": "Dimensions", "value": "5 x 5 x 1.5 inches" },
-        { "key": "Weight", "value": "0.8 lbs" }
+        { "key": "protocols", "name": "Protocols", "value": "Zigbee, Z-Wave, WiFi, Bluetooth" },
+        { "key": "range", "name": "Range", "value": "Up to 300ft" },
+        { "key": "max_devices", "name": "Max Devices", "value": "200+" },
+        { "key": "processor", "name": "Processor", "value": "Quad-Core ARM" },
+        { "key": "memory", "name": "Memory", "value": "2GB RAM, 8GB Storage" },
+        { "key": "connectivity", "name": "Connectivity", "value": "WiFi, Ethernet" },
+        { "key": "dimensions", "name": "Dimensions", "value": "5 x 5 x 1.5 inches" },
+        { "key": "weight", "name": "Weight", "value": "0.8 lbs" }
       ]
     }
   },
@@ -201,20 +213,23 @@
       "Quiet Operation (38dB)"
     ],
     "inStock": true,
+    "payOnDelivery": false,
     "badge": "EnergyEfficient",
-    "categories": [
-      { "id": 2 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 2, "name": "Energy-Efficient Smart Refrigerator", "categoryName": "Appliances" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Capacity", "value": "22 Cubic Feet" },
-        { "key": "Energy Rating", "value": "A+++" },
-        { "key": "Annual Energy", "value": "320 kWh/year" },
-        { "key": "Cooling Type", "value": "Multi-Zone Frost-Free" },
-        { "key": "Noise Level", "value": "38 dB" },
-        { "key": "Climate Class", "value": "SN-T" },
-        { "key": "Dimensions", "value": "70 x 33 x 28 inches" },
-        { "key": "Weight", "value": "220 lbs" }
+        { "key": "capacity", "name": "Capacity", "value": "22 Cubic Feet" },
+        { "key": "energy_rating", "name": "Energy Rating", "value": "A+++" },
+        { "key": "annual_energy", "name": "Annual Energy", "value": "320 kWh/year" },
+        { "key": "cooling_type", "name": "Cooling Type", "value": "Multi-Zone Frost-Free" },
+        { "key": "noise_level", "name": "Noise Level", "value": "38 dB" },
+        { "key": "climate_class", "name": "Climate Class", "value": "SN-T" },
+        { "key": "dimensions", "name": "Dimensions", "value": "70 x 33 x 28 inches" },
+        { "key": "weight", "name": "Weight", "value": "220 lbs" }
       ]
     }
   },
@@ -243,20 +258,23 @@
       "25,000 Hour Lifespan"
     ],
     "inStock": true,
+    "payOnDelivery": false,
     "badge": "TopRated",
-    "categories": [
-      { "id": 9 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 9, "name": "LED Smart Bulb 4-Pack", "categoryName": "Lighting" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Wattage", "value": "9W (60W equivalent)" },
-        { "key": "Brightness", "value": "800 Lumens" },
-        { "key": "Color Temperature", "value": "2700K-6500K" },
-        { "key": "Colors", "value": "16 Million RGB" },
-        { "key": "Connectivity", "value": "WiFi 2.4GHz" },
-        { "key": "Lifespan", "value": "25,000 Hours" },
-        { "key": "Base Type", "value": "E26/E27" },
-        { "key": "Voltage", "value": "110-240V AC" }
+        { "key": "wattage", "name": "Wattage", "value": "9W (60W equivalent)" },
+        { "key": "brightness", "name": "Brightness", "value": "800 Lumens" },
+        { "key": "color_temperature", "name": "Color Temperature", "value": "2700K-6500K" },
+        { "key": "colors", "name": "Colors", "value": "16 Million RGB" },
+        { "key": "connectivity", "name": "Connectivity", "value": "WiFi 2.4GHz" },
+        { "key": "lifespan", "name": "Lifespan", "value": "25,000 Hours" },
+        { "key": "base_type", "name": "Base Type", "value": "E26/E27" },
+        { "key": "voltage", "name": "Voltage", "value": "110-240V AC" }
       ]
     }
   },
@@ -286,23 +304,26 @@
       "Works with All HVAC Systems"
     ],
     "inStock": true,
+    "payOnDelivery": false,
     "badge": "Smart",
-    "categories": [
-      { "id": 8 },
-      { "id": 6 },
-      { "id": 1 }
-    ],
+    "categories": {
+      "create": [
+        { "categoryId": 8, "name": "Smart WiFi Thermostat Pro", "categoryName": "Automation" },
+        { "categoryId": 6, "name": "Smart WiFi Thermostat Pro", "categoryName": "Cooling" },
+        { "categoryId": 1, "name": "Smart WiFi Thermostat Pro", "categoryName": "Power Solutions" }
+      ]
+    },
     "specifications": {
       "create": [
-        { "key": "Display", "value": "3.5 inch Color Touchscreen" },
-        { "key": "Connectivity", "value": "WiFi 2.4GHz/5GHz, Bluetooth" },
-        { "key": "Compatibility", "value": "24V HVAC Systems" },
-        { "key": "Power", "value": "C-Wire or Battery Backup" },
-        { "key": "Temperature Range", "value": "45-90 degrees F" },
-        { "key": "Sensors", "value": "Temperature, Humidity, Occupancy" },
-        { "key": "Zones Supported", "value": "Up to 20 Zones" },
-        { "key": "Dimensions", "value": "4.5 x 4.5 x 1 inches" },
-        { "key": "Weight", "value": "0.6 lbs" }
+        { "key": "display", "name": "Display", "value": "3.5 inch Color Touchscreen" },
+        { "key": "connectivity", "name": "Connectivity", "value": "WiFi 2.4GHz/5GHz, Bluetooth" },
+        { "key": "compatibility", "name": "Compatibility", "value": "24V HVAC Systems" },
+        { "key": "power", "name": "Power", "value": "C-Wire or Battery Backup" },
+        { "key": "temperature_range", "name": "Temperature Range", "value": "45-90 degrees F" },
+        { "key": "sensors", "name": "Sensors", "value": "Temperature, Humidity, Occupancy" },
+        { "key": "zones_supported", "name": "Zones Supported", "value": "Up to 20 Zones" },
+        { "key": "dimensions", "name": "Dimensions", "value": "4.5 x 4.5 x 1 inches" },
+        { "key": "weight", "name": "Weight", "value": "0.6 lbs" }
       ]
     }
   }

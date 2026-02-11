@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Searchbar from '@/components/Searchbar';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { z } from 'zod';
 import { LoginFormData } from '@/types';
 import { getSupabaseBrowserClient } from '@/lib/supabaseClient';
 import { AppleAuthIcon, GoogleAuthIcon } from '@/components/Icons';

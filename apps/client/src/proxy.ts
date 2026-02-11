@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -29,7 +29,7 @@ export default async function middleware(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getSession();
+  await supabase.auth.getUser();
 
   return response;
 }

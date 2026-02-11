@@ -85,7 +85,7 @@ export function DataTable<TData, TValue>({
       toast.success("User(s) deleted successfully");
       router.refresh()
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message);
     },
   });

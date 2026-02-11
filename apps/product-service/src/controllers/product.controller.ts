@@ -33,9 +33,27 @@ export const createProduct = async (c: Context) => {
 	const slug = await ensureUniqueSlug(baseSlug);
 
 	// Extract categories if provided as an array of ids
-	const categoriesData = Array.isArray(body.categories)
-		? { categories: { create: body.categories.map((cat: any) => ({ category: { connect: { id: cat.id || cat } } })) } }
-		: body.categories || {};
+	let categoriesData: Prisma.ProductCategoryCreateNestedManyWithoutProductInput | {} = {};
+	if (Array.isArray(body.categories)) {
+		// Resolve category names for denormalized fields
+		const categoryIds = body.categories.map((cat: any) => cat.id || cat);
+		const categories = await prisma.category.findMany({ where: { id: { in: categoryIds.map(Number) } } });
+		const categoryMap = new Map(categories.map((cat) => [cat.id, cat]));
+
+		categoriesData = {
+			create: body.categories.map((cat: any) => {
+				const catId = cat.id || cat;
+				const resolved = categoryMap.get(Number(catId));
+				return {
+					category: { connect: { id: Number(catId) } },
+					name: resolved?.name ?? "",
+					categoryName: resolved?.name ?? "",
+				};
+			}),
+		};
+	} else if (body.categories) {
+		categoriesData = body.categories;
+	}
 
 	const product = await prisma.product.create({
 		data: {
@@ -54,7 +72,7 @@ export const createProduct = async (c: Context) => {
 			payOnDelivery: body.payOnDelivery ?? false,
 			badge: body.badge,
 			slug,
-			...categoriesData,
+			categories: categoriesData as any,
 			...(body.specifications && { specifications: body.specifications }),
 		},
 		include: {
