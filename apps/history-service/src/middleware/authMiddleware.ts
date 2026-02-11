@@ -1,6 +1,16 @@
 import { createMiddleware } from "hono/factory";
 import type { CustomJwtSessionClaims } from "@repo/types";
-import { jwtVerify } from "jose";
+import { jwtVerify, createRemoteJWKSet } from "jose";
+
+const getJWKS = () => {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("SUPABASE_URL is not configured.");
+  }
+  return createRemoteJWKSet(
+    new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`)
+  );
+};
 
 export const shouldBeUser = createMiddleware<{
   Variables: {
@@ -37,12 +47,8 @@ const verifySupabaseAuth = async (
   }
 
   try {
-    const secret = process.env.SUPABASE_JWT_SECRET;
-    if (!secret) {
-      return c.json({ message: "Auth secret not configured." }, 500);
-    }
-
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    const JWKS = getJWKS();
+    const { payload } = await jwtVerify(token, JWKS);
     const claims = payload as CustomJwtSessionClaims;
     const userId = claims.sub || claims.userId;
 

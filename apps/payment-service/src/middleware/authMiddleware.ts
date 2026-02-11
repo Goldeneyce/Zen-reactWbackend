@@ -1,7 +1,17 @@
 import type { CustomJwtSessionClaims } from "@repo/types";
-import { jwtVerify } from "jose";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
 import type { FastifyReply, FastifyRequest } from "fastify";
+
+const getJWKS = () => {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("SUPABASE_URL is not configured.");
+  }
+  return createRemoteJWKSet(
+    new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`)
+  );
+};
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -43,12 +53,8 @@ const verifySupabaseAuth = async (
   }
 
   try {
-    const secret = process.env.SUPABASE_JWT_SECRET;
-    if (!secret) {
-      return reply.code(500).send({ message: "Auth secret not configured." });
-    }
-
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    const JWKS = getJWKS();
+    const { payload } = await jwtVerify(token, JWKS);
     const claims = payload as CustomJwtSessionClaims;
     const userId = claims.sub || claims.userId;
 
