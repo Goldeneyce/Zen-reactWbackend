@@ -1,9 +1,11 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
+import { draftMode } from 'next/headers';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import VisualEditingWrapper from '@/components/VisualEditingWrapper';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,11 +24,13 @@ export const metadata: Metadata = {
   description: 'Zenon Electrics provides cutting-edge solar power, home automation, and security solutions to transform your space into an efficient, secure, and sustainable environment.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
   return (
     <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
       <body className="font-sans text-dark bg-light dark:text-dark-light dark:bg-light-dark transition-colors duration-300">
@@ -36,6 +40,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <ToastContainer position="top-left" theme="light" />
+        {isDraftMode && <VisualEditingWrapper />}
       </body>
     </html>
   );

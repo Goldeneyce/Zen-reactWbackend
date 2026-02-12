@@ -16,6 +16,10 @@ const nextConfig: NextConfig & { turbopack?: { root: string } } = {
         protocol:"https",
         hostname:"res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
     ],
   },
   // Silence workspace root inference warning in Next.js 16 (Turbopack)

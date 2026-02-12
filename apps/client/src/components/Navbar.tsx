@@ -92,6 +92,7 @@ export default function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/products', label: 'Shop' },
     { href: '/services', label: 'Services' },
+    { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
