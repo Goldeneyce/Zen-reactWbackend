@@ -30,6 +30,7 @@ export default function ProductsPage() {
     { id: 'kitchen', label: 'Kitchen Essentials' },
     { id: 'security', label: 'Security' },
     { id: 'cooling', label: 'Cooling' },
+    { id: 'solar', label: 'Solar' },
   ];
 
   // Fetch products from API
