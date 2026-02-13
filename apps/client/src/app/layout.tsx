@@ -20,8 +20,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Zenon Electrics - Powering Smarter, Safer, Sustainable Living',
-  description: 'Zenon Electrics provides cutting-edge solar power, home automation, and security solutions to transform your space into an efficient, secure, and sustainable environment.',
+  title: 'Zentrics - Powering Smarter, Safer, Sustainable Living',
+  description: 'Zentrics provides cutting-edge solar power, home automation, and security solutions to transform your space into an efficient, secure, and sustainable environment.',
 };
 
 export default async function RootLayout({

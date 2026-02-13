@@ -6,7 +6,7 @@ import { schemaTypes } from "./schemas";
 
 export default defineConfig({
   name: "zenon-studio",
-  title: "Zenon Electrics Blog",
+  title: "Zentrics Blog",
 
   projectId: "mff7y2ll",
   dataset: "production",

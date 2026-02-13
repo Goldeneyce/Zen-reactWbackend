@@ -23,7 +23,7 @@ export default function Footer() {
           {/* About Column */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-accent relative pb-3">
-              About Zenon Electrics
+              About Zentrics
               <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-secondary" />
             </h3>
             <p className="text-sm">
@@ -130,7 +130,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-[var(--color-dark)]/10 dark:border-[var(--color-dark-light)]/10 text-center text-sm">
           <p className="flex items-center justify-center gap-1">
-            <span>&copy; {currentYear} Zenon Electrics. All Rights Reserved. | Designed with</span>
+            <span>&copy; {currentYear} Zentrics. All Rights Reserved. | Designed with</span>
             <HeartIcon className="w-4 h-4 text-red-500 inline-block" />
             <span>for Smart Living</span>
           </p>

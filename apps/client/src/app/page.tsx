@@ -18,7 +18,7 @@ const testimonials = [
       id: '2',
       name: 'Jennifer Martinez',
       role: 'Business Owner',
-      content: 'We hired Zenon Electrics for our office security system upgrade. Their team designed a comprehensive solution that perfectly addressed our needs. The installation was smooth, and their ongoing support has been invaluable.',
+      content: 'We hired Zentrics for our office security system upgrade. Their team designed a comprehensive solution that perfectly addressed our needs. The installation was smooth, and their ongoing support has been invaluable.',
       rating: 5,
     },
   ];
@@ -26,7 +26,7 @@ const testimonials = [
 export default function Home() {
   return (
     <>
-      <Hero title="Smart Solutions for Modern Living" subtitle="Zenon Electrics provides cutting-edge solar power, home automation, and security solutions to transform your space into an efficient, secure, and sustainable environment." showSearch={true} />
+      <Hero title="Smart Solutions for Modern Living" subtitle="Zentrics provides cutting-edge solar power, home automation, and security solutions to transform your space into an efficient, secure, and sustainable environment." showSearch={true} />
       <Features />
       <Categories />
       <Services services={[]} />

@@ -32,8 +32,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return { title: "Post not found" };
 
   return {
-    title: `${post.title} | Zenon Electrics Blog`,
-    description: post.excerpt ?? `Read "${post.title}" on the Zenon Electrics blog.`,
+    title: `${post.title} | Zentrics Blog`,
+    description: post.excerpt ?? `Read "${post.title}" on the Zentrics blog.`,
     openGraph: post.mainImage
       ? { images: [urlFor(post.mainImage).width(1200).height(630).url()] }
       : undefined,

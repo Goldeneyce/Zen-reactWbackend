@@ -236,7 +236,7 @@ export default function ContactPage() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Zenon Electrics Location"
+                  title="Zentrics Location"
                 />
               </div>
             </div>

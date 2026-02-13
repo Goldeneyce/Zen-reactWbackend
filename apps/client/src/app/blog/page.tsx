@@ -9,7 +9,7 @@ import { estimateReadingTime } from "@/lib/sanity/readingTime";
 import type { Post } from "@/lib/sanity/types";
 
 export const metadata: Metadata = {
-  title: "Blog | Zenon Electrics",
+  title: "Blog | Zentrics",
   description:
     "Tips, guides, and news about solar power, home automation, and security systems.",
 };

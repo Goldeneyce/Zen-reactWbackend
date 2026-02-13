@@ -41,7 +41,7 @@ export default function AboutPage() {
   return (
     <>
       <Hero
-        title="About Zenon Electrics"
+        title="About Zentrics"
         subtitle="Learn about our mission, vision, and the team behind our success"
         backgroundImage="/zenhero1.avif"
       />
@@ -65,7 +65,7 @@ export default function AboutPage() {
               </h2>
               
               <p className="text-gray-600 dark:text-gray-300">
-                Founded in 2010, Zenon Electrics started as a small electronics store with a vision to bring innovative technology solutions to homes and businesses. Over the years, we've grown into a leading provider of smart home and energy solutions, serving thousands of satisfied customers.
+                Founded in 2010, Zentrics started as a small electronics store with a vision to bring innovative technology solutions to homes and businesses. Over the years, we've grown into a leading provider of smart home and energy solutions, serving thousands of satisfied customers.
               </p>
               
               <p className="text-gray-600 dark:text-gray-300">
@@ -110,14 +110,14 @@ export default function AboutPage() {
       {/* Team Section */}
       <TeamSection 
         title="Meet Our Leadership Team"
-        subtitle="The experts behind Zenon Electrics' success"
+        subtitle="The experts behind Zentrics' success"
         members={teamMembers}
       />
       
       {/* CTA */}
       <CTA
         title="Ready to Experience Smart Living?"
-        description="Contact us today to learn how Zenon Electrics can transform your space with innovative technology solutions."
+        description="Contact us today to learn how Zentrics can transform your space with innovative technology solutions."
         primaryButton={{ text: 'Contact Us', href: '/contact' }}
         secondaryButton={{ text: 'Browse Products', href: '/products' }}
       />
