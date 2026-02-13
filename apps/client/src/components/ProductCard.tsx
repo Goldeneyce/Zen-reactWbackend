@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
+import { formatPrice } from '@/lib/formatPrice';
 import type { ProductType, CategoryType } from '@repo/types';
 import {
   StarIcon,
@@ -121,11 +122,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              ₦{product.price.toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-gray-500 line-through text-sm">
-                ₦{product.originalPrice.toFixed(2)}
+                {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>

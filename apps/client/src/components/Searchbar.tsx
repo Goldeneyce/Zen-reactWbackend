@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon } from "./Icons";
 import { getProducts } from "@/lib/api";
 import type { ProductType } from "@repo/types";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface SearchbarProps {
   className?: string;
@@ -153,11 +154,11 @@ export default function Searchbar({ className = "" }: SearchbarProps) {
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-gray-900 dark:!text-gray-200 truncate">
                         {product.name}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        ₦{product.price.toFixed(2)}
+                        {formatPrice(product.price)}
                       </p>
                     </div>
                   </div>

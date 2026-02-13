@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
 import Searchbar from '@/components/Searchbar';
+import { formatPrice } from '@/lib/formatPrice';
 import ProductInteraction from '@/components/ProductInteraction';
 import CTA from '@/components/CTA';
 import type { ProductType } from '@repo/types';
@@ -141,11 +142,11 @@ export default function ProductDetailClient({ product }: { product: ProductType 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    ₦{product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">
-                      ₦{product.originalPrice.toFixed(2)}
+                      {formatPrice(product.originalPrice)}
                     </span>
                   )}
                 </div>

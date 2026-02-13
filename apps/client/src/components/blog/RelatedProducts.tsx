@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlFor } from "@/lib/sanity/image";
 import type { RelatedProduct } from "@/lib/sanity/types";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface RelatedProductsProps {
   products: RelatedProduct[];
@@ -48,7 +49,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
               </h3>
               {product.price != null && (
                 <p className="text-secondary font-bold mt-1">
-                  ₦{product.price.toLocaleString()}
+                  {formatPrice(product.price)}
                 </p>
               )}
               {product.description && (

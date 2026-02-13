@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
 
 const ReturnPage = async ({
   searchParams,
@@ -57,7 +58,7 @@ const ReturnPage = async ({
     // Check if payment was successful
     const isSuccess = data.success && data.data?.status === "success";
     const paymentStatus = data.data?.status || "unknown";
-    const amount = data.data?.amount ? (data.data.amount / 100).toFixed(2) : "0.00";
+    const amount = data.data?.amount ? formatPrice(data.data.amount / 100) : "₦0.00";
     const reference = data.data?.reference || session_id;
 
     return (
@@ -83,7 +84,7 @@ const ReturnPage = async ({
               <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful!</h1>
               <p className="text-lg text-muted-foreground mb-2">Thank you for your purchase.</p>
               <p className="text-sm text-muted-foreground mb-6">
-                Amount paid: <span className="font-semibold">₦{amount}</span>
+                Amount paid: <span className="font-semibold">{amount}</span>
               </p>
               <p className="text-xs text-muted-foreground mb-8">
                 Reference: {reference}

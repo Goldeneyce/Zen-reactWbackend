@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { OrderType } from "@repo/types";
 import { toast } from "react-toastify";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
+import { formatPrice } from "@/lib/formatPrice";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState<OrderType[]>([]);
@@ -204,7 +205,7 @@ const OrdersPage = () => {
                           </span>
                         </div>
                         <span className="text-gray-900 font-medium">
-                          ${(product.price * product.quantity).toFixed(2)}
+                          {formatPrice(product.price * product.quantity)}
                         </span>
                       </div>
                     ))}
@@ -225,7 +226,7 @@ const OrdersPage = () => {
                       Total Amount
                     </span>
                     <span className="text-lg font-bold text-gray-900">
-                      ${order.amount.toFixed(2)}
+                      {formatPrice(order.amount)}
                     </span>
                   </div>
                 </div>

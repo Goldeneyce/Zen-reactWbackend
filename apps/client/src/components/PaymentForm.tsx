@@ -5,6 +5,7 @@ import React from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import PaystackPaymentForm from './PaystackPaymentForm';
 import { ShippingFormData, CartItem } from '@repo/types';
+import { formatPrice } from '@/lib/formatPrice';
 
 interface PaymentFormProps {
   control?: Control<any>;
@@ -50,7 +51,7 @@ export default function PaymentForm({
             Secure Payment with Paystack
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Amount to pay: ₦{amount?.toLocaleString() || '0'}
+            Amount to pay: {amount ? formatPrice(amount) : '₦0.00'}
           </p>
           {shippingData && (
             <PaystackPaymentForm

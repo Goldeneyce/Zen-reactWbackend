@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/stores/cartStore';
 import Searchbar from '@/components/Searchbar';
+import { formatPrice } from '@/lib/formatPrice';
 import ShippingForm from '@/components/ShippingForm';
 import PaymentForm from '@/components/PaymentForm';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -190,11 +191,11 @@ export default function CheckoutPage() {
                             <div>
                               <p className="font-medium">{item.productName}</p>
                               <p className="text-sm text-gray-600 dark:text-gray-100">
-                                Qty: {item.quantity} × ₦{item.price.toFixed(2)}
+                                Qty: {item.quantity} × {formatPrice(item.price)}
                               </p>
                             </div>
                             <p className="font-semibold">
-                              ₦{(item.price * item.quantity).toFixed(2)}
+                              {formatPrice(item.price * item.quantity)}
                             </p>
                           </div>
                         ))}
@@ -229,25 +230,25 @@ export default function CheckoutPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Subtotal</span>
-                    <span className="font-semibold">₦{subtotal.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(subtotal)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Shipping</span>
                     <span className="font-semibold">
-                      {shipping === 0 ? 'Free' : `₦${shipping.toFixed(2)}`}
+                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
                     </span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Tax (10%)</span>
-                    <span className="font-semibold">₦{tax.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(tax)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pt-3">
                     <span className="text-xl font-bold text-primary">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      ₦{total.toFixed(2)}
+                      {formatPrice(total)}
                     </span>
                   </div>
                 </div>

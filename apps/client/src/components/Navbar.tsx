@@ -32,18 +32,16 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<null | { id: string }>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    return isDark;
-  });
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getTotalItems } = useCartStore();
 
   useEffect(() => {
-    // Apply initial theme preference to DOM
-    if (isDarkMode) {
+    // Read stored theme preference on mount (client-only)
+    const isDark = localStorage.getItem('theme') === 'dark' || 
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    setIsDarkMode(isDark);
+    if (isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');

@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/formatPrice';
 import { useCartStore } from '@/stores/cartStore';
 import { MinusIcon, PlusIcon, TrashIcon } from '@/components/Icons';
 import ShippingForm from '@/components/ShippingForm';
@@ -282,7 +283,7 @@ export default function CartPage() {
                             {item.productName}
                           </h3>
                           <p className="text-secondary font-semibold mb-3">
-                            ₦{item.price.toFixed(2)}
+                            {formatPrice(item.price)}
                           </p>
                           <div className="flex flex-wrap items-center gap-4">
                             <div className="flex items-center gap-2">
@@ -312,7 +313,7 @@ export default function CartPage() {
                         </div>
                         <div className="sm:text-right">
                           <h3 className="font-bold text-lg">
-                            ₦{(item.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.price * item.quantity)}
                           </h3>
                         </div>
                       </div>
@@ -363,25 +364,25 @@ export default function CartPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Subtotal</span>
-                    <span className="font-semibold">₦{subtotal.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(subtotal)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Shipping</span>
                     <span className="font-semibold">
-                      {shipping === 0 ? 'Free' : `₦${shipping.toFixed(2)}`}
+                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
                     </span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Tax (10%)</span>
-                    <span className="font-semibold">₦{tax.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(tax)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pt-3">
                     <span className="text-xl font-bold text-primary">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      ₦{total.toFixed(2)}
+                      {formatPrice(total)}
                     </span>
                   </div>
                 </div>

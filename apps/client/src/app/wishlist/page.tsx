@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface WishlistItem {
   id: string;
@@ -91,7 +92,7 @@ export default function WishlistPage() {
                   <div className="flex-1">
                     <h3 className="text-base font-semibold text-dark dark:text-gray-100">{item.name}</h3>
                     {typeof item.price === "number" && (
-                      <p className="mt-1 text-sm text-secondary">₦{item.price.toLocaleString()}</p>
+                      <p className="mt-1 text-sm text-secondary">{formatPrice(item.price)}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">

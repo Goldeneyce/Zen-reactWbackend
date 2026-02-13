@@ -3,8 +3,8 @@
     "name": "UltraHD 4K LED Projector",
     "slug": "ultrahd-4k-led-projector",
     "description": "Experience cinema-quality entertainment in the comfort of your home with our UltraHD 4K LED Projector. This state-of-the-art projector delivers stunning 4K resolution with HDR10 support, ensuring vibrant colors and exceptional detail. Perfect for movie nights, gaming, and presentations, this projector features smart connectivity, built-in streaming apps, and a long-lasting LED light source that provides up to 30,000 hours of viewing.",
-    "price": 349.99,
-    "originalPrice": 499.99,
+    "price": 3495.99,
+    "originalPrice": 4999.99,
     "image": "/products/laptop.avif",
     "images": [
       "/products/laptop.avif",
@@ -54,8 +54,8 @@
     "name": "5000W Solar Inverter System",
     "slug": "5000w-solar-inverter-system",
     "description": "Harness the power of the sun with our high-efficiency 5000W Solar Inverter System. This complete solution includes a pure sine wave inverter, MPPT charge controller, and comprehensive battery management. Perfect for off-grid living, backup power, and reducing electricity costs. Built with industrial-grade components for maximum reliability and longevity.",
-    "price": 1299.99,
-    "originalPrice": 1799.99,
+    "price": 2014984.50,
+    "originalPrice": 2789984.50,
     "image": "/products/fridge.avif",
     "images": [
       "/products/fridge.avif",
@@ -76,7 +76,7 @@
       "10-Year Warranty"
     ],
     "inStock": true,
-    "payOnDelivery": false,
+    "payOnDelivery": true,
     "badge": "BestSeller",
     "categories": {
       "create": [
@@ -100,8 +100,8 @@
     "name": "Smart Security Camera Pro",
     "slug": "smart-security-camera-pro",
     "description": "Keep your property secure with our AI-powered Smart Security Camera Pro. Features 4K resolution, night vision, motion detection with person/vehicle recognition, two-way audio, and weatherproof design. Cloud and local storage options available. Perfect for homes, offices, and commercial properties.",
-    "price": 199.99,
-    "originalPrice": 299.99,
+    "price": 19987.99,
+    "originalPrice": 29987.99,
     "image": "/products/tvRemote.avif",
     "images": [
       "/products/tvRemote.avif",
@@ -146,8 +146,8 @@
     "name": "Smart Home Automation Hub",
     "slug": "smart-home-automation-hub",
     "description": "Control your entire smart home from one central hub. Compatible with over 200+ brands and thousands of devices. Voice control with Alexa and Google Assistant. Create custom automation routines, schedules, and scenes. Easy setup with intuitive mobile app. Transform your house into an intelligent, energy-efficient smart home.",
-    "price": 149.99,
-    "originalPrice": 219.99,
+    "price": 14987.99,
+    "originalPrice": 21999.99,
     "image": "/products/tab.avif",
     "images": [
       "/products/tab.avif",
@@ -192,8 +192,8 @@
     "name": "Energy-Efficient Smart Refrigerator",
     "slug": "energy-efficient-smart-refrigerator",
     "description": "Modern refrigeration meets smart technology. This Energy Star certified refrigerator features WiFi connectivity, touchscreen display, and smart temperature management. Multi-zone cooling, frost-free operation, and spacious interior design. Monitor and control from your smartphone. Save energy while keeping food fresher longer.",
-    "price": 899.99,
-    "originalPrice": 1299.99,
+    "price": 89987.99,
+    "originalPrice": 129987.99,
     "image": "/products/fridge.avif",
     "images": [
       "/products/fridge.avif"
@@ -237,8 +237,8 @@
     "name": "LED Smart Bulb 4-Pack",
     "slug": "led-smart-bulb-4-pack",
     "description": "Transform any room with color-changing LED smart bulbs. Choose from 16 million colors or warm to cool white. Control with voice commands or smartphone app. Set schedules, create scenes, and sync with music. Energy-efficient with 25,000-hour lifespan. No hub required - connects directly to WiFi.",
-    "price": 49.99,
-    "originalPrice": 79.99,
+    "price": 4987.99,
+    "originalPrice": 7999.99,
     "image": "/products/laptop.avif",
     "images": [
       "/products/laptop.avif"
