@@ -74,6 +74,10 @@ interface Product {
   inStock: boolean;
   payOnDelivery: boolean;
   badge: string | null;
+  weight: number | null;
+  length: number | null;
+  width: number | null;
+  height: number | null;
   specifications: Specification[];
   categories: Array<{ category: { id: number; name: string; slug: string } }>;
   createdAt: string;
@@ -103,6 +107,10 @@ export default function ProductDetailClient() {
     badge: "",
     sizes: "",
     colors: "",
+    weight: 0,
+    length: 0,
+    width: 0,
+    height: 0,
   });
 
   // Spec edit state
@@ -144,6 +152,10 @@ export default function ProductDetailClient() {
         badge: data.badge ?? "",
         sizes: data.sizes?.join(", ") ?? "",
         colors: data.colors?.join(", ") ?? "",
+        weight: data.weight ?? 0,
+        length: data.length ?? 0,
+        width: data.width ?? 0,
+        height: data.height ?? 0,
       });
     } catch {
       showMessage("error", "Failed to load product");
@@ -189,6 +201,10 @@ export default function ProductDetailClient() {
         inStock: editForm.inStock,
         payOnDelivery: editForm.payOnDelivery,
         badge: editForm.badge || undefined,
+        weight: editForm.weight || undefined,
+        length: editForm.length || undefined,
+        width: editForm.width || undefined,
+        height: editForm.height || undefined,
         sizes: editForm.sizes
           ? editForm.sizes.split(",").map((s) => s.trim()).filter(Boolean)
           : [],
@@ -560,6 +576,62 @@ export default function ProductDetailClient() {
                   onCheckedChange={(v) => setEditForm({ ...editForm, payOnDelivery: v })}
                 />
                 <label className="text-sm font-medium">Pay on Delivery</label>
+              </div>
+            </div>
+
+            {/* Shipping Dimensions */}
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium">Shipping Dimensions</label>
+              <p className="text-xs text-muted-foreground">Used for logistics and shipping rate calculation</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Weight (kg)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 2.5"
+                    value={editForm.weight || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, weight: Number(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Length (cm)</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="e.g. 30"
+                    value={editForm.length || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, length: Number(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Width (cm)</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="e.g. 20"
+                    value={editForm.width || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, width: Number(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Height (cm)</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="e.g. 15"
+                    value={editForm.height || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, height: Number(e.target.value) })
+                    }
+                  />
+                </div>
               </div>
             </div>
 

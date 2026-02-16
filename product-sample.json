@@ -31,6 +31,10 @@
     "inStock": true,
     "payOnDelivery": true,
     "badge": "New",
+    "weight": 4.0,
+    "length": 32.0,
+    "width": 24.9,
+    "height": 11.9,
     "categories": {
       "create": [
         { "categoryId": 3, "name": "UltraHD 4K LED Projector", "categoryName": "Entertainment" }
@@ -78,6 +82,10 @@
     "inStock": true,
     "payOnDelivery": true,
     "badge": "BestSeller",
+    "weight": 20.4,
+    "length": 61.0,
+    "width": 45.7,
+    "height": 20.3,
     "categories": {
       "create": [
         { "categoryId": 7, "name": "5000W Solar Inverter System", "categoryName": "Solar" }
@@ -124,6 +132,10 @@
     "inStock": true,
     "payOnDelivery": true,
     "badge": "TopRated",
+    "weight": 0.54,
+    "length": 11.4,
+    "width": 7.6,
+    "height": 7.6,
     "categories": {
       "create": [
         { "categoryId": 5, "name": "Smart Security Camera Pro", "categoryName": "Security" }
@@ -170,6 +182,10 @@
     "inStock": true,
     "payOnDelivery": false,
     "badge": null,
+    "weight": 0.36,
+    "length": 12.7,
+    "width": 12.7,
+    "height": 3.8,
     "categories": {
       "create": [
         { "categoryId": 8, "name": "Smart Home Automation Hub", "categoryName": "Automation" }
@@ -215,6 +231,10 @@
     "inStock": true,
     "payOnDelivery": false,
     "badge": "EnergyEfficient",
+    "weight": 99.8,
+    "length": 177.8,
+    "width": 83.8,
+    "height": 71.1,
     "categories": {
       "create": [
         { "categoryId": 2, "name": "Energy-Efficient Smart Refrigerator", "categoryName": "Appliances" }

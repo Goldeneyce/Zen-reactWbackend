@@ -42,6 +42,10 @@ export default function NewProductClient() {
     inStock: true,
     payOnDelivery: false,
     badge: "",
+    weight: 0,
+    length: 0,
+    width: 0,
+    height: 0,
   });
 
   const showMessage = (type: "success" | "error", text: string) => {
@@ -93,6 +97,10 @@ export default function NewProductClient() {
         inStock: form.inStock,
         payOnDelivery: form.payOnDelivery,
         badge: form.badge || undefined,
+        weight: form.weight || undefined,
+        length: form.length || undefined,
+        width: form.width || undefined,
+        height: form.height || undefined,
       };
 
       const res = await fetch(`${PRODUCT_URL}/products`, {
@@ -274,6 +282,54 @@ export default function NewProductClient() {
                 onCheckedChange={(v) => setForm({ ...form, payOnDelivery: v })}
               />
               <label className="text-sm font-medium">Pay on Delivery</label>
+            </div>
+          </div>
+
+          {/* Shipping Dimensions */}
+          <div className="space-y-2 pt-2">
+            <label className="text-sm font-medium">Shipping Dimensions (Optional)</label>
+            <p className="text-xs text-muted-foreground">Used for logistics and shipping rate calculation</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Weight (kg)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 2.5"
+                  value={form.weight || ""}
+                  onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Length (cm)</label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g. 30"
+                  value={form.length || ""}
+                  onChange={(e) => setForm({ ...form, length: Number(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Width (cm)</label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g. 20"
+                  value={form.width || ""}
+                  onChange={(e) => setForm({ ...form, width: Number(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Height (cm)</label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g. 15"
+                  value={form.height || ""}
+                  onChange={(e) => setForm({ ...form, height: Number(e.target.value) })}
+                />
+              </div>
             </div>
           </div>
 

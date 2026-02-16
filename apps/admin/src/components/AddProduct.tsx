@@ -80,6 +80,10 @@ const AddProduct = () => {
       inStock: true,
       payOnDelivery: false,
       badge: undefined,
+      weight: undefined,
+      length: undefined,
+      width: undefined,
+      height: undefined,
       rating: 0,
       reviews: 0,
     },
@@ -546,6 +550,96 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
+                <div className="space-y-2">
+                  <FormLabel>Shipping Dimensions (Optional)</FormLabel>
+                  <FormDescription>Used for logistics and shipping rate calculation.</FormDescription>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Weight (kg)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="e.g. 2.5"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="length"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Length (cm)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g. 30"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="width"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Width (cm)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g. 20"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="height"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Height (cm)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g. 15"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
                 <Button
                   type="submit"
                   disabled={mutation.isPending}

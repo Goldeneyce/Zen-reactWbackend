@@ -257,6 +257,38 @@ export default function ProductDetailClient({ product }: { product: ProductType 
                   <strong>Shipping:</strong> Free on orders over ₦500
                 </div>
               </div>
+
+              {(product.weight || product.length || product.width || product.height) && (
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="font-semibold text-primary">Shipping Details</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                    {product.weight != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Weight</span>
+                        <span className="font-medium text-primary">{product.weight} kg</span>
+                      </div>
+                    )}
+                    {product.length != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Length</span>
+                        <span className="font-medium text-primary">{product.length} cm</span>
+                      </div>
+                    )}
+                    {product.width != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Width</span>
+                        <span className="font-medium text-primary">{product.width} cm</span>
+                      </div>
+                    )}
+                    {product.height != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Height</span>
+                        <span className="font-medium text-primary">{product.height} cm</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

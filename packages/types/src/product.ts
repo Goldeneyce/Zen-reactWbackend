@@ -32,6 +32,10 @@ export const ProductFormSchema = z.object({
   inStock: z.boolean().default(true),
   payOnDelivery: z.boolean().optional(),
   badge: z.enum(ProductBadgeValues).optional(),
+  weight: z.number().positive().optional(),
+  length: z.number().positive().optional(),
+  width: z.number().positive().optional(),
+  height: z.number().positive().optional(),
   rating: z.number().default(0),
   reviews: z.number().int().default(0),
 });
