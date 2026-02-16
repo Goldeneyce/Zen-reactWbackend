@@ -1,14 +1,14 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import { clerkPlugin} from '@clerk/fastify'
 import { shouldBeUser } from './middleware/authMiddleware.js';
 import { connectOrderDB } from '@repo/order-db';
+import { consumer, producer } from './utils/kafka.ts';
+import { runKafkaSubscriptions } from './utils/subscriptions.ts';
 
 const fastify = Fastify();
 await fastify.register(cors, {
   origin: true
 });
-fastify.register(clerkPlugin);
 
 fastify.get('/health', (request,reply) => {
   return reply.status(200).send({
@@ -32,7 +32,12 @@ fastify.register( async (fastifyInstance) => {
 
 const start = async () => {
   try {
-    await connectOrderDB();
+		await Promise.all([
+      connectOrderDB(),
+      consumer.connect(), 
+      producer.connect()]
+    );
+    await runKafkaSubscriptions();
     await fastify.listen({ port: 8001 });
     console.log('Order service is running on port 8001');
   } catch (err) {

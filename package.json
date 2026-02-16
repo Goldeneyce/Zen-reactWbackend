@@ -1,5 +1,5 @@
 {
-  "name": "Zen-reactWbackend",
+  "name": "zen-reactwbackend",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -14,8 +14,13 @@
     "turbo": "^2.7.2",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.29.3",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.93.3",
+    "jose": "^5.10.0"
   }
 }

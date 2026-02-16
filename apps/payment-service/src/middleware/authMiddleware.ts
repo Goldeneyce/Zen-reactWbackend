@@ -1,47 +1,81 @@
-import { getAuth } from "@hono/clerk-auth";
-import { createMiddleware } from "hono/factory";
 import type { CustomJwtSessionClaims } from "@repo/types";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
-export const shouldBeUser = createMiddleware<{
- Variables: {
-    userId: string;
- }
-}>(async (c, next) =>{
-    const  auth = getAuth(c);
+import type { FastifyReply, FastifyRequest } from "fastify";
 
-  if(!auth?.userId){
-    return c.json({
-      message: "You are not logged in!",
-    }, 401);
+const getJWKS = () => {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("SUPABASE_URL is not configured.");
+  }
+  return createRemoteJWKSet(
+    new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`)
+  );
+};
+
+declare module "fastify" {
+  interface FastifyRequest {
+    userId?: string;
+    rawBody?: string;
+  }
+}
+
+export const shouldBeUser = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return verifySupabaseAuth(request, reply);
+};
+
+export const shouldBeAdmin = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return verifySupabaseAuth(request, reply, "admin");
+};
+
+const getBearerToken = (authorization: string | undefined) => {
+  if (!authorization) return null;
+  const [type, token] = authorization.split(" ");
+  if (type !== "Bearer" || !token) return null;
+  return token;
+};
+
+const verifySupabaseAuth = async (
+	request: FastifyRequest,
+	reply: FastifyReply,
+	requiredRole?: "admin"
+) => {
+	const token = getBearerToken(request.headers.authorization);
+
+  if (!token) {
+    return reply.code(401).send({ message: "You are not logged in!" });
   }
 
-  c.set("userId", auth.userId);
+  try {
+    const JWKS = getJWKS();
+    const { payload } = await jwtVerify(token, JWKS);
+    const claims = payload as CustomJwtSessionClaims;
+    const userId = claims.sub || claims.userId;
 
-  await next();
-});
+    if (!userId) {
+      return reply.code(401).send({ message: "You are not logged in!" });
+    }
 
-export const shouldBeAdmin = createMiddleware<{
- Variables: {
-    userId: string;
- }
-}>(async (c, next) =>{
-    const  auth = getAuth(c);
+    if (requiredRole) {
+      const role =
+        claims.app_metadata?.role ||
+        claims.user_metadata?.role ||
+        claims.role;
 
-  if(!auth?.userId){
-    return c.json({
-      message: "You are not logged in!",
-    }, 401);
+      if (role !== requiredRole) {
+        return reply.code(403).send({ message: "You are not authorized!" });
+      }
+    }
+
+    request.userId = userId;
+    return;
+  } catch (error) {
+    return reply.code(401).send({ message: "You are not logged in!" });
   }
-
-  const claims = auth.sessionClaims as CustomJwtSessionClaims;
-
-  if(claims.metadata?.role !== 'admin'){
-    return c.json({
-      message: "You are not authorized!",
-    }, 403);
-  }
-
-  c.set("userId", auth.userId);
-
-  await next();
-});
+};

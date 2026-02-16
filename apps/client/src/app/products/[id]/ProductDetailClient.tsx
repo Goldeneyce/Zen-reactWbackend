@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
 import Searchbar from '@/components/Searchbar';
+import { formatPrice } from '@/lib/formatPrice';
 import ProductInteraction from '@/components/ProductInteraction';
 import CTA from '@/components/CTA';
 import type { ProductType } from '@repo/types';
@@ -141,11 +142,11 @@ export default function ProductDetailClient({ product }: { product: ProductType 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    ₦{product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">
-                      ₦{product.originalPrice.toFixed(2)}
+                      {formatPrice(product.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -256,6 +257,38 @@ export default function ProductDetailClient({ product }: { product: ProductType 
                   <strong>Shipping:</strong> Free on orders over ₦500
                 </div>
               </div>
+
+              {(product.weight || product.length || product.width || product.height) && (
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="font-semibold text-primary">Shipping Details</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                    {product.weight != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Weight</span>
+                        <span className="font-medium text-primary">{product.weight} kg</span>
+                      </div>
+                    )}
+                    {product.length != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Length</span>
+                        <span className="font-medium text-primary">{product.length} cm</span>
+                      </div>
+                    )}
+                    {product.width != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Width</span>
+                        <span className="font-medium text-primary">{product.width} cm</span>
+                      </div>
+                    )}
+                    {product.height != null && (
+                      <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Height</span>
+                        <span className="font-medium text-primary">{product.height} cm</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

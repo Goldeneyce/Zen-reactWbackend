@@ -2,6 +2,7 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/formatPrice';
 
 type OrderSummary = {
   id: string;
@@ -56,15 +57,15 @@ export default function OrderConfirmation({ searchParams }: { searchParams: Prom
                   {order.items.map((it) => (
                     <li key={it.id} className="flex justify-between">
                       <span className="text-gray-700 dark:text-gray-300">{it.name} × {it.qty}</span>
-                      <span className="font-semibold">₦{(it.price * it.qty).toFixed(2)}</span>
+                      <span className="font-semibold">{formatPrice(it.price * it.qty)}</span>
                     </li>
                   ))}
                 </ul>
                 <div className="mt-4 space-y-1 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Subtotal</span><span className="font-semibold">₦{order.totals.subtotal.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Shipping</span><span className="font-semibold">{order.totals.shipping === 0 ? 'Free' : `₦${order.totals.shipping.toFixed(2)}`}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Tax</span><span className="font-semibold">₦{order.totals.tax.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-primary font-bold"><span>Total</span><span>₦{order.totals.total.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Subtotal</span><span className="font-semibold">{formatPrice(order.totals.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Shipping</span><span className="font-semibold">{order.totals.shipping === 0 ? 'Free' : formatPrice(order.totals.shipping)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-400">Tax</span><span className="font-semibold">{formatPrice(order.totals.tax)}</span></div>
+                  <div className="flex justify-between text-primary font-bold"><span>Total</span><span>{formatPrice(order.totals.total)}</span></div>
                 </div>
               </div>
 

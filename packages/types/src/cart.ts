@@ -10,6 +10,7 @@ export interface CartItem {
     image: string;
     selectedSize?: string;
     selectedColor?: string;
+    payOnDelivery?: boolean;
 }
 
 export type CartItemType = Product & {

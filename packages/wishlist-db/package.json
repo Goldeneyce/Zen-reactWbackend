@@ -1,0 +1,25 @@
+{
+  "name": "@repo/wishlist-db",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.39.3",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.13.1",
+    "drizzle-kit": "^0.30.5",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

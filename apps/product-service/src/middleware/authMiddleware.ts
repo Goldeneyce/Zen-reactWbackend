@@ -1,57 +1,91 @@
-import { getAuth } from "@clerk/express";
-import { Request, Response, NextFunction } from "express";
-import { CustomJwtSessionClaims } from "@repo/types";
+import { createMiddleware } from "hono/factory";
+import type { CustomJwtSessionClaims } from "@repo/types";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
-declare global {
-    namespace Express {
-        interface Request {
-            userId?: string;
-        }
-    }
-}
-
-export const shouldBeUser = (
-    req:Request, 
-    res:Response, 
-    next:NextFunction
-) => {
-    const auth = getAuth(req);
-    const userId = auth.userId;
-
-    if(!userId){
-        return res.status(401).json({
-      message: "You are not logged in!",
-    });
+const getJWKS = () => {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("SUPABASE_URL is not configured.");
   }
-
-  req.userId = auth.userId;
-
-  return next();
+  return createRemoteJWKSet(
+    new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`)
+  );
 };
 
-export const shouldBeAdmin = (
-    req:Request, 
-    res:Response, 
-    next:NextFunction
+export const shouldBeUser = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next);
+});
+
+export const shouldBeAdmin = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next, "admin");
+});
+
+export const shouldBeProductAdmin = createMiddleware<{
+  Variables: {
+    userId: string;
+  };
+}>(async (c, next) => {
+  return verifySupabaseAuth(c, next, "productAdmin");
+});
+
+const getBearerToken = (authorization: string | undefined) => {
+  if (!authorization) return null;
+  const [type, token] = authorization.split(" ");
+  if (type !== "Bearer" || !token) return null;
+  return token;
+};
+
+const verifySupabaseAuth = async (
+  c: any,
+  next: () => Promise<void>,
+  requiredRole?: "admin" | "productAdmin"
 ) => {
-    const auth = getAuth(req);
-    const userId = auth.userId;
+  const token = getBearerToken(c.req.header("Authorization"));
 
-    if(!userId){
-        return res.status(401).json({
-      message: "You are not logged in!",
-    });
+  if (!token) {
+    return c.json({ message: "You are not logged in!" }, 401);
   }
 
-    const claims = auth.sessionClaims as CustomJwtSessionClaims;
+  try {
+    const JWKS = getJWKS();
+    const { payload } = await jwtVerify(token, JWKS);
+    const claims = payload as CustomJwtSessionClaims;
+    const userId = claims.sub || claims.userId;
 
-    if(claims.metadata?.role !== 'admin'){
-      return res.status(403).send({
-      message: "You are not authorized to access this resource!",
-    });
+    if (!userId) {
+      return c.json({ message: "You are not logged in!" }, 401);
+    }
+
+    if (requiredRole) {
+      const role =
+        claims.app_metadata?.role ||
+        claims.user_metadata?.role ||
+        claims.role;
+
+      if (requiredRole === "productAdmin") {
+        if (role !== "productAdmin" && role !== "admin") {
+          return c.json({
+            message: "You are not authorized to access this resource!",
+          }, 403);
+        }
+      } else if (role !== requiredRole) {
+        return c.json({
+          message: "You are not authorized to access this resource!",
+        }, 403);
+      }
+    }
+
+    c.set("userId", userId);
+    await next();
+  } catch (error) {
+    return c.json({ message: "You are not logged in!" }, 401);
   }
-
-  req.userId = auth.userId;
-
-  return next();
 };

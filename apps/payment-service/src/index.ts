@@ -1,70 +1,37 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import { clerkMiddleware} from '@hono/clerk-auth'
-import { shouldBeUser } from './middleware/authMiddleware.js';
+import fastify from "fastify";
+import cors from "@fastify/cors";
+import sessionRoute from "./routes/session.route.js";
+import webhookRoute from "./routes/webhooks.route.js";
+import { consumer, producer } from './utils/kafka.js';
+import { runKafkaSubscriptions } from './utils/subscriptions.js';
 
-const app = new Hono()
-app.use('*', clerkMiddleware())
+const app = fastify({ logger: false });
 
-app.get('/health', (c) => {
-  return c.json({
+app.get("/health", async () => {
+  return {
     status: "ok",
     uptime: process.uptime(),
     timestamp: Date.now(),
-  });
+  };
 });
-
-//getting product price from product db and not cart page.
-// app.get("/pay", shouldBeUser, async (c) => {
-
-//   const {products} = await c.req.json()
-
-//   const totalPrice = await Promise.all(
-//     products.map(async (product:any)=>{
-//       const productsInDb:any = await fetch ("Localhost:8000/products{product.id}");
-//       return productsInDb.price * product.quantity;
-//     })
-//   );
-
-//     return c.json({
-//       message: "Payment service is Authenticated", userId:c.get("userId")
-//     })
-// });
-
-// app.post('/create-payment-page', async (c) => {
-
-//   const res = await stripe.products.create({
-//     id:"234",
-//     name:"Test Product",
-//     default_price_data: {
-//       currency: 'ngn',
-//       unit_amount: 10*100,
-//     },
-//   });
-
-//   return c.json(res);
-  
-// });
-
-// app.get('/stripe-product-price', async (c) => {
-
-//   const res = await stripe.prices.list({
-//     product: '234',
-//   });
-
-//   return c.json(res);
-  
-// });
 
 const start = async () => {
   try {
-    serve({
-  fetch: app.fetch,
-  port: 8002
-}, (info) => {
-  console.log(`Payment service is running on ${info.address}:${info.port}`);
-}
-);
+    // Register plugins
+    await app.register(cors, { origin: ["http://localhost:3002"] });
+    await app.register(sessionRoute, { prefix: "/sessions" });
+    await app.register(webhookRoute, { prefix: "/webhooks" });
+    
+    // Connect to Kafka
+    await Promise.all([
+      consumer.connect(), 
+      producer.connect()
+    ]);
+    await runKafkaSubscriptions();
+    
+    // Start server
+    await app.listen({ port: 8002, host: "0.0.0.0" });
+    console.log("Payment service is running on 0.0.0.0:8002");
   } catch (error) {
     console.error('Error starting the server:', error);
     process.exit(1);

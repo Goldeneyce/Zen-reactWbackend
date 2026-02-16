@@ -1,14 +1,15 @@
-import { Router } from "express";
-import { createProduct, deleteProduct, getProduct, getProductBySlug, getProducts, updateProduct } from "../controllers/product.controller.js";
-import { shouldBeAdmin } from "../middleware/authMiddleware.js";
+import { Hono } from "hono";
+import { createProduct, deleteProduct, getProduct, getProductBySlug, getProducts, getProductsByIds, updateProduct } from "../controllers/product.controller.js";
+import { shouldBeProductAdmin } from "../middleware/authMiddleware.js";
 
-const router: Router = Router();
+const router = new Hono();
 
-router.post("/", shouldBeAdmin, createProduct);
+router.post("/", shouldBeProductAdmin, createProduct);
 router.get("/", getProducts);
+router.get("/bulk", getProductsByIds);
 router.get("/:slug", getProductBySlug);
 router.get("/:id", getProduct);
-router.put("/:id", shouldBeAdmin, updateProduct);
-router.delete("/:id", shouldBeAdmin, deleteProduct);
+router.put("/:id", shouldBeProductAdmin, updateProduct);
+router.delete("/:id", shouldBeProductAdmin, deleteProduct);
 
 export default router;

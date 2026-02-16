@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Context } from "hono";
 import { prisma, Prisma } from "@repo/product-db";
 
 const slugify = (value: string) =>
@@ -25,8 +25,8 @@ const ensureUniqueSlug = async (base: string, currentId?: number) => {
 	}
 };
 
-export const createCategory = async (req: Request, res: Response) => {
-	const body = req.body as Prisma.CategoryCreateInput & { slug?: string };
+export const createCategory = async (c: Context) => {
+	const body = (await c.req.json()) as Prisma.CategoryCreateInput & { slug?: string };
 	const baseSlug = body.slug ? slugify(body.slug) : slugify(body.name);
 	const slug = await ensureUniqueSlug(baseSlug);
 
@@ -36,22 +36,20 @@ export const createCategory = async (req: Request, res: Response) => {
 			slug,
 		},
 	});
-	res.status(201).json(category);
+	return c.json(category, 201);
 };
 
-export const getCategories = async (req: Request, res: Response) => {
-	const { search, limit } = req.query;
+export const getCategories = async (c: Context) => {
+	const { search, limit } = c.req.query();
 
 	// Validate search parameter
 	let validatedSearch: string | undefined;
 	if (search) {
 		if (typeof search !== "string") {
-			res.status(400).json({ error: "Search parameter must be a string" });
-			return;
+			return c.json({ error: "Search parameter must be a string" }, 400);
 		}
 		if (search.length > 100) {
-			res.status(400).json({ error: "Search parameter must be 100 characters or less" });
-			return;
+			return c.json({ error: "Search parameter must be 100 characters or less" }, 400);
 		}
 		validatedSearch = search.trim();
 	}
@@ -63,17 +61,14 @@ export const getCategories = async (req: Request, res: Response) => {
 
 	if (limit) {
 		if (typeof limit !== "string" || isNaN(Number(limit))) {
-			res.status(400).json({ error: "Limit parameter must be a valid number" });
-			return;
+			return c.json({ error: "Limit parameter must be a valid number" }, 400);
 		}
 		const parsedLimit = parseInt(limit, 10);
 		if (parsedLimit < 1) {
-			res.status(400).json({ error: "Limit must be at least 1" });
-			return;
+			return c.json({ error: "Limit must be at least 1" }, 400);
 		}
 		if (parsedLimit > MAX_LIMIT) {
-			res.status(400).json({ error: `Limit cannot exceed ${MAX_LIMIT}` });
-			return;
+			return c.json({ error: `Limit cannot exceed ${MAX_LIMIT}` }, 400);
 		}
 		validatedLimit = parsedLimit;
 	} else {
@@ -91,15 +86,14 @@ export const getCategories = async (req: Request, res: Response) => {
 			},
 		},
 	});
-	res.status(200).json(categories);
+	return c.json(categories, 200);
 };
 
-export const getCategory = async (req: Request, res: Response) => {
-	const { id } = req.params;
+export const getCategory = async (c: Context) => {
+	const id = c.req.param("id");
 
 	if (!id) {
-		res.status(400).json({ error: "Category ID is required" });
-		return;
+		return c.json({ error: "Category ID is required" }, 400);
 	}
 
 	const category = await prisma.category.findUnique({
@@ -112,19 +106,17 @@ export const getCategory = async (req: Request, res: Response) => {
 	});
 
 	if (!category) {
-		res.status(404).json({ error: "Category not found" });
-		return;
+		return c.json({ error: "Category not found" }, 404);
 	}
 
-	res.status(200).json(category);
+	return c.json(category, 200);
 };
 
-export const getCategoryBySlug = async (req: Request, res: Response) => {
-	const { slug } = req.params;
+export const getCategoryBySlug = async (c: Context) => {
+	const slug = c.req.param("slug");
 
 	if (!slug || typeof slug !== "string") {
-		res.status(400).json({ error: "Slug parameter is required" });
-		return;
+		return c.json({ error: "Slug parameter is required" }, 400);
 	}
 
 	const category = await prisma.category.findUnique({
@@ -138,22 +130,20 @@ export const getCategoryBySlug = async (req: Request, res: Response) => {
 	});
 
 	if (!category) {
-		res.status(404).json({ error: "Category not found" });
-		return;
+		return c.json({ error: "Category not found" }, 404);
 	}
 
-	res.status(200).json(category);
+	return c.json(category, 200);
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
-	const { id } = req.params;
+export const updateCategory = async (c: Context) => {
+	const id = c.req.param("id");
 
 	if (!id) {
-		res.status(400).json({ error: "Category ID is required" });
-		return;
+		return c.json({ error: "Category ID is required" }, 400);
 	}
 
-	const body = req.body as Prisma.CategoryUpdateInput & { slug?: string };
+	const body = (await c.req.json()) as Prisma.CategoryUpdateInput & { slug?: string };
 
 	let slugUpdate: string | undefined;
 	const baseSlug = body.slug
@@ -174,20 +164,19 @@ export const updateCategory = async (req: Request, res: Response) => {
 		},
 	});
 
-	res.status(200).json(category);
+	return c.json(category, 200);
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
-	const { id } = req.params;
+export const deleteCategory = async (c: Context) => {
+	const id = c.req.param("id");
 
 	if (!id) {
-		res.status(400).json({ error: "Category ID is required" });
-		return;
+		return c.json({ error: "Category ID is required" }, 400);
 	}
 
 	await prisma.category.delete({
 		where: { id: parseInt(id) },
 	});
 
-	res.status(200).json({ message: "Category deleted successfully" });
+	return c.json({ message: "Category deleted successfully" }, 200);
 };

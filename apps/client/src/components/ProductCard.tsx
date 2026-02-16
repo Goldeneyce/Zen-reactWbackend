@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
+import { formatPrice } from '@/lib/formatPrice';
 import type { ProductType, CategoryType } from '@repo/types';
 import {
   StarIcon,
@@ -69,11 +70,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       navigator.share({
         title: product.name,
         text: product.description,
-        url: window.location.origin + `/products/${product.id}`,
+        url: window.location.origin + `/products/${product.slug}`,
       }).catch((error) => console.log('Error sharing', error));
     } else {
       // Fallback: copy link to clipboard
-      navigator.clipboard.writeText(window.location.origin + `/products/${product.id}`);
+      navigator.clipboard.writeText(window.location.origin + `/products/${product.slug}`);
       toast.success('Link copied to clipboard!');
     }
   };
@@ -88,7 +89,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       )}
       
       {/* Product Image */}
-      <Link href={`/products/${product.id}`} className="block">
+      <Link href={`/products/${product.slug}`} className="block">
         <div className="relative h-64 overflow-hidden group">
           <Image
             src={product.image}
@@ -102,7 +103,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       {/* Product Content */}
       <div className="p-6">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${product.slug}`}>
           <span className="text-secondary text-sm font-medium block mb-1">
             {product.categories && product.categories.length > 0 && product.categories[0]?.category
               ? product.categories[0].category.name.charAt(0).toUpperCase() + product.categories[0].category.name.slice(1)
@@ -121,11 +122,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              ₦{product.price.toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-gray-500 line-through text-sm">
-                ₦{product.originalPrice.toFixed(2)}
+                {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>
@@ -159,6 +160,18 @@ export default function ProductCard({ product }: ProductCardProps) {
             ({product.reviews})
           </span>
         </div>
+
+        {/* Pay on Delivery Tag */}
+        {product.payOnDelivery && (
+          <div className="mb-3">
+            <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold px-2.5 py-1 rounded">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Pay on Delivery
+            </span>
+          </div>
+        )}
         
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-2">
@@ -174,17 +187,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           >
             Buy Now
           </button>
-          {/* <button
-            onClick={toggleWishlist}
-            className="btn btn-icon"
-            aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          >
-            {isWishlisted ? (
-              <HeartIcon className="w-5 h-5 text-secondary" />
-            ) : (
-              <HeartOutlineIcon className="w-5 h-5" />
-            )}
-          </button> */}
         </div>
       </div>
     </div>

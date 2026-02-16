@@ -52,6 +52,7 @@ export const useCartStore = create<CartStore>()(
             image: product.image,
             selectedSize: size,
             selectedColor: color,
+            payOnDelivery: product.payOnDelivery ?? false,
           };
           
           return {

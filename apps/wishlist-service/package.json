@@ -1,0 +1,27 @@
+{
+  "name": "wishlist-service",
+  "version": "1.0.0",
+  "description": "Wishlist service – persists user wishlists to Postgres (Hono)",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm dlx tsx --env-file=.env --watch src/index.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0",
+  "dependencies": {
+    "@hono/node-server": "^1.19.7",
+    "drizzle-orm": "^0.39.3",
+    "hono": "^4.11.3",
+    "jose": "^5.2.4",
+    "@repo/wishlist-db": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/types": "workspace:*",
+    "@types/node": "^22.13.1"
+  }
+}

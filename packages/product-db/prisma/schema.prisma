@@ -39,24 +39,35 @@ model Product {
   features        String[]
   specifications  ProductSpecification[]
   inStock         Boolean
+  payOnDelivery   Boolean                 @default(false)
   badge           ProductBadge?
+  weight          Float?
+  length          Float?
+  width           Float?
+  height          Float?
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
 }
 
 model ProductCategory {
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId  String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId    Int
+  name          String
+  categoryName  String
 
   @@id([productId, categoryId])
+  @@index([productId])
 }
 
 model ProductSpecification {
   id        String  @id @default(uuid())
   key       String
   value     String
+  name      String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
+
+  @@index([productId])
 }

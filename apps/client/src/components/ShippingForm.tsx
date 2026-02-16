@@ -15,7 +15,7 @@ const NIGERIA_STATES = [
 ];
 
 interface ShippingFormProps {
-  onNext: () => void;
+  onNext: (data: ShippingFormInputs) => void;
 }
 
 export default function ShippingForm({ onNext }: ShippingFormProps) {
@@ -37,8 +37,8 @@ export default function ShippingForm({ onNext }: ShippingFormProps) {
   });
 
   const onSubmit: SubmitHandler<ShippingFormInputs> = (data) => {
-    // TODO: persist data to store if needed
-    onNext();
+    // Pass shipping data to parent component
+    onNext(data);
   };
 
   return (
@@ -113,7 +113,7 @@ export default function ShippingForm({ onNext }: ShippingFormProps) {
           </label>
           <input
             {...register("city")}
-            placeholder="Lagos"
+            placeholder="Asaba"
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-white-dark text-dark dark:text-light focus:outline-none focus:ring-2 focus:ring-secondary"
           />
           {errors.city && (

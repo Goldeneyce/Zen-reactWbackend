@@ -106,7 +106,7 @@ export default function ServicesPage() {
       id: '2',
       name: 'Jennifer Martinez',
       role: 'Business Owner',
-      content: 'We hired Zenon Electrics for our office security system upgrade. Their team designed a comprehensive solution that perfectly addressed our needs. The installation was smooth, and their ongoing support has been invaluable.',
+      content: 'We hired Zentrics for our office security system upgrade. Their team designed a comprehensive solution that perfectly addressed our needs. The installation was smooth, and their ongoing support has been invaluable.',
       rating: 5,
     },
   ];

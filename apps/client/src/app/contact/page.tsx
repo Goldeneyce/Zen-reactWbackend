@@ -12,7 +12,7 @@ import {
 } from '@/components/Icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { z } from 'zod';
 import { ContactFormData } from '@/types';
 
 const contactFormSchema = z.object({
@@ -236,7 +236,7 @@ export default function ContactPage() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Zenon Electrics Location"
+                  title="Zentrics Location"
                 />
               </div>
             </div>

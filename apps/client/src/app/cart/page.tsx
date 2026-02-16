@@ -6,17 +6,20 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/formatPrice';
 import { useCartStore } from '@/stores/cartStore';
 import { MinusIcon, PlusIcon, TrashIcon } from '@/components/Icons';
 import ShippingForm from '@/components/ShippingForm';
 import PaymentForm from '@/components/PaymentForm';
+import type { ShippingFormData } from '@repo/types';
+import { getSupabaseBrowserClient } from '@/lib/supabaseClient';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCartStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [activeStep, setActiveStep] = useState<number>(1); // 1: Cart, 2: Shipping, 3: Payment
   const router = useRouter();
-  const [shippingData, setShippingData] = useState<any>(null);
+  const [shippingData, setShippingData] = useState<ShippingFormData | undefined>(undefined);
 
   const formatOrderId = () => {
     const d = new Date();
@@ -41,8 +44,8 @@ export default function CartPage() {
     }
   };
 
-  const handleShippingNext = () => {
-    // TODO: capture shipping data from ShippingForm if needed
+  const handleShippingNext = (data: ShippingFormData) => {
+    setShippingData(data);
     setActiveStep(3);
   };
 
@@ -66,29 +69,95 @@ export default function CartPage() {
     }, 1000);
   };
 
-  const handleCashOnDelivery = () => {
+  const handleCashOnDelivery = async () => {
     setIsCheckingOut(true);
-    setTimeout(() => {
+    try {
       const orderId = formatOrderId();
+
+      // Get auth token for the API call
+      const supabase = getSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        toast.error('Please sign in to place an order.');
+        setIsCheckingOut(false);
+        return;
+      }
+
+      // Create COD order via order service
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders/cod`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            email: shippingData?.email || '',
+            amount: total,
+            products: items.map(i => ({
+              name: i.productName,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+            shippingAddress: shippingData
+              ? `${shippingData.address}, ${shippingData.city}, ${shippingData.state}`
+              : '',
+            shippingDetails: shippingData
+              ? {
+                  fullName: shippingData.fullName,
+                  phone: shippingData.phone,
+                  address: shippingData.address,
+                  city: shippingData.city,
+                  state: shippingData.state,
+                }
+              : undefined,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to create order');
+      }
+
+      const savedOrder = await res.json();
+
+      // Save to localStorage for confirmation page
       const order = {
-        id: orderId,
+        id: savedOrder._id || orderId,
         method: 'cod' as const,
         items: items.map(i => ({ id: i.id, name: i.productName, qty: i.quantity, price: i.price })),
         totals: { subtotal, shipping, tax, total },
         shippingData,
       };
       try { localStorage.setItem('last-order', JSON.stringify(order)); } catch {}
+
       toast.info('Order placed with Pay on Delivery. You will pay upon delivery.');
       clearCart();
+      router.push(`/order-confirmation?method=cod&id=${encodeURIComponent(savedOrder._id || orderId)}`);
+    } catch (error) {
+      console.error('COD order error:', error);
+      toast.error('Failed to place order. Please try again.');
+    } finally {
       setIsCheckingOut(false);
-      router.push(`/order-confirmation?method=cod&id=${encodeURIComponent(orderId)}`);
-    }, 1000);
+    }
   };
 
   const subtotal = getTotalPrice();
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.1; // 10% tax
   const total = subtotal + shipping + tax;
+
+  // OLD PAY ON DELIVERY LOGIC (commented out):
+  // const codAvailable = subtotal < 50000;
+
+  // NEW PAY ON DELIVERY LOGIC:
+  // POD is only available if ALL items in the cart have payOnDelivery enabled.
+  // If any item does not support POD, pay on delivery is disabled entirely.
+  const allItemsSupportPOD = items.length > 0 && items.every(item => item.payOnDelivery === true);
+  const codAvailable = allItemsSupportPOD;
 
   if (items.length === 0) {
     return (
@@ -214,7 +283,7 @@ export default function CartPage() {
                             {item.productName}
                           </h3>
                           <p className="text-secondary font-semibold mb-3">
-                            ₦{item.price.toFixed(2)}
+                            {formatPrice(item.price)}
                           </p>
                           <div className="flex flex-wrap items-center gap-4">
                             <div className="flex items-center gap-2">
@@ -244,7 +313,7 @@ export default function CartPage() {
                         </div>
                         <div className="sm:text-right">
                           <h3 className="font-bold text-lg">
-                            ₦{(item.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.price * item.quantity)}
                           </h3>
                         </div>
                       </div>
@@ -275,7 +344,10 @@ export default function CartPage() {
                     onBack={() => setActiveStep(2)}
                     onNext={handleCheckout}
                     onPayOnDelivery={handleCashOnDelivery}
-                    codAvailable={subtotal < 50000}
+                    codAvailable={codAvailable}
+                    shippingData={shippingData}
+                    amount={total}
+                    cartItems={items}
                   />
                   {isCheckingOut && (
                     <p className="text-sm text-secondary mt-4">Processing...</p>
@@ -292,25 +364,25 @@ export default function CartPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Subtotal</span>
-                    <span className="font-semibold">₦{subtotal.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(subtotal)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Shipping</span>
                     <span className="font-semibold">
-                      {shipping === 0 ? 'Free' : `₦${shipping.toFixed(2)}`}
+                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
                     </span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-300">Tax (10%)</span>
-                    <span className="font-semibold">₦{tax.toFixed(2)}</span>
+                    <span className="font-semibold">{formatPrice(tax)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pt-3">
                     <span className="text-xl font-bold text-primary">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      ₦{total.toFixed(2)}
+                      {formatPrice(total)}
                     </span>
                   </div>
                 </div>

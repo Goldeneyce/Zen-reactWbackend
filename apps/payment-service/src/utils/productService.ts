@@ -1,4 +1,5 @@
 import { ProductType } from "@repo/types";
+import { productCache } from "./productCache.ts";
 
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || "http://localhost:8000";
 
@@ -9,6 +10,15 @@ const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || "http://localhost
  * @returns Product details including current price
  */
 export const getProductById = async (productId: string): Promise<ProductType> => {
+    // Try cache first
+    const cachedProduct = productCache.get(productId);
+    if (cachedProduct) {
+        console.log(`💨 Cache hit for product: ${productId}`);
+        return cachedProduct;
+    }
+
+    // Cache miss - fetch from product-service
+    console.log(`🌐 Cache miss for product: ${productId} - fetching from product-service`);
     try {
         const response = await fetch(`${PRODUCT_SERVICE_URL}/products/${productId}`);
         
@@ -17,6 +27,10 @@ export const getProductById = async (productId: string): Promise<ProductType> =>
         }
         
         const product = await response.json();
+        
+        // Update cache for future requests
+        productCache.set(product);
+        
         return product;
     } catch (error) {
         console.error(`Error fetching product ${productId} from product-service:`, error);
@@ -31,10 +45,20 @@ export const getProductById = async (productId: string): Promise<ProductType> =>
  */
 export const getProductsByIds = async (productIds: string[]): Promise<ProductType[]> => {
     try {
-        const products = await Promise.all(
-            productIds.map(id => getProductById(id))
+        // Check which products are in cache
+        const cachedProducts = productCache.getMany(productIds);
+        const cachedIds = new Set(cachedProducts.map(p => p.id));
+        const missingIds = productIds.filter(id => !cachedIds.has(id));
+
+        console.log(`📊 Cache stats: ${cachedProducts.length} hits, ${missingIds.length} misses`);
+
+        // Fetch missing products from product-service
+        const fetchedProducts = await Promise.all(
+            missingIds.map(id => getProductById(id))
         );
-        return products;
+
+        // Combine cached and fetched products
+        return [...cachedProducts, ...fetchedProducts];
     } catch (error) {
         console.error("Error fetching products from product-service:", error);
         throw error;
@@ -44,21 +68,37 @@ export const getProductsByIds = async (productIds: string[]): Promise<ProductTyp
 /**
  * Calculate total price for a cart/order
  * Fetches current prices from product-service to prevent price manipulation
- * @param items - Array of items with productId and quantity
+ * Falls back to provided prices for placeholder/development products
+ * @param items - Array of items with productId, quantity, and optional fallback price
  * @returns Total price in the base currency
  */
 export const calculateOrderTotal = async (
-    items: Array<{ productId: string; quantity: number }>
+    items: Array<{ productId: string; quantity: number; price?: number }>
 ): Promise<number> => {
     try {
-        const products = await getProductsByIds(items.map(item => item.productId));
+        // Try to fetch products from product-service
+        let products: ProductType[];
+        try {
+            products = await getProductsByIds(items.map(item => item.productId));
+        } catch (fetchError) {
+            console.warn("Failed to fetch products from product-service, will use fallback prices if available");
+            products = [];
+        }
         
         const total = items.reduce((sum, item) => {
             const product = products.find(p => p.id === item.productId);
-            if (!product) {
-                throw new Error(`Product not found: ${item.productId}`);
+            
+            if (product) {
+                // Use price from product service (secure)
+                console.log(`Using DB price for ${item.productId}: ₦${product.price}`);
+                return sum + (product.price * item.quantity);
+            } else if (item.price !== undefined) {
+                // Fallback to provided price for placeholder products (DEVELOPMENT ONLY)
+                console.warn(`⚠️ Using fallback price for placeholder product ${item.productId}: ₦${item.price}`);
+                return sum + (item.price * item.quantity);
+            } else {
+                throw new Error(`Product not found and no fallback price provided: ${item.productId}`);
             }
-            return sum + (product.price * item.quantity);
         }, 0);
         
         return total;

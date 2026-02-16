@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────────
+//  Shipment – one per order (or per fulfillment)
+// ──────────────────────────────────────────────
+
+enum ShipmentStatus {
+  PENDING            // order placed, not yet picked
+  PROCESSING         // warehouse is picking / packing
+  LABEL_CREATED      // carrier label generated
+  SHIPPED            // handed off to carrier
+  IN_TRANSIT         // carrier scan – on the way
+  OUT_FOR_DELIVERY   // last-mile
+  DELIVERED          // final delivery confirmed
+  RETURNED           // return received back
+  CANCELLED          // shipment voided
+  FAILED             // delivery attempt failed
+}
+
+model Shipment {
+  id              String          @id @default(uuid())
+  orderId         String
+  userId          String
+
+  carrier         String?         // e.g. "FedEx", "UPS", "DHL"
+  trackingNumber  String?
+  trackingUrl     String?
+  serviceLevel    String?         // e.g. "STANDARD", "EXPRESS", "OVERNIGHT"
+
+  status          ShipmentStatus  @default(PENDING)
+
+  estimatedDelivery DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+
+  shippingCost    Float?          // cost charged / quoted
+  weight          Float?          // total weight in kg
+  currency        String          @default("USD")
+
+  // Addresses stored as JSON for flexibility
+  originAddress      Json?        // warehouse / sender
+  destinationAddress Json         // customer shipping address
+
+  notes           String?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  events          ShipmentEvent[]
+  items           ShipmentItem[]
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([trackingNumber])
+  @@index([status])
+}
+
+// ──────────────────────────────────────────────
+//  ShipmentEvent – append-only tracking timeline
+// ──────────────────────────────────────────────
+
+model ShipmentEvent {
+  id          String         @id @default(uuid())
+  shipmentId  String
+  shipment    Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  status      ShipmentStatus
+  location    String?        // "Distribution Centre – Chicago, IL"
+  description String?
+  occurredAt  DateTime       @default(now())
+
+  @@index([shipmentId])
+}
+
+// ──────────────────────────────────────────────
+//  ShipmentItem – line items inside a shipment
+// ──────────────────────────────────────────────
+
+model ShipmentItem {
+  id          String   @id @default(uuid())
+  shipmentId  String
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  productId   String
+  sku         String?
+  productName String?
+  quantity    Int      @default(1)
+
+  @@index([shipmentId])
+  @@index([productId])
+}
+
+// ──────────────────────────────────────────────
+//  ShippingRate – pre-configured rate table
+// ──────────────────────────────────────────────
+
+model ShippingRate {
+  id            String   @id @default(uuid())
+  carrier       String
+  serviceLevel  String   // "STANDARD" | "EXPRESS" | "OVERNIGHT"
+  region        String?  // geographic zone or country code
+  minWeight     Float    @default(0)
+  maxWeight     Float    @default(9999)
+  basePrice     Float
+  pricePerKg    Float    @default(0)
+  currency      String   @default("USD")
+  estimatedDays Int?     // estimated transit days
+  active        Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([carrier, serviceLevel, region])
+}

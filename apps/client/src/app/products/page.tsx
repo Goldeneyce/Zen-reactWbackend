@@ -1,19 +1,26 @@
 // app/products/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Searchbar from '@/components/Searchbar';
 import ProductList from '@/components/ProductList';
 import Filter from '@/components/Filter';
+import SortDropdown from '@/components/SortDropdown';
 import CTA from '@/components/CTA';
 import type { ProductType } from '@repo/types';
-import { products as mockProducts } from '@/data/products';
+import { getProducts } from '@/lib/api';
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
-  // Using mock products data - in a real app, this would come from an API
-  const products: ProductType[] = mockProducts;
+  const [selectedSort, setSelectedSort] = useState<string>('newest');
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get search query from URL
+  const searchQuery = searchParams.get('search') || '';
 
   const categories = [
     { id: 'all', label: 'All Products' },
@@ -23,10 +30,32 @@ export default function ProductsPage() {
     { id: 'kitchen', label: 'Kitchen Essentials' },
     { id: 'security', label: 'Security' },
     { id: 'cooling', label: 'Cooling' },
+    { id: 'solar', label: 'Solar' },
   ];
 
-  // Note: products from DB don't have category field directly (it's a many-to-many relationship)
-  // Filter by category would need to access product.categories relationship
+  // Fetch products from API
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getProducts({
+          category: selectedCategory === 'all' ? undefined : selectedCategory,
+          search: searchQuery || undefined,
+          sort: selectedSort as 'newest' | 'oldest' | 'price-asc' | 'price-desc'
+        });
+        setProducts(data);
+      } catch (err) {
+        setError('Failed to load products. Please try again later.');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, [selectedCategory, searchQuery, selectedSort]);
+
   const filteredProducts = products;
 
   return (
@@ -49,8 +78,26 @@ export default function ProductsPage() {
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
+          <SortDropdown
+            selectedSort={selectedSort}
+            onSelectSort={setSelectedSort}
+          />
           
-          <ProductList products={filteredProducts} />
+          
+          {loading && (
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">Loading products...</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="text-center py-12">
+              <p className="text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
+          
+          {!loading && !error && <ProductList products={filteredProducts} />}
         </div>
       </div>
       
