@@ -8,6 +8,7 @@ import { postBySlugQuery, postSlugsQuery } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
 import { estimateReadingTime } from "@/lib/sanity/readingTime";
 import RelatedProducts from "@/components/blog/RelatedProducts";
+import BlogComments from "@/components/blog/BlogComments";
 import type { Post } from "@/lib/sanity/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -177,6 +178,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         {post.relatedProducts && post.relatedProducts.length > 0 && (
           <RelatedProducts products={post.relatedProducts} />
         )}
+
+        {/* Comments */}
+        <BlogComments slug={slug} />
       </div>
     </article>
   );

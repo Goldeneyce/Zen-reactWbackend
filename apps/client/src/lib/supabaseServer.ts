@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
 export const createSupabaseServerClient = async () => {
   const cookieStore = await cookies();
@@ -23,4 +24,21 @@ export const createSupabaseServerClient = async () => {
       },
     },
   });
+};
+
+/**
+ * Service-role client — bypasses Row Level Security.
+ * Only use on the server for trusted admin operations.
+ */
+export const createSupabaseServiceClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      "Missing SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL env vars."
+    );
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey);
 };
