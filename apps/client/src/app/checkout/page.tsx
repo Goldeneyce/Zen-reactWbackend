@@ -1,69 +1,80 @@
 // app/checkout/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/stores/cartStore';
 import Searchbar from '@/components/Searchbar';
 import { formatPrice } from '@/lib/formatPrice';
 import ShippingForm from '@/components/ShippingForm';
+import ShippingSelector, { type SelectedShipping } from '@/components/ShippingSelector';
 import PaymentForm from '@/components/PaymentForm';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, FieldErrors } from 'react-hook-form';
-import { z } from 'zod';
+import type { ShippingFormData } from '@repo/types';
 
-const checkoutSchema = z.object({
-  payment: z.object({
-    cardNumber: z.string().min(16, 'Please enter a valid card number'),
-    cardHolder: z.string().min(2, 'Please enter card holder name'),
-    expiryDate: z
-      .string()
-      .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Please enter a valid expiry date (MM/YY)'),
-    cvv: z.string().min(3, 'Please enter a valid CVV'),
-  }),
-});
-
-type CheckoutFormData = z.infer<typeof checkoutSchema>;
-type PaymentFormData = CheckoutFormData['payment'];
+/** Default weight (kg) when a product doesn't specify one */
+const DEFAULT_ITEM_WEIGHT = 0.5;
 
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeStep, setActiveStep] = useState<'shipping' | 'payment' | 'review'>('shipping');
   const { items, getTotalPrice, clearCart } = useCartStore();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CheckoutFormData>({
-    resolver: zodResolver(checkoutSchema),
-    defaultValues: {
-      payment: {
-        cardNumber: '',
-        cardHolder: '',
-        expiryDate: '',
-        cvv: '',
-      },
-    },
+  // Shipping address captured from Step 1
+  const [shippingData, setShippingData] = useState<ShippingFormData | null>(null);
+
+  // Selected shipping option from the ShippingSelector
+  const [selectedShipping, setSelectedShipping] = useState<SelectedShipping>({
+    rate: null,
+    isCOD: false,
+    cost: 0,
+    shippingMethodId: '',
   });
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal > 500 ? 0 : 50;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
 
-  const onSubmit = async (data: CheckoutFormData) => {
+  // Dynamic total weight of the cart (kg)
+  const totalWeight = useMemo(() => {
+    return items.reduce((sum, item) => {
+      // CartItem may carry a `weight` field from ProductType; fallback to default
+      const w = (item as any).weight ?? DEFAULT_ITEM_WEIGHT;
+      return sum + w * item.quantity;
+    }, 0);
+  }, [items]);
+
+  // Shipping cost comes from the selected rate
+  const shippingCost = selectedShipping.cost;
+  const total = subtotal + shippingCost;
+
+  // COD available only if all items support it
+  const codAvailable = items.length > 0 && items.every(item => item.payOnDelivery === true);
+
+  /* ─── Step handlers ─── */
+
+  const handleShippingFormDone = (data: ShippingFormData) => {
+    // Store address data – don't advance step yet; user must pick a shipping method
+    setShippingData(data);
+  };
+
+  const handleProceedToPayment = () => {
+    if (!selectedShipping.shippingMethodId) return;
+    setActiveStep('payment');
+  };
+
+  const handleShippingBack = () => {
+    setActiveStep('shipping');
+  };
+
+  const handlePayOnDelivery = () => {
+    // COD is handled via ShippingSelector already
+    // Just proceed to review
+    setActiveStep('review');
+  };
+
+  const onSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Checkout data:', data);
-      
-      // Clear cart and show success
       clearCart();
-      alert('Order placed successfully! Thank you for your purchase.');
-      
-      // Redirect to confirmation page
       window.location.href = '/order-confirmation';
     } catch (error) {
       console.error('Checkout error:', error);
@@ -144,19 +155,43 @@ export default function CheckoutPage() {
             {/* Checkout Form */}
             <div className="lg:col-span-2">
               {activeStep === 'shipping' && (
-                <ShippingForm onNext={() => setActiveStep('payment')} />
+                <div className="space-y-6">
+                  {/* Address Form */}
+                  <ShippingForm onNext={handleShippingFormDone} />
+
+                  {/* Shipping Selector – appears after address is filled */}
+                  {shippingData && (
+                    <div className="bg-white dark:bg-white-dark p-8 rounded-lg shadow-custom dark:shadow-dark-custom">
+                      <ShippingSelector
+                        shippingData={shippingData}
+                        weight={totalWeight}
+                        codAvailable={codAvailable}
+                        onSelect={setSelectedShipping}
+                      />
+
+                      <button
+                        onClick={handleProceedToPayment}
+                        disabled={!selectedShipping.shippingMethodId}
+                        className="btn btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Continue to Payment
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
               
               {activeStep === 'payment' && (
                 <PaymentForm 
-                  control={control}
-                  errors={(errors.payment || {}) as FieldErrors<PaymentFormData>}
-                  onBack={() => setActiveStep('shipping')}
+                  onBack={handleShippingBack}
                   onNext={() => setActiveStep('review')}
-                  onPayOnDelivery={() => {}}
-                  // OLD: codAvailable={false}
-                  // NEW: POD only if ALL cart items support it
-                  codAvailable={items.length > 0 && items.every(item => item.payOnDelivery === true)}
+                  onPayOnDelivery={handlePayOnDelivery}
+                  codAvailable={selectedShipping.isCOD}
+                  shippingData={shippingData ?? undefined}
+                  amount={total}
+                  cartItems={items}
+                  shippingMethodId={selectedShipping.shippingMethodId}
+                  shippingCost={shippingCost}
                 />
               )}
               
@@ -168,18 +203,31 @@ export default function CheckoutPage() {
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Shipping Information</h3>
                       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded">
-                        {/* This would display actual form data */}
-                        <p>John Doe</p>
-                        <p>123 Main St, New York, NY 10001</p>
-                        <p>john@example.com | (123) 456-7890</p>
+                        {shippingData ? (
+                          <>
+                            <p>{shippingData.fullName}</p>
+                            <p>{shippingData.address}, {shippingData.city}, {shippingData.state}</p>
+                            <p>{shippingData.email} | {shippingData.phone}</p>
+                          </>
+                        ) : (
+                          <p className="text-gray-400">No shipping information</p>
+                        )}
                       </div>
                     </div>
-                    
+
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">Payment Method</h3>
+                      <h3 className="font-semibold text-lg mb-2">Shipping Method</h3>
                       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded">
-                        <p>Visa ending in 4242</p>
-                        <p>Expires: 12/25</p>
+                        {selectedShipping.isCOD ? (
+                          <p>Cash on Delivery — ₦0.00</p>
+                        ) : selectedShipping.rate ? (
+                          <p>
+                            {selectedShipping.rate.carrier} ({selectedShipping.rate.serviceType})
+                            — {formatPrice(selectedShipping.cost)}
+                          </p>
+                        ) : (
+                          <p className="text-gray-400">No shipping method selected</p>
+                        )}
                       </div>
                     </div>
                     
@@ -210,7 +258,7 @@ export default function CheckoutPage() {
                         Back to Payment
                       </button>
                       <button
-                        onClick={handleSubmit(onSubmit)}
+                        onClick={onSubmit}
                         disabled={isSubmitting}
                         className="btn btn-primary flex-1"
                       >
@@ -236,13 +284,12 @@ export default function CheckoutPage() {
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Shipping</span>
                     <span className="font-semibold">
-                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
+                      {selectedShipping.isCOD
+                        ? 'Pay on Delivery'
+                        : shippingCost === 0
+                        ? 'Select option'
+                        : formatPrice(shippingCost)}
                     </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center pb-3 border-b">
-                    <span className="text-gray-600 dark:text-gray-300">Tax (10%)</span>
-                    <span className="font-semibold">{formatPrice(tax)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pt-3">
@@ -254,11 +301,16 @@ export default function CheckoutPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    <strong>Free shipping</strong> on orders over ₦500
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Estimated delivery: 3-5 business days
+                  {selectedShipping.rate && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <strong>{selectedShipping.rate.carrier}</strong> — Est.{' '}
+                      {selectedShipping.rate.estimatedDays <= 1
+                        ? '1 day'
+                        : `${selectedShipping.rate.estimatedDays} days`}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Cart weight: {totalWeight.toFixed(2)} kg
                   </p>
                 </div>
               </div>

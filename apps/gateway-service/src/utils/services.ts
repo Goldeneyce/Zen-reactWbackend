@@ -15,3 +15,6 @@ export const WISHLIST_SERVICE_URL =
 
 export const INVENTORY_SERVICE_URL =
   process.env.INVENTORY_SERVICE_URL ?? "http://localhost:8010";
+
+export const LOGISTICS_SERVICE_URL =
+  process.env.LOGISTICS_SERVICE_URL ?? "http://localhost:8011";

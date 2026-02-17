@@ -2,14 +2,11 @@
 'use client';
 
 import React from 'react';
-import { Control, Controller, FieldErrors } from 'react-hook-form';
 import PaystackPaymentForm from './PaystackPaymentForm';
 import { ShippingFormData, CartItem } from '@repo/types';
 import { formatPrice } from '@/lib/formatPrice';
 
 interface PaymentFormProps {
-  control?: Control<any>;
-  errors?: FieldErrors<any>;
   onBack: () => void;
   onNext: () => void;
   onPayOnDelivery: () => void;
@@ -17,18 +14,20 @@ interface PaymentFormProps {
   shippingData?: ShippingFormData;
   amount?: number;
   cartItems?: CartItem[];
+  shippingMethodId?: string;
+  shippingCost?: number;
 }
 
 export default function PaymentForm({ 
-  control, 
-  errors, 
   onBack, 
   onNext, 
   onPayOnDelivery, 
   codAvailable,
   shippingData,
   amount = 0,
-  cartItems
+  cartItems,
+  shippingMethodId,
+  shippingCost,
 }: PaymentFormProps) {
   
   const handlePaymentSuccess = (reference: string) => {
@@ -58,6 +57,8 @@ export default function PaymentForm({
               shippingData={shippingData}
               amount={amount}
               cartItems={cartItems}
+              shippingMethodId={shippingMethodId}
+              shippingCost={shippingCost}
               onSuccess={handlePaymentSuccess}
               onClose={handlePaymentClose}
             />

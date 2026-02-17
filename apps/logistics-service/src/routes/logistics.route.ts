@@ -11,8 +11,14 @@ import {
   listRates,
   createRate,
 } from "../controllers/logistics.controller.ts";
+import { getShippingQuote } from "../controllers/rateQuote.controller.ts";
 
 export const logisticsRoutes = (app: FastifyInstance) => {
+  // ─── Live rate quote (races Terminal Africa + ShipBubble) ──
+  app.post("/quote", async (request, reply) =>
+    getShippingQuote(request as any, reply)
+  );
+
   // ─── Shipping rates (public + admin) ─────────────────
   app.get<{ Querystring: { region?: string; carrier?: string } }>(
     "/rates",

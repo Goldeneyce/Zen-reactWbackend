@@ -73,6 +73,8 @@ const webhookRoute: FastifyPluginAsync = async (app) => {
                 city: metadata.city,
                 state: metadata.state,
               },
+              shippingMethodId: metadata.shipping_method_id || "",
+              shippingCost: Number(metadata.shipping_cost) || 0,
               products: cart.map((item: any) => ({
                 productId: item.id,
                 quantity: item.quantity,

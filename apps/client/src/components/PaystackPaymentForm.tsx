@@ -9,6 +9,8 @@ interface PaystackPaymentFormProps {
   shippingData: ShippingFormData;
   amount: number;
   cartItems?: CartItem[];
+  shippingMethodId?: string;
+  shippingCost?: number;
   onSuccess?: (reference: string) => void;
   onClose?: () => void;
 }
@@ -27,7 +29,9 @@ const fetchPaystackSession = async (
   shippingData: ShippingFormData,
   amount: number,
   token: string | null,
-  cartItems?: CartItem[]
+  cartItems?: CartItem[],
+  shippingMethodId?: string,
+  shippingCost?: number
 ) => {
   return fetch(
     `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
@@ -47,6 +51,8 @@ const fetchPaystackSession = async (
           address: shippingData.address,
           city: shippingData.city,
           state: shippingData.state,
+          shipping_method_id: shippingMethodId || "",
+          shipping_cost: shippingCost ?? 0,
         },
       }),
       headers: {
@@ -76,6 +82,8 @@ export default function PaystackPaymentForm({
   shippingData,
   amount,
   cartItems,
+  shippingMethodId,
+  shippingCost,
   onSuccess,
   onClose,
 }: PaystackPaymentFormProps) {
@@ -158,7 +166,7 @@ export default function PaystackPaymentForm({
 
     setLoading(true);
     try {
-      const data = await fetchPaystackSession(shippingData, amount, token, cartItems);
+      const data = await fetchPaystackSession(shippingData, amount, token, cartItems, shippingMethodId, shippingCost);
       
       console.log("Backend response:", data);
       console.log("Access code:", data.access_code);

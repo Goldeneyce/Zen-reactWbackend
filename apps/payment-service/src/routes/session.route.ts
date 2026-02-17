@@ -56,7 +56,11 @@ const sessionRoute: FastifyPluginAsync = async (app) => {
                     });
                 }
 
-                const amount = calculatedAmount;
+                // Add shipping cost to the total (server-side re-calculation)
+                const shippingCost = Number(metadata?.shipping_cost) || 0;
+                const amount = calculatedAmount + shippingCost;
+                console.log(`Subtotal: ₦${calculatedAmount}, Shipping: ₦${shippingCost}, Total: ₦${amount}`);
+
                 const reference = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 const callback_url = `http://localhost:3002/return?session_id=${reference}`;
 
@@ -65,6 +69,8 @@ const sessionRoute: FastifyPluginAsync = async (app) => {
                     userId,
                     cart: cart || [],
                     orderDate: new Date().toISOString(),
+                    shipping_method_id: metadata?.shipping_method_id || "",
+                    shipping_cost: shippingCost,
                 };
 
                 const response = await initializePaystackTransaction(
@@ -115,10 +121,49 @@ const sessionRoute: FastifyPluginAsync = async (app) => {
                 }
 
                 const response = await verifyPaystackTransaction(reference);
+                const txn = response.data;
+
+                // ── Server-side total re-verification ──
+                if (txn && txn.status === "success") {
+                    const meta = txn.metadata || {};
+                    const cart = meta.cart || [];
+
+                    if (cart.length > 0) {
+                        const cartItems = cart.map((item: any) => ({
+                            productId: item.id,
+                            quantity: item.quantity,
+                            price: item.price,
+                        }));
+
+                        try {
+                            const expectedSubtotal = await calculateOrderTotal(cartItems);
+                            const shippingCost = Number(meta.shipping_cost) || 0;
+                            const expectedTotal = expectedSubtotal + shippingCost;
+                            const paidAmount = txn.amount / 100; // kobo → Naira
+
+                            if (Math.abs(paidAmount - expectedTotal) > 1) {
+                                console.error(
+                                    `Payment amount mismatch! Paid: ₦${paidAmount}, Expected: ₦${expectedTotal} (subtotal: ₦${expectedSubtotal} + shipping: ₦${shippingCost})`
+                                );
+                                return reply.code(400).send({
+                                    error: "Payment amount does not match order total",
+                                    expected: expectedTotal,
+                                    paid: paidAmount,
+                                });
+                            }
+
+                            console.log(
+                                `Payment verified: ₦${paidAmount} (subtotal: ₦${expectedSubtotal} + shipping: ₦${shippingCost})`
+                            );
+                        } catch (calcError) {
+                            console.warn("Could not re-verify total, proceeding:", calcError);
+                        }
+                    }
+                }
 
                 return reply.send({
                     success: true,
-                    data: response.data,
+                    data: txn,
                 });
             } catch (error) {
                 console.error("Error verifying payment:", error);
