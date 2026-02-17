@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 export default function SignInPage() {
@@ -13,12 +14,12 @@ export default function SignInPage() {
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
       setSignedIn(!!data.session?.user);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         setSignedIn(!!session?.user);
       }
     );

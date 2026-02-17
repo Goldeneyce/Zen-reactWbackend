@@ -182,7 +182,7 @@ export default function OrdersListClient() {
     for (const order of orders) {
       const matched = matchState(order.shippingDetails?.state);
       if (matched) {
-        groups[matched].push(order);
+        groups[matched]!.push(order);
       } else {
         unmatched.push(order);
       }
@@ -195,8 +195,8 @@ export default function OrdersListClient() {
   const stateSummary = useMemo(() => {
     const all = NIGERIAN_STATES.map((state) => ({
       state,
-      count: stateGroups.groups[state].length,
-      totalAmount: stateGroups.groups[state].reduce((s, o) => s + o.amount, 0),
+      count: stateGroups.groups[state]!.length,
+      totalAmount: stateGroups.groups[state]!.reduce((s, o) => s + o.amount, 0),
     }));
     const withOrders = all.filter((s) => s.count > 0).sort((a, b) => b.count - a.count);
     const empty = all.filter((s) => s.count === 0);
