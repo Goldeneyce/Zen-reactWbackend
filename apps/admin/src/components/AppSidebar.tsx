@@ -71,6 +71,13 @@ const items = [
   },
 ];
 
+const orderAdminItems = [
+  { title: "Order Dashboard", url: "/order-admin", icon: HomeIcon },
+  { title: "All Orders", url: "/order-admin/orders", icon: ShoppingBasketIcon },
+  { title: "Returns & Refunds", url: "/order-admin/returns", icon: PackageIcon },
+  { title: "Reports", url: "/order-admin/reports", icon: WarehouseIcon },
+];
+
 const AppSidebar = () => {
   return (
     <Sidebar collapsible="icon">
@@ -242,6 +249,23 @@ const AppSidebar = () => {
                   </Sheet>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Order Admin</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {orderAdminItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -30,6 +30,12 @@ fastify.register( async (fastifyInstance) => {
   });
 });
 
+fastify.register( async (fastifyInstance) => {
+  await import('./routes/order-admin.js').then( (module) => {
+    module.orderAdminRoutes(fastifyInstance);
+  });
+});
+
 const start = async () => {
   try {
 		await Promise.all([

@@ -1,0 +1,83 @@
+"use client";
+
+import { LogOutIcon, MoonIcon, SettingsIcon, SunIcon, UserIcon } from "@/components/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { useTheme } from "next-themes";
+import { SidebarTrigger } from "./ui/sidebar";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+
+const Navbar = () => {
+  const { setTheme } = useTheme();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.push("/sign-in");
+  };
+
+  return (
+    <nav className="p-4 flex items-center justify-between sticky top-0 bg-background z-10 border-b">
+      <div className="flex items-center gap-3">
+        <SidebarTrigger />
+        <h1 className="text-sm font-medium text-muted-foreground hidden sm:block">
+          Order Management
+        </h1>
+      </div>
+      <div className="flex items-center gap-3">
+        {/* THEME MENU */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {/* USER MENU */}
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Avatar>
+              <AvatarImage src="" />
+              <AvatarFallback>OA</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent sideOffset={10}>
+            <DropdownMenuLabel>Order Admin</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <UserIcon className="h-[1.2rem] w-[1.2rem] mr-2" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <SettingsIcon className="h-[1.2rem] w-[1.2rem] mr-2" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+              <LogOutIcon className="h-[1.2rem] w-[1.2rem] mr-2" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
