@@ -249,11 +249,11 @@ export default function OrderDetailClient({ order: initialOrder, activity: initi
           </div>
 
           {/* Tags */}
-          {order.tags?.length > 0 && (
+          {(order.tags?.length ?? 0) > 0 && (
             <div className="border-t pt-4">
               <Label className="text-sm font-medium mb-2 block">Tags</Label>
               <div className="flex flex-wrap gap-1">
-                {order.tags.map((tag: string, i: number) => (
+                {order.tags!.map((tag: string, i: number) => (
                   <Badge key={i} variant="secondary">{tag}</Badge>
                 ))}
               </div>
@@ -603,11 +603,11 @@ export default function OrderDetailClient({ order: initialOrder, activity: initi
             </div>
 
             {/* Existing Flags */}
-            {order.fraudAnalysis?.flags?.length > 0 && (
+            {(order.fraudAnalysis?.flags?.length ?? 0) > 0 && (
               <div className="mt-4 border-t pt-4">
                 <Label className="mb-2 block">Current Flags</Label>
                 <div className="flex flex-wrap gap-2">
-                  {order.fraudAnalysis.flags.map((flag: string, i: number) => (
+                  {order.fraudAnalysis!.flags!.map((flag: string, i: number) => (
                     <Badge key={i} variant="destructive">{flag}</Badge>
                   ))}
                 </div>
@@ -934,7 +934,7 @@ export default function OrderDetailClient({ order: initialOrder, activity: initi
                         {ret.items?.map((item: { name: string; quantity: number }, i: number) => (
                           <span key={i}>
                             {item.name} x{item.quantity}
-                            {i < ret.items.length - 1 ? ", " : ""}
+                            {i < ret.items!.length - 1 ? ", " : ""}
                           </span>
                         ))}
                       </div>

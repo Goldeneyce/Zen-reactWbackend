@@ -32,13 +32,13 @@ const OrderDetailPage = async ({ params }: Props) => {
   }
 
   // Try to get logistics data
-  let shipments: Record<string, unknown>[] = [];
+  let shipments: { id: string; trackingNumber?: string; carrier?: string; status: string; estimatedDelivery?: string; trackingUrl?: string }[] = [];
   try {
     const logisticsUrl = process.env.NEXT_PUBLIC_LOGISTICS_SERVICE_URL || "http://localhost:8011";
     const shipRes = await fetch(`${logisticsUrl}/shipments/order/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (shipRes.ok) shipments = await shipRes.json();
+    if (shipRes.ok) shipments = await shipRes.json() as typeof shipments;
   } catch { /* logistics service may be down */ }
 
   return (

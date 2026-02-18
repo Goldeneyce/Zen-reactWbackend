@@ -24,6 +24,7 @@ import { MoreHorizontalIcon, ArrowUpDownIcon, SearchIcon } from "@/components/ic
 
 interface OrderItem {
   _id: string;
+  userId?: string;
   email: string;
   status: string;
   priority: string;

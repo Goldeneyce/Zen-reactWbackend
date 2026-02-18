@@ -44,3 +44,6 @@ apps/**/src/**/*.d.ts.map
 packages/**/src/**/*.js
 packages/**/src/**/*.d.ts
 packages/**/src/**/*.d.ts.map
+
+# certifications*.crt
+certs/
