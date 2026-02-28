@@ -80,7 +80,7 @@ export default function CartPage() {
       const token = sessionData.session?.access_token;
 
       if (!token) {
-        toast.error('Please sign in to place an order.');
+        toast.error('Please log in to place an order.');
         setIsCheckingOut(false);
         return;
       }

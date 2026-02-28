@@ -11,7 +11,7 @@ const Page = () => {
   return (
     <div className="">
       <h1>You do not have an access!</h1>
-      <button onClick={handleSignOut}>Sign out</button>
+      <button onClick={handleSignOut}>Log out</button>
     </div>
   );
 };

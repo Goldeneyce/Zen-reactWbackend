@@ -27,7 +27,7 @@ export default function UnauthorizedPage() {
         onClick={handleSignOut}
         className="rounded-md border px-6 py-2 text-sm hover:bg-accent transition-colors"
       >
-        Sign out &amp; try another account
+        Log out &amp; try another account
       </button>
     </div>
   );

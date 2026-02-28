@@ -115,7 +115,7 @@ export default function Navbar() {
       </button>
       <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white dark:bg-white-dark shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-          <p className="text-xs uppercase tracking-wide text-gray-400">Signed in</p>
+          <p className="text-xs uppercase tracking-wide text-gray-400">Logged in</p>
           <p className="text-sm font-semibold text-dark dark:text-gray-100">Welcome back</p>
         </div>
         <div className="py-2">
@@ -146,7 +146,7 @@ export default function Navbar() {
             onClick={handleSignOut}
             className="w-full rounded-lg px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
-            Sign out
+            Log out
           </button>
         </div>
       </div>
@@ -252,8 +252,8 @@ export default function Navbar() {
               
               {authReady && !user && (
                 <div className="flex items-center gap-3">
-                  <Link href="/login" className="btn btn-primary">Sign in</Link>
-                  <Link href="/sign-up" className="btn btn-outline">Sign up</Link>
+                  <Link href="/login" className="btn btn-primary">Log in</Link>
+                  <Link href="/sign-up" className="btn btn-outline">Register</Link>
                 </div>
               )}
               {authReady && user && <ProfileButton />}
@@ -264,7 +264,7 @@ export default function Navbar() {
               <ShoppingCartIconWithBadge />
               
               {authReady && !user && (
-                <Link href="/login" className="btn btn-primary">Sign in</Link>
+                <Link href="/login" className="btn btn-primary">Log in</Link>
               )}
               {authReady && user && <ProfileButton />}
               

@@ -53,7 +53,7 @@ export default function Page() {
     <div className="flex items-center justify-center h-screen">
       {signedIn ? (
         <div className="flex flex-col items-center gap-4">
-          <p className="text-lg font-medium">You are already signed in.</p>
+          <p className="text-lg font-medium">You are already logged in.</p>
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -65,13 +65,13 @@ export default function Page() {
               onClick={handleSignOut}
               className="rounded-md border px-4 py-2 text-sm"
             >
-              Sign out
+              Log out
             </button>
           </div>
         </div>
       ) : (
         <div className="w-full max-w-md rounded-lg border p-6">
-          <h1 className="text-2xl font-semibold mb-4">Admin sign in</h1>
+          <h1 className="text-2xl font-semibold mb-4">Admin log in</h1>
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
@@ -99,7 +99,7 @@ export default function Page() {
               disabled={loading}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-60"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Logging in..." : "Log in"}
             </button>
           </form>
         </div>

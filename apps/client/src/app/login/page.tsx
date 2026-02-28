@@ -70,7 +70,7 @@ export default function LoginPage() {
           <div className="max-w-md mx-auto bg-white dark:bg-white-dark rounded-2xl shadow-custom dark:shadow-dark-custom p-8">
             <div className="text-center mb-8">
               <p className="text-sm uppercase tracking-[0.2em] text-secondary">Welcome back</p>
-              <h1 className="text-3xl font-bold text-primary mt-2">Sign in to Zentrics</h1>
+              <h1 className="text-3xl font-bold text-primary mt-2">Login to Zentrics</h1>
               <p className="text-sm text-gray-500 mt-2">Access your orders, wishlist, and account settings.</p>
             </div>
             
@@ -137,7 +137,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Signing In...' : 'Sign In'}
+                {isSubmitting ? 'Logging In...' : 'Log In'}
               </button>
             </form>
             
@@ -177,7 +177,7 @@ export default function LoginPage() {
                   href="/sign-up"
                   className="text-secondary hover:text-green-500 transition-colors font-medium"
                 >
-                  Sign up here
+                  Register here
                 </Link>
               </p>
             </div>

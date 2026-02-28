@@ -126,7 +126,7 @@ export default function AccountPage() {
                   onClick={handleSignOut}
                   className="btn btn-outline"
                 >
-                  Sign out
+                  Log out
                 </button>
               </div>
             </div>

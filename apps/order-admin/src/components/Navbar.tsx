@@ -71,7 +71,7 @@ const Navbar = () => {
             </DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
               <LogOutIcon className="h-[1.2rem] w-[1.2rem] mr-2" />
-              Sign Out
+              Log Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

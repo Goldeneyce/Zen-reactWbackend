@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
@@ -13,12 +14,12 @@ export default function SignInPage() {
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
       setSignedIn(!!data.session?.user);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         setSignedIn(!!session?.user);
       }
     );
@@ -55,7 +56,7 @@ export default function SignInPage() {
     <div className="flex items-center justify-center h-screen bg-background">
       {signedIn ? (
         <div className="flex flex-col items-center gap-4">
-          <p className="text-lg font-medium">You are already signed in.</p>
+          <p className="text-lg font-medium">You are already logged in.</p>
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -67,7 +68,7 @@ export default function SignInPage() {
               onClick={handleSignOut}
               className="rounded-md border px-4 py-2 text-sm"
             >
-              Sign out
+              Log out
             </button>
           </div>
         </div>
@@ -76,7 +77,7 @@ export default function SignInPage() {
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold">Product Admin</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Sign in to manage products &amp; inventory
+              Log in to manage products &amp; inventory
             </p>
           </div>
           <form onSubmit={handleSignIn} className="space-y-4">
@@ -108,7 +109,7 @@ export default function SignInPage() {
               disabled={loading}
               className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Logging in..." : "Log in"}
             </button>
           </form>
         </div>

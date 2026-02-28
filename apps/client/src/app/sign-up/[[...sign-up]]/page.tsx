@@ -76,7 +76,7 @@ export default function Page() {
             disabled={loading}
             className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating account..." : "Sign up"}
+            {loading ? "Creating account..." : "Register"}
           </button>
         </form>
         <div className="relative my-8">
@@ -110,7 +110,7 @@ export default function Page() {
           </button>
         </div>
         <p className="text-sm text-center text-gray-600 dark:text-gray-300 mt-6">
-          Already have an account? <Link href="/login" className="text-secondary">Sign in</Link>
+          Already have an account? <Link href="/login" className="text-secondary">Log in</Link>
         </p>
       </div>
     </div>

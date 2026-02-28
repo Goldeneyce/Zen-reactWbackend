@@ -282,7 +282,7 @@ const AppSidebar = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Account</DropdownMenuItem>
                 <DropdownMenuItem>Setting</DropdownMenuItem>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
+                <DropdownMenuItem>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

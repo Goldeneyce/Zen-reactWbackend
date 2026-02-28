@@ -241,7 +241,7 @@ export default function PaystackPaymentForm({
   if (!isSignedIn) {
     return (
       <div className="w-full text-center py-3 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600">Please sign in to continue with payment</p>
+        <p className="text-red-600">Please log in to continue with payment</p>
       </div>
     );
   }

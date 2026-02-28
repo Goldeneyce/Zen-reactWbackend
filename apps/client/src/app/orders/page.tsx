@@ -45,7 +45,7 @@ const OrdersPage = () => {
       const token = sessionData.session?.access_token;
 
       if (!token) {
-        toast.error('Please sign in to make payment.');
+        toast.error('Please log in to make payment.');
         return;
       }
 

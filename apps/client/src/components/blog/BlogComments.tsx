@@ -174,14 +174,14 @@ export default function BlogComments({ slug }: { slug: string }) {
       ) : (
         <div className="mb-10 rounded-xl border border-gray/20 bg-white dark:bg-white-dark p-6 text-center">
           <p className="text-gray text-sm mb-3">
-            Sign in to join the conversation.
+            Log in to join the conversation.
           </p>
           <a
             href="/login"
             className="inline-block px-5 py-2 rounded-lg bg-secondary text-white text-sm font-medium
                        hover:bg-secondary/90 transition-colors"
           >
-            Sign In
+            Log In
           </a>
         </div>
       )}
