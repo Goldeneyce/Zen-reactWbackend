@@ -82,7 +82,7 @@ export class CacheHelper {
   }
 
   async zrange(key: string, start: number, stop: number): Promise<string[]> {
-    const raw = await this.redis.zrange<string>(this.key(key), start, stop);
+    const raw = await this.redis.zrange<string[]>(this.key(key), start, stop);
     return raw ?? [];
   }
 

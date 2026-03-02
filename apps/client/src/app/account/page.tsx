@@ -5,7 +5,12 @@ import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 export default function AccountPage() {
   const [email, setEmail] = useState<string | null>(null);
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -15,8 +20,21 @@ export default function AccountPage() {
     const supabase = getSupabaseBrowserClient();
     supabase.auth.getUser().then(({ data }) => {
       const user = data.user;
+      const meta = user?.user_metadata as {
+        first_name?: string;
+        middle_name?: string;
+        last_name?: string;
+        phone_number?: string;
+        gender?: string;
+        date_of_birth?: string;
+      } | undefined;
       setEmail(user?.email ?? null);
-      setFullName((user?.user_metadata as { full_name?: string } | undefined)?.full_name ?? "");
+      setFirstName(meta?.first_name ?? "");
+      setMiddleName(meta?.middle_name ?? "");
+      setLastName(meta?.last_name ?? "");
+      setPhoneNumber(meta?.phone_number ?? "");
+      setGender(meta?.gender ?? "");
+      setDateOfBirth(meta?.date_of_birth ?? "");
       setLoading(false);
     });
   }, []);
@@ -29,7 +47,12 @@ export default function AccountPage() {
     const supabase = getSupabaseBrowserClient();
     const { error } = await supabase.auth.updateUser({
       data: {
-        full_name: fullName,
+        first_name: firstName,
+        middle_name: middleName,
+        last_name: lastName,
+        phone_number: phoneNumber,
+        gender,
+        date_of_birth: dateOfBirth,
       },
     });
 
@@ -92,7 +115,7 @@ export default function AccountPage() {
           </div>
 
           <form onSubmit={handleSave} className="mt-6 grid gap-5 sm:grid-cols-2">
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium mb-2">Email</label>
               <input
                 type="email"
@@ -102,12 +125,65 @@ export default function AccountPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Full name</label>
+              <label className="block text-sm font-medium mb-2">First name</label>
               <input
                 type="text"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                placeholder="Your name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Middle name</label>
+              <input
+                type="text"
+                value={middleName}
+                onChange={(e) => setMiddleName(e.target.value)}
+                placeholder="Middle name (optional)"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Last name</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Phone number</label>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+1 234 567 8900"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Gender</label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
+              >
+                <option value="">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Date of birth</label>
+              <input
+                type="date"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
                 className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
               />
             </div>

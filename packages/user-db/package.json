@@ -3,20 +3,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:pull": "prisma db pull",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "drizzle-orm": "^0.39.3",
-    "postgres": "^3.4.5"
+    "@prisma/adapter-pg": "^7.2.0"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.13.1",
-    "drizzle-kit": "^0.30.5",
     "dotenv": "^16.4.7",
+    "prisma": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "typescript": "^5.9.3"
   },
   "exports": {

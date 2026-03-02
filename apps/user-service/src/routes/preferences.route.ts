@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { db, userPreferences, userProfiles } from "@repo/user-db";
-import { eq } from "drizzle-orm";
+import { prisma } from "@repo/user-db";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
 
 export default async function preferencesRoute(fastify: FastifyInstance) {
@@ -8,11 +7,10 @@ export default async function preferencesRoute(fastify: FastifyInstance) {
 
   // Helper: get internal user ID from auth ID
   const getUserId = async (authId: string) => {
-    const [profile] = await db
-      .select({ id: userProfiles.id })
-      .from(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .limit(1);
+    const profile = await prisma.userProfile.findUnique({
+      where: { authId },
+      select: { id: true },
+    });
     return profile?.id;
   };
 
@@ -23,11 +21,9 @@ export default async function preferencesRoute(fastify: FastifyInstance) {
       return reply.status(404).send({ message: "Profile not found. Create a profile first." });
     }
 
-    const [prefs] = await db
-      .select()
-      .from(userPreferences)
-      .where(eq(userPreferences.userId, userId))
-      .limit(1);
+    const prefs = await prisma.userPreference.findUnique({
+      where: { userId },
+    });
 
     if (!prefs) {
       // Return defaults if no preferences row exists
@@ -50,33 +46,17 @@ export default async function preferencesRoute(fastify: FastifyInstance) {
 
     const { receiveNewsletter } = request.body;
 
-    const [existing] = await db
-      .select()
-      .from(userPreferences)
-      .where(eq(userPreferences.userId, userId))
-      .limit(1);
-
-    if (existing) {
-      const [updated] = await db
-        .update(userPreferences)
-        .set({
-          ...(receiveNewsletter !== undefined && { receiveNewsletter }),
-          updatedAt: new Date(),
-        })
-        .where(eq(userPreferences.userId, userId))
-        .returning();
-
-      return reply.send(updated);
-    }
-
-    const [created] = await db
-      .insert(userPreferences)
-      .values({
+    const result = await prisma.userPreference.upsert({
+      where: { userId },
+      update: {
+        ...(receiveNewsletter !== undefined && { receiveNewsletter }),
+      },
+      create: {
         userId,
         receiveNewsletter: receiveNewsletter ?? false,
-      })
-      .returning();
+      },
+    });
 
-    return reply.status(201).send(created);
+    return reply.send(result);
   });
 }

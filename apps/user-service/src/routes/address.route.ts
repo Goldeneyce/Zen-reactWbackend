@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { db, shippingAddresses, userProfiles } from "@repo/user-db";
-import { eq, and } from "drizzle-orm";
+import { prisma } from "@repo/user-db";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
 
 export default async function addressRoute(fastify: FastifyInstance) {
@@ -8,11 +7,10 @@ export default async function addressRoute(fastify: FastifyInstance) {
 
   // Helper: get internal user ID from auth ID
   const getUserId = async (authId: string) => {
-    const [profile] = await db
-      .select({ id: userProfiles.id })
-      .from(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .limit(1);
+    const profile = await prisma.userProfile.findUnique({
+      where: { authId },
+      select: { id: true },
+    });
     return profile?.id;
   };
 
@@ -23,10 +21,9 @@ export default async function addressRoute(fastify: FastifyInstance) {
       return reply.status(404).send({ message: "Profile not found. Create a profile first." });
     }
 
-    const addresses = await db
-      .select()
-      .from(shippingAddresses)
-      .where(eq(shippingAddresses.userId, userId));
+    const addresses = await prisma.shippingAddress.findMany({
+      where: { userId },
+    });
 
     return reply.send(addresses);
   });
@@ -40,16 +37,9 @@ export default async function addressRoute(fastify: FastifyInstance) {
       return reply.status(404).send({ message: "Profile not found" });
     }
 
-    const [address] = await db
-      .select()
-      .from(shippingAddresses)
-      .where(
-        and(
-          eq(shippingAddresses.id, request.params.id),
-          eq(shippingAddresses.userId, userId)
-        )
-      )
-      .limit(1);
+    const address = await prisma.shippingAddress.findFirst({
+      where: { id: request.params.id, userId },
+    });
 
     if (!address) {
       return reply.status(404).send({ message: "Address not found" });
@@ -82,15 +72,14 @@ export default async function addressRoute(fastify: FastifyInstance) {
 
     // If this address is default, unset other defaults
     if (body.isDefault) {
-      await db
-        .update(shippingAddresses)
-        .set({ isDefault: false })
-        .where(eq(shippingAddresses.userId, userId));
+      await prisma.shippingAddress.updateMany({
+        where: { userId },
+        data: { isDefault: false },
+      });
     }
 
-    const [created] = await db
-      .insert(shippingAddresses)
-      .values({
+    const created = await prisma.shippingAddress.create({
+      data: {
         userId,
         label: body.label ?? "Home",
         fullName: body.fullName,
@@ -102,8 +91,8 @@ export default async function addressRoute(fastify: FastifyInstance) {
         country: body.country,
         phone: body.phone ?? null,
         isDefault: body.isDefault ?? false,
-      })
-      .returning();
+      },
+    });
 
     return reply.status(201).send(created);
   });
@@ -133,13 +122,9 @@ export default async function addressRoute(fastify: FastifyInstance) {
     const body = request.body;
 
     // Verify ownership
-    const [existing] = await db
-      .select()
-      .from(shippingAddresses)
-      .where(
-        and(eq(shippingAddresses.id, id), eq(shippingAddresses.userId, userId))
-      )
-      .limit(1);
+    const existing = await prisma.shippingAddress.findFirst({
+      where: { id, userId },
+    });
 
     if (!existing) {
       return reply.status(404).send({ message: "Address not found" });
@@ -147,29 +132,28 @@ export default async function addressRoute(fastify: FastifyInstance) {
 
     // If setting as default, unset other defaults
     if (body.isDefault) {
-      await db
-        .update(shippingAddresses)
-        .set({ isDefault: false })
-        .where(eq(shippingAddresses.userId, userId));
+      await prisma.shippingAddress.updateMany({
+        where: { userId },
+        data: { isDefault: false },
+      });
     }
 
-    const [updated] = await db
-      .update(shippingAddresses)
-      .set({
-        ...(body.label !== undefined && { label: body.label }),
-        ...(body.fullName !== undefined && { fullName: body.fullName }),
-        ...(body.addressLine1 !== undefined && { addressLine1: body.addressLine1 }),
-        ...(body.addressLine2 !== undefined && { addressLine2: body.addressLine2 }),
-        ...(body.city !== undefined && { city: body.city }),
-        ...(body.state !== undefined && { state: body.state }),
-        ...(body.postalCode !== undefined && { postalCode: body.postalCode }),
-        ...(body.country !== undefined && { country: body.country }),
-        ...(body.phone !== undefined && { phone: body.phone }),
-        ...(body.isDefault !== undefined && { isDefault: body.isDefault }),
-        updatedAt: new Date(),
-      })
-      .where(eq(shippingAddresses.id, id))
-      .returning();
+    const data: Record<string, unknown> = {};
+    if (body.label !== undefined) data.label = body.label;
+    if (body.fullName !== undefined) data.fullName = body.fullName;
+    if (body.addressLine1 !== undefined) data.addressLine1 = body.addressLine1;
+    if (body.addressLine2 !== undefined) data.addressLine2 = body.addressLine2;
+    if (body.city !== undefined) data.city = body.city;
+    if (body.state !== undefined) data.state = body.state;
+    if (body.postalCode !== undefined) data.postalCode = body.postalCode;
+    if (body.country !== undefined) data.country = body.country;
+    if (body.phone !== undefined) data.phone = body.phone;
+    if (body.isDefault !== undefined) data.isDefault = body.isDefault;
+
+    const updated = await prisma.shippingAddress.update({
+      where: { id },
+      data,
+    });
 
     return reply.send(updated);
   });
@@ -183,19 +167,18 @@ export default async function addressRoute(fastify: FastifyInstance) {
       return reply.status(404).send({ message: "Profile not found" });
     }
 
-    const [deleted] = await db
-      .delete(shippingAddresses)
-      .where(
-        and(
-          eq(shippingAddresses.id, request.params.id),
-          eq(shippingAddresses.userId, userId)
-        )
-      )
-      .returning();
+    // Verify ownership first
+    const existing = await prisma.shippingAddress.findFirst({
+      where: { id: request.params.id, userId },
+    });
 
-    if (!deleted) {
+    if (!existing) {
       return reply.status(404).send({ message: "Address not found" });
     }
+
+    await prisma.shippingAddress.delete({
+      where: { id: request.params.id },
+    });
 
     return reply.send({ message: "Address deleted successfully" });
   });

@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { db, userProfiles, userPreferences } from "@repo/user-db";
-import { eq } from "drizzle-orm";
+import { prisma } from "@repo/user-db";
 import { shouldBeUser } from "../middleware/authMiddleware.js";
 
 export default async function profileRoute(fastify: FastifyInstance) {
@@ -10,11 +9,9 @@ export default async function profileRoute(fastify: FastifyInstance) {
   fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
     const authId = request.userId;
 
-    const [profile] = await db
-      .select()
-      .from(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .limit(1);
+    const profile = await prisma.userProfile.findUnique({
+      where: { authId },
+    });
 
     if (!profile) {
       return reply.status(404).send({ message: "Profile not found" });
@@ -36,45 +33,37 @@ export default async function profileRoute(fastify: FastifyInstance) {
     const authId = request.userId;
     const { firstName, lastName, email, phone, avatarUrl } = request.body;
 
-    const [existing] = await db
-      .select()
-      .from(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .limit(1);
+    const existing = await prisma.userProfile.findUnique({
+      where: { authId },
+    });
 
     if (existing) {
-      const [updated] = await db
-        .update(userProfiles)
-        .set({
+      const updated = await prisma.userProfile.update({
+        where: { authId },
+        data: {
           firstName,
           lastName,
           email,
           phone: phone ?? null,
           avatarUrl: avatarUrl ?? null,
-          updatedAt: new Date(),
-        })
-        .where(eq(userProfiles.authId, authId))
-        .returning();
+        },
+      });
 
       return reply.send(updated);
     }
 
-    const [created] = await db
-      .insert(userProfiles)
-      .values({
+    const created = await prisma.userProfile.create({
+      data: {
         authId,
         firstName,
         lastName,
         email,
         phone: phone ?? null,
         avatarUrl: avatarUrl ?? null,
-      })
-      .returning();
-
-    // Also create default preferences
-    await db.insert(userPreferences).values({
-      userId: created!.id,
-      receiveNewsletter: false,
+        preferences: {
+          create: { receiveNewsletter: false },
+        },
+      },
     });
 
     return reply.status(201).send(created);
@@ -93,28 +82,25 @@ export default async function profileRoute(fastify: FastifyInstance) {
     const authId = request.userId;
     const { firstName, lastName, email, phone, avatarUrl } = request.body;
 
-    const [profile] = await db
-      .select()
-      .from(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .limit(1);
+    const profile = await prisma.userProfile.findUnique({
+      where: { authId },
+    });
 
     if (!profile) {
       return reply.status(404).send({ message: "Profile not found" });
     }
 
-    const [updated] = await db
-      .update(userProfiles)
-      .set({
-        ...(firstName !== undefined && { firstName }),
-        ...(lastName !== undefined && { lastName }),
-        ...(email !== undefined && { email }),
-        ...(phone !== undefined && { phone }),
-        ...(avatarUrl !== undefined && { avatarUrl }),
-        updatedAt: new Date(),
-      })
-      .where(eq(userProfiles.authId, authId))
-      .returning();
+    const data: Record<string, unknown> = {};
+    if (firstName !== undefined) data.firstName = firstName;
+    if (lastName !== undefined) data.lastName = lastName;
+    if (email !== undefined) data.email = email;
+    if (phone !== undefined) data.phone = phone;
+    if (avatarUrl !== undefined) data.avatarUrl = avatarUrl;
+
+    const updated = await prisma.userProfile.update({
+      where: { authId },
+      data,
+    });
 
     return reply.send(updated);
   });
@@ -123,12 +109,11 @@ export default async function profileRoute(fastify: FastifyInstance) {
   fastify.delete("/", async (request: FastifyRequest, reply: FastifyReply) => {
     const authId = request.userId;
 
-    const [deleted] = await db
-      .delete(userProfiles)
-      .where(eq(userProfiles.authId, authId))
-      .returning();
-
-    if (!deleted) {
+    try {
+      await prisma.userProfile.delete({
+        where: { authId },
+      });
+    } catch {
       return reply.status(404).send({ message: "Profile not found" });
     }
 
