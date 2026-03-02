@@ -26,8 +26,11 @@ export const shippingFormSchema = z.object({
     email: z.string().email("Invalid email address").regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format"),
     phone: z.string().regex(/^\+?1?\d{9,15}$/, "Phone number must be 9-15 digits"),
     address: z.string().min(1, "Address is required"),
+    addressLine2: z.string().optional(),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
+    country: z.string().optional(),
+    label: z.string().optional(),
 });
 
 export type ShippingFormData = z.infer<typeof shippingFormSchema>;

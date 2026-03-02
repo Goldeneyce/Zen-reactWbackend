@@ -20,6 +20,7 @@ await app.register(cors, {
     "http://192.168.0.152:3004",
     ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
   ],
+  methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 });
 

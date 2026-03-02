@@ -72,9 +72,9 @@ export default async function addressRoute(fastify: FastifyInstance) {
       addressLine2?: string;
       city: string;
       state: string;
-      postalCode: string;
+      postalCode?: string;
       country: string;
-      phone?: string;
+      phone: string;
       isDefault?: boolean;
     };
   }>("/", async (request, reply) => {
@@ -99,9 +99,9 @@ export default async function addressRoute(fastify: FastifyInstance) {
         addressLine2: body.addressLine2 ?? null,
         city: body.city,
         state: body.state,
-        postalCode: body.postalCode,
+        postalCode: body.postalCode ?? "",
         country: body.country,
-        phone: body.phone ?? null,
+        phone: body.phone,
         isDefault: body.isDefault ?? false,
       },
     });

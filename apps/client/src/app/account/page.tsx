@@ -160,7 +160,7 @@ export default function AccountPage() {
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+1 234 567 8900"
+                placeholder="+234 123 456 7890"
                 className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm"
               />
             </div>

@@ -117,8 +117,8 @@ const OrdersPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading your orders...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-300 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your orders...</p>
           </div>
         </div>
       </div>
@@ -141,15 +141,15 @@ const OrdersPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Orders</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Track and manage all your orders in one place
         </p>
       </div>
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <div className="text-gray-400 mb-4">
+        <div className="bg-white dark:bg-white-dark rounded-lg shadow-md dark:shadow-dark-custom p-12 text-center">
+          <div className="text-gray-400 dark:text-gray-500 mb-4">
             <svg
               className="mx-auto h-24 w-24"
               fill="none"
@@ -164,10 +164,10 @@ const OrdersPage = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
             No Orders Yet
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             When you place orders, they will appear here
           </p>
         </div>
@@ -176,15 +176,15 @@ const OrdersPage = () => {
           {orders.map((order) => (
             <div
               key={order._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-white dark:bg-white-dark rounded-lg shadow-md dark:shadow-dark-custom overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Order #{order._id.slice(-8).toUpperCase()}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Placed on {formatDate(order.createdAt || new Date())}
                     </p>
                   </div>
@@ -198,8 +198,8 @@ const OrdersPage = () => {
                   </span>
                 </div>
 
-                <div className="border-t border-gray-200 pt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Products
                   </h4>
                   <div className="space-y-2">
@@ -209,14 +209,14 @@ const OrdersPage = () => {
                         className="flex justify-between items-center text-sm"
                       >
                         <div className="flex-1">
-                          <span className="text-gray-900 font-medium">
+                          <span className="text-gray-900 dark:text-gray-100 font-medium">
                             {product.name}
                           </span>
-                          <span className="text-gray-500 ml-2">
+                          <span className="text-gray-500 dark:text-gray-400 ml-2">
                             × {product.quantity}
                           </span>
                         </div>
-                        <span className="text-gray-900 font-medium">
+                        <span className="text-gray-900 dark:text-gray-100 font-medium">
                           {formatPrice(product.price * product.quantity)}
                         </span>
                       </div>
@@ -224,27 +224,27 @@ const OrdersPage = () => {
                   </div>
                 </div>
 
-                <div className="border-t border-gray-200 mt-4 pt-4">
+                <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
                       Shipping Address
                     </span>
-                    <span className="text-sm text-gray-900">
+                    <span className="text-sm text-gray-900 dark:text-gray-100">
                       {order.shippingAddress}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-base font-semibold text-gray-900">
+                    <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
                       Total Amount
                     </span>
-                    <span className="text-lg font-bold text-gray-900">
+                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                       {formatPrice(order.amount)}
                     </span>
                   </div>
                 </div>
 
                 {/* Action buttons */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3">
                     {/* Show payment method badge */}
                     {(order as any).paymentMethod === 'cod' && (
@@ -263,7 +263,7 @@ const OrdersPage = () => {
                     )}
                     {/* Show unpaid notice for COD orders awaiting delivery */}
                     {(order as any).paymentMethod === 'cod' && order.status === 'unpaid' && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         Payment due upon delivery
                       </span>
                     )}

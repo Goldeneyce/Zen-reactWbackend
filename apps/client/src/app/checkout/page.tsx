@@ -120,7 +120,7 @@ export default function CheckoutPage() {
                 }`}>
                   1
                 </div>
-                <span className="mt-2 text-sm font-medium">Shipping</span>
+                <span className="mt-2 text-sm font-medium text-dark dark:text-gray-100">Shipping</span>
               </div>
               
               <div className="w-24 h-0.5 bg-gray-300 dark:bg-gray-600 mx-4" />
@@ -133,7 +133,7 @@ export default function CheckoutPage() {
                 }`}>
                   2
                 </div>
-                <span className="mt-2 text-sm font-medium">Payment</span>
+                <span className="mt-2 text-sm font-medium text-dark dark:text-gray-100">Payment</span>
               </div>
               
               <div className="w-24 h-0.5 bg-gray-300 dark:bg-gray-600 mx-4" />
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
                 }`}>
                   3
                 </div>
-                <span className="mt-2 text-sm font-medium">Review</span>
+                <span className="mt-2 text-sm font-medium text-dark dark:text-gray-100">Review</span>
               </div>
             </div>
           </div>
@@ -201,48 +201,55 @@ export default function CheckoutPage() {
                   
                   <div className="space-y-6">
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">Shipping Information</h3>
+                      <h3 className="font-semibold text-lg mb-2 text-dark dark:text-gray-100">Shipping Information</h3>
                       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded">
                         {shippingData ? (
                           <>
-                            <p>{shippingData.fullName}</p>
-                            <p>{shippingData.address}, {shippingData.city}, {shippingData.state}</p>
-                            <p>{shippingData.email} | {shippingData.phone}</p>
+                            <p className="font-semibold text-dark dark:text-gray-100">{shippingData.fullName}</p>
+                            <p className="text-gray-700 dark:text-gray-300">
+                              {shippingData.address}
+                              {shippingData.addressLine2 && `, ${shippingData.addressLine2}`}
+                            </p>
+                            <p className="text-gray-700 dark:text-gray-300">
+                              {shippingData.city}, {shippingData.state}
+                              {shippingData.country && `, ${shippingData.country}`}
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-400">{shippingData.email} | {shippingData.phone}</p>
                           </>
                         ) : (
-                          <p className="text-gray-400">No shipping information</p>
+                          <p className="text-gray-400 dark:text-gray-500">No shipping information</p>
                         )}
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">Shipping Method</h3>
+                      <h3 className="font-semibold text-lg mb-2 text-dark dark:text-gray-100">Shipping Method</h3>
                       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded">
                         {selectedShipping.isCOD ? (
-                          <p>Cash on Delivery — ₦0.00</p>
+                          <p className="text-dark dark:text-gray-100">Cash on Delivery — ₦0.00</p>
                         ) : selectedShipping.rate ? (
-                          <p>
+                          <p className="text-dark dark:text-gray-100">
                             {selectedShipping.rate.carrier} ({selectedShipping.rate.serviceType})
                             — {formatPrice(selectedShipping.cost)}
                           </p>
                         ) : (
-                          <p className="text-gray-400">No shipping method selected</p>
+                          <p className="text-gray-400 dark:text-gray-500">No shipping method selected</p>
                         )}
                       </div>
                     </div>
                     
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">Order Items</h3>
+                      <h3 className="font-semibold text-lg mb-2 text-dark dark:text-gray-100">Order Items</h3>
                       <div className="space-y-3">
                         {items.map((item) => (
                           <div key={item.id} className="flex justify-between items-center py-2 border-b">
                             <div>
-                              <p className="font-medium">{item.productName}</p>
+                              <p className="font-medium text-dark dark:text-gray-100">{item.productName}</p>
                               <p className="text-sm text-gray-600 dark:text-gray-100">
                                 Qty: {item.quantity} × {formatPrice(item.price)}
                               </p>
                             </div>
-                            <p className="font-semibold">
+                            <p className="font-semibold text-dark dark:text-gray-100">
                               {formatPrice(item.price * item.quantity)}
                             </p>
                           </div>
@@ -278,12 +285,12 @@ export default function CheckoutPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Subtotal</span>
-                    <span className="font-semibold">{formatPrice(subtotal)}</span>
+                    <span className="font-semibold text-dark dark:text-gray-100">{formatPrice(subtotal)}</span>
                   </div>
                   
                   <div className="flex justify-between items-center pb-3 border-b">
                     <span className="text-gray-600 dark:text-gray-300">Shipping</span>
-                    <span className="font-semibold">
+                    <span className="font-semibold text-dark dark:text-gray-100">
                       {selectedShipping.isCOD
                         ? 'Pay on Delivery'
                         : shippingCost === 0
