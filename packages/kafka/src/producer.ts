@@ -1,7 +1,7 @@
-import type { Kafka, Producer } from "kafkajs";
+import { Partitioners, type Kafka, type Producer } from "kafkajs";
 
 export const createProducer = (kafka: Kafka) => {
-    const producer: Producer = kafka.producer();
+    const producer: Producer = kafka.producer({ createPartitioner: Partitioners.DefaultPartitioner });
     let connected = false;
 
     const connect = async () => {

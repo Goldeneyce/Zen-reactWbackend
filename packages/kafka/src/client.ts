@@ -34,6 +34,8 @@ export const createKafkaClient = (service: string) => {
                 cert: fs.readFileSync(certPath, "utf-8"),
                 key: fs.readFileSync(keyPath, "utf-8"),
             },
+            connectionTimeout: 10000,
+            requestTimeout: 30000,
         });
     }
 
