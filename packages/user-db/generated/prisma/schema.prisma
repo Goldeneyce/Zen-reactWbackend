@@ -31,8 +31,8 @@ model ShippingAddress {
   userId       String   @map("user_id") @db.Uuid
   label        String   @default("Home") @db.VarChar(50)
   fullName     String   @map("full_name") @db.VarChar(200)
-  addressLine1 String   @map("address_line_1") @db.VarChar(255)
-  addressLine2 String?  @map("address_line_2") @db.VarChar(255)
+  addressLine1 String   @map("address_line1") @db.VarChar(255)
+  addressLine2 String?  @map("address_line2") @db.VarChar(255)
   city         String   @db.VarChar(100)
   state        String   @db.VarChar(100)
   postalCode   String   @map("postal_code") @db.VarChar(20)

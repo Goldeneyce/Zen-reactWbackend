@@ -5,21 +5,39 @@ import { shouldBeUser } from "../middleware/authMiddleware.js";
 export default async function addressRoute(fastify: FastifyInstance) {
   fastify.addHook("onRequest", shouldBeUser);
 
-  // Helper: get internal user ID from auth ID
-  const getUserId = async (authId: string) => {
-    const profile = await prisma.userProfile.findUnique({
+  // Helper: get or auto-create internal user ID from auth ID
+  const getOrCreateUserId = async (request: FastifyRequest) => {
+    const authId = request.userId;
+
+    const existing = await prisma.userProfile.findUnique({
       where: { authId },
       select: { id: true },
     });
-    return profile?.id;
+    if (existing) return existing.id;
+
+    // Auto-create a profile from JWT claims
+    const email = request.userEmail ?? `${authId}@unknown.com`;
+    const fullName = request.userMeta?.full_name ?? request.userMeta?.name ?? "";
+    const [firstName, ...rest] = fullName.split(" ");
+    const lastName = rest.join(" ");
+
+    const created = await prisma.userProfile.create({
+      data: {
+        authId,
+        firstName: firstName || email.split("@")[0] || "User",
+        lastName: lastName || "",
+        email,
+        avatarUrl: request.userMeta?.avatar_url ?? null,
+        preferences: { create: { receiveNewsletter: false } },
+      },
+      select: { id: true },
+    });
+    return created.id;
   };
 
   // GET /addresses — list all shipping addresses
   fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
-    const userId = await getUserId(request.userId);
-    if (!userId) {
-      return reply.status(404).send({ message: "Profile not found. Create a profile first." });
-    }
+    const userId = await getOrCreateUserId(request);
 
     const addresses = await prisma.shippingAddress.findMany({
       where: { userId },
@@ -32,10 +50,7 @@ export default async function addressRoute(fastify: FastifyInstance) {
   fastify.get<{
     Params: { id: string };
   }>("/:id", async (request, reply) => {
-    const userId = await getUserId(request.userId);
-    if (!userId) {
-      return reply.status(404).send({ message: "Profile not found" });
-    }
+    const userId = await getOrCreateUserId(request);
 
     const address = await prisma.shippingAddress.findFirst({
       where: { id: request.params.id, userId },
@@ -63,10 +78,7 @@ export default async function addressRoute(fastify: FastifyInstance) {
       isDefault?: boolean;
     };
   }>("/", async (request, reply) => {
-    const userId = await getUserId(request.userId);
-    if (!userId) {
-      return reply.status(404).send({ message: "Profile not found. Create a profile first." });
-    }
+    const userId = await getOrCreateUserId(request);
 
     const body = request.body;
 
@@ -113,10 +125,7 @@ export default async function addressRoute(fastify: FastifyInstance) {
       isDefault?: boolean;
     };
   }>("/:id", async (request, reply) => {
-    const userId = await getUserId(request.userId);
-    if (!userId) {
-      return reply.status(404).send({ message: "Profile not found" });
-    }
+    const userId = await getOrCreateUserId(request);
 
     const { id } = request.params;
     const body = request.body;
@@ -162,10 +171,7 @@ export default async function addressRoute(fastify: FastifyInstance) {
   fastify.delete<{
     Params: { id: string };
   }>("/:id", async (request, reply) => {
-    const userId = await getUserId(request.userId);
-    if (!userId) {
-      return reply.status(404).send({ message: "Profile not found" });
-    }
+    const userId = await getOrCreateUserId(request);
 
     // Verify ownership first
     const existing = await prisma.shippingAddress.findFirst({

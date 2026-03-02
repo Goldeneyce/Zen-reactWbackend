@@ -25,8 +25,12 @@ export default function ProductInteraction({
   const toggleItem = useWishlistStore((state) => state.toggleItem);
   const isWishlisted = useWishlistStore((state) => state.items.some((item) => item.id === product.id));
 
-  const toggleWishlist = () => {
-    toggleItem(product);
+  const toggleWishlist = async () => {
+    const ok = await toggleItem(product);
+    if (!ok) {
+      toast.error('Please log in to manage your wishlist');
+      return;
+    }
     if (isWishlisted) {
       toast.info(`${product.name} removed from wishlist`);
     } else {

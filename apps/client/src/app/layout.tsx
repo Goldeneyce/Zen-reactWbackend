@@ -5,6 +5,7 @@ import { draftMode } from 'next/headers';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import WishlistSync from '@/components/WishlistSync';
 import VisualEditingWrapper from '@/components/VisualEditingWrapper';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -57,6 +58,7 @@ export default async function RootLayout({
         </main>
         <Footer />
         <ToastContainer position="top-left" theme="light" />
+        <WishlistSync />
         {isDraftMode && <VisualEditingWrapper />}
       </body>
     </html>

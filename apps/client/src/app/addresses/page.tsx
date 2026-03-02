@@ -243,7 +243,7 @@ export default function AddressesPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Full Name *</label>
                   <input required name="fullName" value={form.fullName} onChange={handleChange}
-                    placeholder="John Doe"
+                    placeholder="Ciroma Chukwuma Adekunle"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div className="sm:col-span-2">
@@ -261,13 +261,13 @@ export default function AddressesPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">City *</label>
                   <input required name="city" value={form.city} onChange={handleChange}
-                    placeholder="Lagos"
+                    placeholder="Asaba"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">State *</label>
                   <input required name="state" value={form.state} onChange={handleChange}
-                    placeholder="Lagos State"
+                    placeholder="Delta State"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import useWishlistStore from "@/stores/wishlistStore";
@@ -11,7 +12,14 @@ export default function WishlistPage() {
   const items = useWishlistStore((state) => state.items);
   const removeItem = useWishlistStore((state) => state.removeItem);
   const clearWishlist = useWishlistStore((state) => state.clearWishlist);
+  const syncFromBackend = useWishlistStore((state) => state.syncFromBackend);
+  const syncing = useWishlistStore((state) => state.syncing);
   const addItem = useCartStore((state) => state.addItem);
+
+  // Hydrate from backend on mount
+  useEffect(() => {
+    syncFromBackend();
+  }, [syncFromBackend]);
 
   const totalCount = items.length;
 
@@ -42,7 +50,10 @@ export default function WishlistPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-gray-500">{totalCount} item{totalCount > 1 ? "s" : ""}</p>
               <button
-                onClick={clearWishlist}
+                onClick={async () => {
+                  const ok = await clearWishlist();
+                  if (!ok) toast.error('Please log in to manage your wishlist');
+                }}
                 className="btn btn-outline"
               >
                 Clear wishlist
@@ -85,7 +96,10 @@ export default function WishlistPage() {
                       Add to Cart
                     </button>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={async () => {
+                        const ok = await removeItem(item.id);
+                        if (!ok) toast.error('Please log in to manage your wishlist');
+                      }}
                       className="btn btn-outline"
                     >
                       Remove

@@ -15,6 +15,8 @@ const getJWKS = () => {
 declare module "fastify" {
   interface FastifyRequest {
     userId: string;
+    userEmail?: string;
+    userMeta?: { full_name?: string; name?: string; avatar_url?: string };
   }
 }
 
@@ -74,6 +76,8 @@ const verifySupabaseAuth = async (
     }
 
     request.userId = userId;
+    request.userEmail = claims.email;
+    request.userMeta = claims.user_metadata;
   } catch (error) {
     return reply.status(401).send({ message: "Invalid or expired token!" });
   }

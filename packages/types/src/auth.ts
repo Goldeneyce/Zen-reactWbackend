@@ -3,12 +3,16 @@ import z from "zod";
 export interface CustomJwtSessionClaims {
   sub?: string;
   userId?: string;
+  email?: string;
   role?: string;
   app_metadata?: {
     role?: 'user' | 'admin' | 'productAdmin';
   };
   user_metadata?: {
     role?: 'user' | 'admin' | 'productAdmin';
+    full_name?: string;
+    name?: string;
+    avatar_url?: string;
   };
 }
 
