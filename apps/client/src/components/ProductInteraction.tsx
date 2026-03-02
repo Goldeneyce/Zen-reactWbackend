@@ -23,8 +23,7 @@ export default function ProductInteraction({
   onBuyNow,
 }: ProductInteractionProps) {
   const toggleItem = useWishlistStore((state) => state.toggleItem);
-  const isInWishlist = useWishlistStore((state) => state.isInWishlist);
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = useWishlistStore((state) => state.items.some((item) => item.id === product.id));
 
   const toggleWishlist = () => {
     toggleItem(product);

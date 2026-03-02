@@ -26,8 +26,7 @@ export default function ProductDetailClient({ product }: { product: ProductType 
   const [selectedColor, setSelectedColor] = useState<string | undefined>(product.colors?.[0]);
   const addItem = useCartStore((state) => state.addItem);
   const toggleItem = useWishlistStore((state) => state.toggleItem);
-  const isInWishlist = useWishlistStore((state) => state.isInWishlist);
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = useWishlistStore((state) => state.items.some((item) => item.id === product.id));
 
   const renderRating = () => {
     const stars = [];
