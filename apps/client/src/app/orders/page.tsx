@@ -15,10 +15,22 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
+        const supabase = getSupabaseBrowserClient();
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+
+        if (!token) {
+          setError("Please log in to view your orders.");
+          setLoading(false);
+          return;
+        }
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/user-orders`,
           {
-            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 

@@ -1,5 +1,5 @@
 import { prisma, MovementType } from "@repo/inventory-db";
-import { getCache, getRedlock } from "../utils/redis.ts";
+import { getCache, acquireLock } from "../utils/redis.ts";
 import { producer } from "../utils/kafka.ts";
 
 /* ─── Cache helpers ─── */
@@ -87,10 +87,8 @@ interface OrderEvent {
  * cannot both succeed.
  */
 export async function reserveStock(event: OrderEvent) {
-  const redlock = getRedlock();
-
   for (const item of event.items) {
-    const lock = await redlock.acquire([lockResource(item.productId)], 5_000);
+    const lock = await acquireLock(lockResource(item.productId), 5_000);
     try {
       const inv = await prisma.inventoryItem.findFirst({
         where: { productId: item.productId },
@@ -166,10 +164,8 @@ export async function reserveStock(event: OrderEvent) {
  * Release previously reserved stock (order cancelled / payment failed).
  */
 export async function releaseStock(event: OrderEvent) {
-  const redlock = getRedlock();
-
   for (const item of event.items) {
-    const lock = await redlock.acquire([lockResource(item.productId)], 5_000);
+    const lock = await acquireLock(lockResource(item.productId), 5_000);
     try {
       const inv = await prisma.inventoryItem.findFirst({
         where: { productId: item.productId },

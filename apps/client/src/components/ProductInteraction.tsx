@@ -3,6 +3,8 @@
 
 import React from 'react';
 import { ProductType } from '@repo/types';
+import useWishlistStore from '@/stores/wishlistStore';
+import { toast } from 'react-toastify';
 import { PlusIcon, MinusIcon, HeartIcon, HeartOutlineIcon } from './Icons';
 
 interface ProductInteractionProps {
@@ -20,11 +22,17 @@ export default function ProductInteraction({
   onAddToCart,
   onBuyNow,
 }: ProductInteractionProps) {
-  const [isWishlisted, setIsWishlisted] = React.useState(false);
+  const toggleItem = useWishlistStore((state) => state.toggleItem);
+  const isInWishlist = useWishlistStore((state) => state.isInWishlist);
+  const isWishlisted = isInWishlist(product.id);
 
   const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    // In real app, this would update wishlist in store/API
+    toggleItem(product);
+    if (isWishlisted) {
+      toast.info(`${product.name} removed from wishlist`);
+    } else {
+      toast.success(`${product.name} added to wishlist!`);
+    }
   };
 
   return (

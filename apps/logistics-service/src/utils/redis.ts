@@ -1,12 +1,12 @@
 import { createRedisClient, CacheHelper } from "@repo/shared-redis";
-import Redis from "ioredis";
+import type { Redis } from "@upstash/redis";
 
 let cache: CacheHelper;
 let rawRedis: Redis;
 
 export const initRedis = () => {
-  rawRedis = createRedisClient({ keyPrefix: "logistics:" });
-  cache = new CacheHelper(rawRedis);
+  rawRedis = createRedisClient();
+  cache = new CacheHelper(rawRedis, "logistics:");
 };
 
 export const getCache = (): CacheHelper => {

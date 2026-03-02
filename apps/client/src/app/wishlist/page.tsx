@@ -1,53 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import useWishlistStore from "@/stores/wishlistStore";
 import { formatPrice } from "@/lib/formatPrice";
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  price?: number;
-  image?: string;
-  href?: string;
-}
-
-const STORAGE_KEY = "zen_wishlist";
+import { useCartStore } from "@/stores/cartStore";
+import { toast } from "react-toastify";
 
 export default function WishlistPage() {
-  const [items, setItems] = useState<WishlistItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const items = useWishlistStore((state) => state.items);
+  const removeItem = useWishlistStore((state) => state.removeItem);
+  const clearWishlist = useWishlistStore((state) => state.clearWishlist);
+  const addItem = useCartStore((state) => state.addItem);
 
-  useEffect(() => {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        setItems(JSON.parse(raw));
-      } catch {
-        setItems([]);
-      }
-    }
-    setLoaded(true);
-  }, []);
+  const totalCount = items.length;
 
-  const totalCount = useMemo(() => items.length, [items]);
-
-  const persist = (next: WishlistItem[]) => {
-    setItems(next);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  const handleAddToCart = (product: (typeof items)[0]) => {
+    addItem(product, 1);
+    toast.success(`${product.name} added to cart!`);
   };
-
-  const removeItem = (id: string) => {
-    persist(items.filter((item) => item.id !== id));
-  };
-
-  const clearAll = () => {
-    persist([]);
-  };
-
-  if (!loaded) {
-    return <div className="container py-12">Loading wishlist…</div>;
-  }
 
   return (
     <div className="container py-12">
@@ -71,7 +42,7 @@ export default function WishlistPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-gray-500">{totalCount} item{totalCount > 1 ? "s" : ""}</p>
               <button
-                onClick={clearAll}
+                onClick={clearWishlist}
                 className="btn btn-outline"
               >
                 Clear wishlist
@@ -81,10 +52,15 @@ export default function WishlistPage() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => (
                 <div key={item.id} className="rounded-2xl border border-gray-200/70 dark:border-gray-700/70 p-4 flex flex-col gap-4">
-                  <div className="aspect-[4/3] rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-[4/3] rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden relative">
                     {item.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
                     ) : (
                       <span className="text-sm text-gray-400">No image</span>
                     )}
@@ -97,11 +73,17 @@ export default function WishlistPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Link
-                      href={item.href ?? "/products"}
+                      href={`/products/${item.slug}`}
                       className="btn btn-primary flex-1 text-center"
                     >
                       View
                     </Link>
+                    <button
+                      onClick={() => handleAddToCart(item)}
+                      className="btn btn-buy flex-1 text-center"
+                    >
+                      Add to Cart
+                    </button>
                     <button
                       onClick={() => removeItem(item.id)}
                       className="btn btn-outline"

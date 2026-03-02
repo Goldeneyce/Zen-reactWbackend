@@ -1,23 +1,12 @@
 import { createRedisClient, CacheHelper } from "@repo/shared-redis";
-import Redis from "ioredis";
-import Redlock from "redlock";
+import type { Redis } from "@upstash/redis";
 
 let cache: CacheHelper;
 let rawRedis: Redis;
-let redlock: Redlock;
 
 export const initRedis = () => {
-  rawRedis = createRedisClient({ keyPrefix: "inv:" });
-  cache = new CacheHelper(rawRedis);
-
-  // Redlock needs a raw ioredis client **without** a keyPrefix,
-  // because lock keys must be written exactly as supplied.
-  const lockClient = createRedisClient();
-  redlock = new Redlock([lockClient], {
-    retryCount: 5,
-    retryDelay: 200,   // ms between retries
-    retryJitter: 100,  // random jitter added to retry delay
-  });
+  rawRedis = createRedisClient();
+  cache = new CacheHelper(rawRedis, "inv:");
 };
 
 export const getCache = (): CacheHelper => {
@@ -30,7 +19,35 @@ export const getRawRedis = (): Redis => {
   return rawRedis;
 };
 
-export const getRedlock = (): Redlock => {
-  if (!redlock) throw new Error("Redis not initialised – call initRedis() first");
-  return redlock;
+/**
+ * Simple distributed lock using Upstash SET NX.
+ * Replaces Redlock (which requires ioredis TCP connections).
+ */
+export const acquireLock = async (
+  resource: string,
+  ttlMs: number,
+  retries = 5,
+  retryDelay = 200,
+): Promise<{ release: () => Promise<void> }> => {
+  const lockKey = `lock:${resource}`;
+  const lockValue = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const ttlSec = Math.ceil(ttlMs / 1000);
+
+  for (let i = 0; i < retries; i++) {
+    const result = await rawRedis.set(lockKey, lockValue, { nx: true, ex: ttlSec });
+    if (result === "OK") {
+      return {
+        release: async () => {
+          // Only release if we still own the lock
+          const current = await rawRedis.get(lockKey);
+          if (current === lockValue) {
+            await rawRedis.del(lockKey);
+          }
+        },
+      };
+    }
+    // Wait before retry with jitter
+    await new Promise((r) => setTimeout(r, retryDelay + Math.random() * 100));
+  }
+  throw new Error(`Could not acquire lock on ${resource} after ${retries} retries`);
 };

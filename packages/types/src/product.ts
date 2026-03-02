@@ -4,7 +4,15 @@ import z from "zod";
 // ProductBadge is now a plain string (SQLite doesn't support enums)
 export type ProductBadge = "New" | "BestSeller" | "Smart" | "EnergyEfficient" | "TopRated";
 
-export type ProductType = Product;
+// Prisma stores these JSON array fields as `string` in SQLite,
+// but the product service parses them into real arrays at runtime.
+// Override those fields so client-side code can safely call .map() etc.
+export type ProductType = Omit<Product, 'images' | 'sizes' | 'colors' | 'features'> & {
+  images: string[];
+  sizes: string[];
+  colors: string[];
+  features: string[];
+};
 
 export type ProductsType = ProductType[];
 

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
+import useWishlistStore from '@/stores/wishlistStore';
 import Searchbar from '@/components/Searchbar';
 import { formatPrice } from '@/lib/formatPrice';
 import ProductInteraction from '@/components/ProductInteraction';
@@ -23,8 +24,10 @@ export default function ProductDetailClient({ product }: { product: ProductType 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(product.sizes?.[0]);
   const [selectedColor, setSelectedColor] = useState<string | undefined>(product.colors?.[0]);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const toggleItem = useWishlistStore((state) => state.toggleItem);
+  const isInWishlist = useWishlistStore((state) => state.isInWishlist);
+  const isWishlisted = isInWishlist(product.id);
 
   const renderRating = () => {
     const stars = [];
@@ -58,7 +61,12 @@ export default function ProductDetailClient({ product }: { product: ProductType 
   };
 
   const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
+    toggleItem(product);
+    if (isWishlisted) {
+      toast.info(`${product.name} removed from wishlist`);
+    } else {
+      toast.success(`${product.name} added to wishlist!`);
+    }
   };
 
   const handleShare = () => {

@@ -1,32 +1,26 @@
-import { Redis } from "ioredis";
+import { Redis } from "@upstash/redis";
 
 let redisInstance: Redis | null = null;
 
 export interface RedisConfig {
-  host?: string;
-  port?: number;
-  password?: string;
-  db?: number;
+  url?: string;
+  token?: string;
   keyPrefix?: string;
 }
 
 export const createRedisClient = (config?: RedisConfig): Redis => {
-  const client = new Redis({
-    host: config?.host ?? process.env.REDIS_HOST ?? "localhost",
-    port: config?.port ?? Number(process.env.REDIS_PORT ?? 6379),
-    password: config?.password ?? process.env.REDIS_PASSWORD ?? undefined,
-    db: config?.db ?? Number(process.env.REDIS_DB ?? 0),
-    keyPrefix: config?.keyPrefix ?? "",
-    maxRetriesPerRequest: 3,
-    retryStrategy(times: number) {
-      const delay = Math.min(times * 200, 5000);
-      return delay;
-    },
-  });
+  const url = config?.url ?? process.env.UPSTASH_REDIS_REST_URL;
+  const token = config?.token ?? process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  client.on("connect", () => console.log(`[Redis] Connected (prefix: ${config?.keyPrefix ?? "none"})`));
-  client.on("error", (err: Error) => console.error("[Redis] Error:", err.message));
+  if (!url || !token) {
+    throw new Error(
+      "Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN env vars"
+    );
+  }
 
+  const client = new Redis({ url, token });
+
+  console.log(`[Redis] Client created (prefix: ${config?.keyPrefix ?? "none"})`);
   return client;
 };
 

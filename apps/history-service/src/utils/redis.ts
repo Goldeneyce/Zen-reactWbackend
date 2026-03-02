@@ -3,8 +3,8 @@ import { createRedisClient, CacheHelper } from "@repo/shared-redis";
 let cache: CacheHelper;
 
 export const initRedis = () => {
-  const redis = createRedisClient({ keyPrefix: "history:" });
-  cache = new CacheHelper(redis);
+  const redis = createRedisClient();
+  cache = new CacheHelper(redis, "history:");
 };
 
 export const getCache = (): CacheHelper => {

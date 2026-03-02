@@ -1,11 +1,11 @@
 // components/ProductCard.tsx
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from "react-toastify";
 import { useCartStore } from '@/stores/cartStore';
+import useWishlistStore from '@/stores/wishlistStore';
 import { formatPrice } from '@/lib/formatPrice';
 import type { ProductType, CategoryType } from '@repo/types';
 import {
@@ -25,8 +25,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const toggleItem = useWishlistStore((state) => state.toggleItem);
+  const isInWishlist = useWishlistStore((state) => state.isInWishlist);
+  const isWishlisted = isInWishlist(product.id);
 
   const renderRating = () => {
     const stars = [];
@@ -61,8 +63,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    // In real app, this would update wishlist in store/API
+    toggleItem(product);
+    if (isWishlisted) {
+      toast.info(`${product.name} removed from wishlist`);
+    } else {
+      toast.success(`${product.name} added to wishlist!`);
+    }
   };
 
   const handleShare = () => {
