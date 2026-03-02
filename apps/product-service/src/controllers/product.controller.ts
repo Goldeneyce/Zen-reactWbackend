@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { prisma, Prisma } from "@repo/product-db";
+import { prisma, Prisma, parseProductArrays } from "@repo/product-db";
 import { producer } from "../utils/kafka.ts";
 import { ProductType } from "@repo/types";
 
@@ -62,13 +62,15 @@ export const createProduct = async (c: Context) => {
 			price: body.price,
 			originalPrice: body.originalPrice,
 			image: body.image,
-			images: body.images,
-			sizes: body.sizes ?? [],
-			colors: body.colors ?? [],
+			images: JSON.stringify(body.images ?? []),
+			sizes: JSON.stringify(body.sizes ?? []),
+			colors: JSON.stringify(body.colors ?? []),
 			rating: body.rating,
 			reviews: body.reviews,
-			features: body.features,
+			features: JSON.stringify(body.features ?? []),
+			stock: body.stock ?? 0,
 			inStock: body.inStock,
+			isFeatured: body.isFeatured ?? false,
 			payOnDelivery: body.payOnDelivery ?? false,
 			badge: body.badge,
 			weight: body.weight ?? undefined,
@@ -89,9 +91,9 @@ export const createProduct = async (c: Context) => {
 		},
 	});
 
-	const productEvent: ProductType = product;
+	const productEvent: ProductType = parseProductArrays(product);
 	producer.send("product.created", { value: JSON.stringify(productEvent) });
-	return c.json(product, 201);
+	return c.json(parseProductArrays(product), 201);
 };
 
 export const getProducts = async (c: Context) => {
@@ -178,7 +180,7 @@ export const getProducts = async (c: Context) => {
 
 	const products = await prisma.product.findMany({
 		where: {
-			...(validatedSearch ? { name: { contains: validatedSearch, mode: "insensitive" } } : {}),
+			...(validatedSearch ? { name: { contains: validatedSearch } } : {}),
 			...(validatedCategory && validatedCategory !== "all"
 				? {
 						categories: {
@@ -201,7 +203,7 @@ export const getProducts = async (c: Context) => {
 			},
 		},
 	});
-	return c.json(products, 200);
+	return c.json(products.map(parseProductArrays), 200);
 };
 
 export const getProduct = async (c: Context) => {
@@ -222,7 +224,7 @@ export const getProduct = async (c: Context) => {
 		return c.json({ error: "Product not found" }, 404);
 	}
 
-	return c.json(product, 200);
+	return c.json(parseProductArrays(product), 200);
 };
 
 export const getProductBySlug = async (c: Context) => {
@@ -248,7 +250,7 @@ export const getProductBySlug = async (c: Context) => {
 		return c.json({ error: "Product not found" }, 404);
 	}
 
-	return c.json(product, 200);
+	return c.json(parseProductArrays(product), 200);
 };
 
 export const updateProduct = async (c: Context) => {
@@ -270,8 +272,10 @@ export const updateProduct = async (c: Context) => {
 		where: { id },
 		data: {
 			...body,
-			...(body.sizes ? { sizes: body.sizes } : {}),
-			...(body.colors ? { colors: body.colors } : {}),
+			...(body.images ? { images: JSON.stringify(body.images) } : {}),
+			...(body.sizes ? { sizes: JSON.stringify(body.sizes) } : {}),
+			...(body.colors ? { colors: JSON.stringify(body.colors) } : {}),
+			...(body.features ? { features: JSON.stringify(body.features) } : {}),
 			...(slugUpdate ? { slug: slugUpdate } : {}),
 		},
 		include: {
@@ -284,10 +288,10 @@ export const updateProduct = async (c: Context) => {
 		},
 	});
 
-	const productEvent: ProductType = product;
+	const productEvent: ProductType = parseProductArrays(product);
 	producer.send("product.updated", { value: JSON.stringify(productEvent) });
 
-	return c.json(product, 200);
+	return c.json(parseProductArrays(product), 200);
 };
 
 export const getProductsByIds = async (c: Context) => {
@@ -319,7 +323,7 @@ export const getProductsByIds = async (c: Context) => {
 		},
 	});
 
-	return c.json(products, 200);
+	return c.json(products.map(parseProductArrays), 200);
 };
 
 export const deleteProduct = async (c: Context) => {

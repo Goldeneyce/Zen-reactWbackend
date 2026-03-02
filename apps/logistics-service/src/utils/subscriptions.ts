@@ -5,29 +5,17 @@ import { consumer } from "./kafka.ts";
  * Add handlers here as the service grows.
  */
 export const runKafkaSubscriptions = async () => {
-  // Example: listen for order-placed events to auto-create shipments
-  await consumer.subscribe({
-    topic: "order-placed",
-    fromBeginning: false,
-  });
-
-  await consumer.run({
-    eachMessage: async ({ topic, message }) => {
-      const value = message.value?.toString();
-      if (!value) return;
-
-      console.log(`[logistics] Received message on "${topic}"`);
-
-      switch (topic) {
-        case "order-placed": {
-          // TODO: auto-create a Shipment record for the new order
-          const payload = JSON.parse(value);
-          console.log("[logistics] Order placed – will create shipment for:", payload.orderId);
-          break;
-        }
-        default:
-          break;
-      }
+  await consumer.subscribe([
+    {
+      topicName: "order-placed",
+      topicHandler: async (message: any) => {
+        // The @repo/kafka wrapper already JSON-parses the message value,
+        // but handle both parsed-object and raw-string cases defensively.
+        const parsed = typeof message === "string" ? JSON.parse(message) : message;
+        const payload = typeof parsed.value === "string" ? JSON.parse(parsed.value) : parsed;
+        console.log("[logistics] Order placed – will create shipment for:", payload.orderId);
+        // TODO: auto-create a Shipment record for the new order
+      },
     },
-  });
+  ]);
 };

@@ -71,7 +71,9 @@ interface Product {
   rating: number;
   reviews: number;
   features: string[];
+  stock: number;
   inStock: boolean;
+  isFeatured: boolean;
   payOnDelivery: boolean;
   badge: string | null;
   weight: number | null;
@@ -103,8 +105,10 @@ export default function ProductDetailClient() {
     price: 0,
     originalPrice: 0,
     inStock: true,
+    isFeatured: false,
     payOnDelivery: false,
     badge: "",
+    stock: 0,
     sizes: "",
     colors: "",
     weight: 0,
@@ -148,8 +152,10 @@ export default function ProductDetailClient() {
         price: data.price,
         originalPrice: data.originalPrice ?? 0,
         inStock: data.inStock,
+        isFeatured: data.isFeatured ?? false,
         payOnDelivery: data.payOnDelivery,
         badge: data.badge ?? "",
+        stock: data.stock ?? 0,
         sizes: data.sizes?.join(", ") ?? "",
         colors: data.colors?.join(", ") ?? "",
         weight: data.weight ?? 0,
@@ -198,7 +204,9 @@ export default function ProductDetailClient() {
         description: editForm.description,
         price: editForm.price,
         originalPrice: editForm.originalPrice || undefined,
+        stock: editForm.stock || 0,
         inStock: editForm.inStock,
+        isFeatured: editForm.isFeatured,
         payOnDelivery: editForm.payOnDelivery,
         badge: editForm.badge || undefined,
         weight: editForm.weight || undefined,
@@ -572,11 +580,29 @@ export default function ProductDetailClient() {
               </div>
               <div className="flex items-center gap-2">
                 <Switch
+                  checked={editForm.isFeatured}
+                  onCheckedChange={(v) => setEditForm({ ...editForm, isFeatured: v })}
+                />
+                <label className="text-sm font-medium">Featured</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
                   checked={editForm.payOnDelivery}
                   onCheckedChange={(v) => setEditForm({ ...editForm, payOnDelivery: v })}
                 />
                 <label className="text-sm font-medium">Pay on Delivery</label>
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Stock Quantity</label>
+              <Input
+                type="number"
+                min="0"
+                value={editForm.stock}
+                onChange={(e) => setEditForm({ ...editForm, stock: Number(e.target.value) })}
+                placeholder="0"
+              />
             </div>
 
             {/* Shipping Dimensions */}

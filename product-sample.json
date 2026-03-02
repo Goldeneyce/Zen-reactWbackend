@@ -28,7 +28,9 @@
       "LED Light Source with 30,000 Hour Lifespan",
       "Keystone Correction & Auto Focus"
     ],
+    "stock": 25,
     "inStock": true,
+    "isFeatured": true,
     "payOnDelivery": true,
     "badge": "New",
     "weight": 4.0,
@@ -79,7 +81,9 @@
       "WiFi Remote Monitoring",
       "10-Year Warranty"
     ],
+    "stock": 15,
     "inStock": true,
+    "isFeatured": true,
     "payOnDelivery": true,
     "badge": "BestSeller",
     "weight": 20.4,
@@ -129,7 +133,9 @@
       "Smart Alerts to Your Phone",
       "Works with Alexa & Google Home"
     ],
+    "stock": 50,
     "inStock": true,
+    "isFeatured": false,
     "payOnDelivery": true,
     "badge": "TopRated",
     "weight": 0.54,
@@ -179,7 +185,9 @@
       "Works Without Internet",
       "Free Lifetime Updates"
     ],
+    "stock": 30,
     "inStock": true,
+    "isFeatured": false,
     "payOnDelivery": false,
     "badge": null,
     "weight": 0.36,
@@ -228,7 +236,9 @@
       "Door Alarm & Notifications",
       "Quiet Operation (38dB)"
     ],
+    "stock": 10,
     "inStock": true,
+    "isFeatured": true,
     "payOnDelivery": false,
     "badge": "EnergyEfficient",
     "weight": 99.8,
@@ -277,7 +287,9 @@
       "Energy Efficient 9W (60W equivalent)",
       "25,000 Hour Lifespan"
     ],
+    "stock": 100,
     "inStock": true,
+    "isFeatured": false,
     "payOnDelivery": false,
     "badge": "TopRated",
     "categories": {
@@ -323,7 +335,9 @@
       "Remote Control via App",
       "Works with All HVAC Systems"
     ],
+    "stock": 40,
     "inStock": true,
+    "isFeatured": true,
     "payOnDelivery": false,
     "badge": "Smart",
     "categories": {

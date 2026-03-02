@@ -1,5 +1,8 @@
-import type {Product, Category, ProductBadge} from "@repo/product-db";
+import type {Product, Category} from "@repo/product-db";
 import z from "zod";
+
+// ProductBadge is now a plain string (SQLite doesn't support enums)
+export type ProductBadge = "New" | "BestSeller" | "Smart" | "EnergyEfficient" | "TopRated";
 
 export type ProductType = Product;
 
@@ -29,7 +32,9 @@ export const ProductFormSchema = z.object({
     name: z.string().min(1),
     value: z.string().min(1),
   })).optional(),
+  stock: z.number().int().min(0).default(0),
   inStock: z.boolean().default(true),
+  isFeatured: z.boolean().default(false),
   payOnDelivery: z.boolean().optional(),
   badge: z.enum(ProductBadgeValues).optional(),
   weight: z.number().positive().optional(),

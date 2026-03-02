@@ -12,6 +12,7 @@ await app.register(cors, {
 	origin: [
 		"http://localhost:3003",
 		"http://192.168.0.152:3003",
+		...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
 	],
 	credentials: true,
 });
@@ -39,11 +40,11 @@ const start = async () => {
 		await producer.connect();
 		
 		await app.listen({
-			port: 8003,
+			port: Number(process.env.PORT ?? 8003),
 			host: "0.0.0.0",
 		});
 		
-		console.log(`Auth service listening on 0.0.0.0:8003`);
+		console.log(`Auth service listening on 0.0.0.0:${process.env.PORT ?? 8003}`);
 	} catch (error) {
 		console.error("Error starting server:", error);
 		process.exit(1);

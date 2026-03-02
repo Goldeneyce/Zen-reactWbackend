@@ -18,7 +18,12 @@ app.get("/health", async () => {
 const start = async () => {
   try {
     // Register plugins
-    await app.register(cors, { origin: ["http://localhost:3002"] });
+    await app.register(cors, {
+      origin: [
+        "http://localhost:3002",
+        ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
+      ],
+    });
     await app.register(sessionRoute, { prefix: "/sessions" });
     await app.register(webhookRoute, { prefix: "/webhooks" });
     
@@ -30,8 +35,8 @@ const start = async () => {
     await runKafkaSubscriptions();
     
     // Start server
-    await app.listen({ port: 8002, host: "0.0.0.0" });
-    console.log("Payment service is running on 0.0.0.0:8002");
+    await app.listen({ port: Number(process.env.PORT ?? 8002), host: "0.0.0.0" });
+    console.log(`Payment service is running on 0.0.0.0:${process.env.PORT ?? 8002}`);
   } catch (error) {
     console.error('Error starting the server:', error);
     process.exit(1);

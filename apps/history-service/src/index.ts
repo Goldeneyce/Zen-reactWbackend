@@ -21,6 +21,7 @@ app.use(
       "http://192.168.0.152:3002",
       "http://192.168.0.152:3003",
       "http://192.168.0.152:3004",
+      ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
     ],
     credentials: true,
   })
@@ -57,7 +58,7 @@ const start = async () => {
     await runKafkaSubscriptions();
 
     serve(
-      { fetch: app.fetch, port: 8003, hostname: "0.0.0.0" },
+      { fetch: app.fetch, port: Number(process.env.PORT ?? 8003), hostname: "0.0.0.0" },
       (info) => {
         console.log(`History service listening on ${info.address}:${info.port}`);
       }

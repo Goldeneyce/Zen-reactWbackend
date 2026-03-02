@@ -40,8 +40,10 @@ export default function NewProductClient() {
     colors: "",
     features: "",
     inStock: true,
+    isFeatured: false,
     payOnDelivery: false,
     badge: "",
+    stock: 0,
     weight: 0,
     length: 0,
     width: 0,
@@ -94,7 +96,9 @@ export default function NewProductClient() {
         features: form.features
           ? form.features.split("\n").map((f) => f.trim()).filter(Boolean)
           : [],
+        stock: form.stock || 0,
         inStock: form.inStock,
+        isFeatured: form.isFeatured,
         payOnDelivery: form.payOnDelivery,
         badge: form.badge || undefined,
         weight: form.weight || undefined,
@@ -278,11 +282,29 @@ export default function NewProductClient() {
             </div>
             <div className="flex items-center gap-2">
               <Switch
+                checked={form.isFeatured}
+                onCheckedChange={(v) => setForm({ ...form, isFeatured: v })}
+              />
+              <label className="text-sm font-medium">Featured</label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
                 checked={form.payOnDelivery}
                 onCheckedChange={(v) => setForm({ ...form, payOnDelivery: v })}
               />
               <label className="text-sm font-medium">Pay on Delivery</label>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Stock Quantity</label>
+            <Input
+              type="number"
+              min="0"
+              value={form.stock}
+              onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+              placeholder="0"
+            />
           </div>
 
           {/* Shipping Dimensions */}

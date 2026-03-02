@@ -22,7 +22,9 @@ interface Product {
   name: string;
   slug: string;
   price: number;
+  stock: number;
   inStock: boolean;
+  isFeatured: boolean;
   images: string[];
   rating: number;
   reviews: number;
@@ -153,7 +155,9 @@ export default function ProductsClient() {
                 <TableRow>
                   <TableHead>Product</TableHead>
                   <TableHead>Price</TableHead>
+                  <TableHead>Stock</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Featured</TableHead>
                   <TableHead>Rating</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -161,7 +165,7 @@ export default function ProductsClient() {
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -187,9 +191,19 @@ export default function ProductsClient() {
                       </TableCell>
                       <TableCell>${product.price?.toFixed(2)}</TableCell>
                       <TableCell>
+                        <span className="text-sm font-medium">{product.stock ?? 0}</span>
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={product.inStock ? "default" : "destructive"}>
                           {product.inStock ? "In Stock" : "Out of Stock"}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {product.isFeatured ? (
+                          <Badge variant="secondary">Featured</Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">

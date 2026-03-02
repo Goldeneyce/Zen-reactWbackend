@@ -4,58 +4,55 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
-enum ProductBadge {
-  New
-  BestSeller
-  Smart
-  EnergyEfficient
-  TopRated
-}
+// NOTE: ProductBadge is no longer an enum (SQLite limitation).
+// Valid values: "New", "BestSeller", "Smart", "EnergyEfficient", "TopRated"
 
 model Category {
-  id       Int       @id @default(autoincrement())
+  id       Int               @id @default(autoincrement())
   name     String
-  slug     String    @unique
+  slug     String            @unique
   products ProductCategory[]
 }
 
 model Product {
-  id              String                  @id @default(uuid())
-  slug            String                  @unique
+  id              String                 @id @default(uuid())
+  slug            String                 @unique
   name            String
   description     String
   price           Float
   originalPrice   Float?
   categories      ProductCategory[]
   image           String
-  images          String[]
-  sizes           String[]                @default([])
-  colors          String[]                @default([])
+  images          String                 @default("[]")
+  sizes           String                 @default("[]")
+  colors          String                 @default("[]")
   rating          Float
   reviews         Int
-  features        String[]
+  features        String                 @default("[]")
   specifications  ProductSpecification[]
+  stock           Int                    @default(0)
   inStock         Boolean
-  payOnDelivery   Boolean                 @default(false)
-  badge           ProductBadge?
+  isFeatured      Boolean                @default(false)
+  payOnDelivery   Boolean                @default(false)
+  badge           String?
   weight          Float?
   length          Float?
   width           Float?
   height          Float?
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
 }
 
 model ProductCategory {
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId     String
-  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId    Int
-  name          String
-  categoryName  String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    String
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId   Int
+  name         String
+  categoryName String
 
   @@id([productId, categoryId])
   @@index([productId])

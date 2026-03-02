@@ -77,7 +77,7 @@ export const getCategories = async (c: Context) => {
 
 	const categories = await prisma.category.findMany({
 		where: {
-			...(validatedSearch ? { name: { contains: validatedSearch, mode: "insensitive" } } : {}),
+			...(validatedSearch ? { name: { contains: validatedSearch } } : {}),
 		},
 		take: validatedLimit,
 		include: {

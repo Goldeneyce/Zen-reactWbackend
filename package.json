@@ -15,6 +15,9 @@
     "typescript": "5.9.2"
   },
   "packageManager": "pnpm@10.29.3",
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/engines", "esbuild", "prisma"]
+  },
   "engines": {
     "node": ">=18"
   },

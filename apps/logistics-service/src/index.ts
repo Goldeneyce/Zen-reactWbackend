@@ -38,8 +38,8 @@ const start = async () => {
     initRedis();
     await Promise.all([consumer.connect(), producer.connect()]);
     await runKafkaSubscriptions();
-    await fastify.listen({ port: 8011 });
-    console.log("Logistics service is running on port 8011");
+    await fastify.listen({ port: Number(process.env.PORT ?? 8011), host: "0.0.0.0" });
+    console.log(`Logistics service is running on port ${process.env.PORT ?? 8011}`);
   } catch (err) {
     console.error(err);
     fastify.log.error(err);

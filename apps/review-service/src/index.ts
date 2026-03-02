@@ -34,8 +34,8 @@ fastify.register(async (instance) => {
 const start = async () => {
   try {
     await connectReviewDb();
-    await fastify.listen({ port: 8020, host: "0.0.0.0" });
-    console.log("Review service is running on port 8020");
+    await fastify.listen({ port: Number(process.env.PORT ?? 8020), host: "0.0.0.0" });
+    console.log(`Review service is running on port ${process.env.PORT ?? 8020}`);
   } catch (err) {
     console.error(err);
     fastify.log.error(err);

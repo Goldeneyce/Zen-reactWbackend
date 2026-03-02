@@ -26,7 +26,9 @@ interface ProductInput {
   rating: number;
   reviews: number;
   features: string[];
+  stock?: number;
   inStock: boolean;
+  isFeatured?: boolean;
   payOnDelivery?: boolean;
   badge?: "New" | "BestSeller" | "Smart" | "EnergyEfficient" | "TopRated" | null;
   categories: {
@@ -74,13 +76,15 @@ async function upsertProduct(input: ProductInput) {
       price: input.price,
       originalPrice: input.originalPrice,
       image: input.image,
-      images: input.images,
-      sizes: input.sizes ?? [],
-      colors: input.colors ?? [],
+      images: JSON.stringify(input.images ?? []),
+      sizes: JSON.stringify(input.sizes ?? []),
+      colors: JSON.stringify(input.colors ?? []),
       rating: input.rating,
       reviews: input.reviews,
-      features: input.features,
+      features: JSON.stringify(input.features ?? []),
+      stock: input.stock ?? 0,
       inStock: input.inStock,
+      isFeatured: input.isFeatured ?? false,
       payOnDelivery: input.payOnDelivery ?? false,
       badge: input.badge ?? undefined,
       categories: input.categories,

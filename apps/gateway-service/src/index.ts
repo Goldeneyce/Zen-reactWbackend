@@ -21,6 +21,7 @@ app.use(
       "http://192.168.0.152:3002",
       "http://192.168.0.152:3003",
       "http://192.168.0.152:3004",
+      ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
     ],
     credentials: true,
   })
@@ -54,7 +55,7 @@ app.onError((err, c) => {
   return c.json({ message: (err as Error)?.message || "Internal Server Error" }, status);
 });
 
-const PORT = Number(process.env.GATEWAY_PORT ?? 8005);
+const PORT = Number(process.env.PORT ?? process.env.GATEWAY_PORT ?? 8005);
 
 serve(
   { fetch: app.fetch, port: PORT, hostname: "0.0.0.0" },

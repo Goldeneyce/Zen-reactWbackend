@@ -44,8 +44,8 @@ const start = async () => {
       producer.connect()]
     );
     await runKafkaSubscriptions();
-    await fastify.listen({ port: 8001 });
-    console.log('Order service is running on port 8001');
+    await fastify.listen({ port: Number(process.env.PORT ?? 8001), host: "0.0.0.0" });
+    console.log(`Order service is running on port ${process.env.PORT ?? 8001}`);
   } catch (err) {
     console.log(err);
     fastify.log.error(err);

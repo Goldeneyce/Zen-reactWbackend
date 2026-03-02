@@ -98,6 +98,25 @@ export const columns: ColumnDef<ProductType>[] = [
     },
   },
   {
+    accessorKey: "stock",
+    header: "Stock",
+    cell: ({ row }) => {
+      const stock = row.original.stock ?? 0;
+      return <span className="text-sm font-medium">{stock}</span>;
+    },
+  },
+  {
+    accessorKey: "isFeatured",
+    header: "Featured",
+    cell: ({ row }) => {
+      return row.original.isFeatured ? (
+        <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Featured</span>
+      ) : (
+        <span className="text-xs text-muted-foreground">—</span>
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
