@@ -39,7 +39,18 @@ export const createKafkaClient = (service: string) => {
         });
     }
 
-    // Local development: plain brokers, no auth
+    // Plain broker (Redpanda / self-hosted): no auth, no SSL
+    // Set KAFKA_BROKER=redpanda:9092 (or comma-separated list) with no credentials
+    if (broker) {
+        return new Kafka({
+            clientId: service,
+            brokers: broker.split(","),
+            connectionTimeout: 10000,
+            requestTimeout: 30000,
+        });
+    }
+
+    // Local development: hardcoded localhost multi-broker
     return new Kafka({
         clientId: service,
         brokers: ["localhost:9094", "localhost:9095", "localhost:9096"],

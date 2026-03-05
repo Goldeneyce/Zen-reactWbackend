@@ -1,0 +1,36 @@
+# Dependencies
+**/node_modules
+
+# Next.js build output
+**/.next
+**/.turbo
+
+# Compiled output
+**/dist
+**/coverage
+
+# Environment files (secrets must NOT be baked into images)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Git
+.git
+.gitignore
+
+# Frontend apps (deployed to Netlify, not needed in backend images)
+apps/client/
+apps/admin/
+apps/product-admin/
+apps/order-admin/
+apps/studio/
+
+# IDE / OS
+.vscode/
+.idea/
+**/.DS_Store
+**/Thumbs.db
+
+# Misc
+*.md
+LICENSE

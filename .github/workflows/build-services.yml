@@ -1,0 +1,111 @@
+name: Build & Push Backend Services
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/gateway-service/**"
+      - "apps/product-service/**"
+      - "apps/order-service/**"
+      - "apps/payment-service/**"
+      - "apps/auth-service/**"
+      - "apps/cart-service/**"
+      - "apps/email-service/**"
+      - "apps/user-service/**"
+      - "apps/history-service/**"
+      - "apps/wishlist-service/**"
+      - "apps/review-service/**"
+      - "apps/inventory-service/**"
+      - "apps/logistics-service/**"
+      - "packages/**"
+      - "docker/Dockerfile.service"
+      - "pnpm-lock.yaml"
+  workflow_dispatch:
+    inputs:
+      services:
+        description: "Comma-separated service names to build (empty = all)"
+        required: false
+        default: ""
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/goldeneyce/zen-reactwbackend
+
+jobs:
+  # Determine which services need building based on changed files
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-services.outputs.services }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine services to build
+        id: set-services
+        run: |
+          # If manually triggered with specific services, use those
+          if [ -n "${{ github.event.inputs.services }}" ]; then
+            SERVICES=$(echo '${{ github.event.inputs.services }}' | jq -R 'split(",") | map(gsub("\\s"; ""))' -c)
+            echo "services=$SERVICES" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Get changed files
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+
+          # If shared packages, lockfile, or Dockerfile changed → rebuild all
+          if echo "$CHANGED" | grep -qE '^(packages/|docker/Dockerfile\.service|pnpm-lock\.yaml)'; then
+            echo 'services=["gateway-service","product-service","order-service","payment-service","auth-service","cart-service","email-service","user-service","history-service","wishlist-service","review-service","inventory-service","logistics-service"]' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Otherwise, only rebuild services whose app directory changed
+          SERVICES="[]"
+          for svc in gateway-service product-service order-service payment-service auth-service cart-service email-service user-service history-service wishlist-service review-service inventory-service logistics-service; do
+            if echo "$CHANGED" | grep -q "^apps/$svc/"; then
+              SERVICES=$(echo "$SERVICES" | jq --arg s "$svc" '. + [$s]' -c)
+            fi
+          done
+
+          echo "services=$SERVICES" >> "$GITHUB_OUTPUT"
+
+  build-and-push:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+      fail-fast: false
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.service
+          build-args: SERVICE_NAME=${{ matrix.service }}
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}

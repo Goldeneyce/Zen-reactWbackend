@@ -1,0 +1,9 @@
+[build]
+  command = "cd ../.. && pnpm turbo run build --filter=product-admin"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

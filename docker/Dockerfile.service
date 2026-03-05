@@ -1,0 +1,91 @@
+# ────────────────────────────────────────────────────────────
+# Generic backend service Dockerfile
+# Build context: repo root (.)
+# Build arg: SERVICE_NAME (e.g. product-service)
+#
+# Usage:
+#   docker build -f docker/Dockerfile.service \
+#     --build-arg SERVICE_NAME=product-service \
+#     -t product-service .
+# ────────────────────────────────────────────────────────────
+
+# ── Stage 1: install dependencies ──
+FROM node:22-slim AS deps
+
+RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
+
+WORKDIR /app
+
+# Copy workspace manifests for pnpm install
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
+
+# Copy all package.json files (pnpm needs the full workspace graph to resolve workspace:* deps)
+# -- backend services --
+COPY apps/gateway-service/package.json ./apps/gateway-service/
+COPY apps/product-service/package.json ./apps/product-service/
+COPY apps/order-service/package.json ./apps/order-service/
+COPY apps/payment-service/package.json ./apps/payment-service/
+COPY apps/auth-service/package.json ./apps/auth-service/
+COPY apps/cart-service/package.json ./apps/cart-service/
+COPY apps/email-service/package.json ./apps/email-service/
+COPY apps/user-service/package.json ./apps/user-service/
+COPY apps/history-service/package.json ./apps/history-service/
+COPY apps/wishlist-service/package.json ./apps/wishlist-service/
+COPY apps/review-service/package.json ./apps/review-service/
+COPY apps/inventory-service/package.json ./apps/inventory-service/
+COPY apps/logistics-service/package.json ./apps/logistics-service/
+
+# -- shared packages --
+COPY packages/kafka/package.json ./packages/kafka/
+COPY packages/shared-redis/package.json ./packages/shared-redis/
+COPY packages/types/package.json ./packages/types/
+COPY packages/typescript-config/package.json ./packages/typescript-config/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/product-db/package.json ./packages/product-db/
+COPY packages/order-db/package.json ./packages/order-db/
+COPY packages/user-db/package.json ./packages/user-db/
+COPY packages/inventory-db/package.json ./packages/inventory-db/
+COPY packages/logistics-db/package.json ./packages/logistics-db/
+COPY packages/wishlist-db/package.json ./packages/wishlist-db/
+COPY packages/review-db/package.json ./packages/review-db/
+
+# Copy Prisma schemas (needed for postinstall generate hooks)
+COPY packages/product-db/prisma ./packages/product-db/prisma/
+COPY packages/user-db/prisma ./packages/user-db/prisma/
+COPY packages/inventory-db/prisma ./packages/inventory-db/prisma/
+COPY packages/logistics-db/prisma ./packages/logistics-db/prisma/
+
+# Copy Drizzle config for wishlist-db
+COPY packages/wishlist-db/drizzle.config.ts ./packages/wishlist-db/
+
+RUN pnpm install --frozen-lockfile
+
+# ── Stage 2: copy source and run ──
+FROM node:22-slim AS runner
+
+RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
+
+WORKDIR /app
+
+# Copy everything from deps stage (node_modules, manifests, prisma schemas)
+COPY --from=deps /app ./
+
+# Copy all shared package source (raw .ts files consumed by tsx)
+COPY packages/ ./packages/
+
+# Copy only the target service source
+ARG SERVICE_NAME
+COPY apps/${SERVICE_NAME}/ ./apps/${SERVICE_NAME}/
+
+# Generate Prisma clients for all 4 Prisma packages
+# (required because @repo/types transitively imports from them)
+RUN cd packages/product-db && npx prisma generate && \
+    cd /app/packages/user-db && npx prisma generate && \
+    cd /app/packages/inventory-db && npx prisma generate && \
+    cd /app/packages/logistics-db && npx prisma generate
+
+ENV NODE_ENV=production
+ENV SERVICE_NAME=${SERVICE_NAME}
+
+# Shell form required so $SERVICE_NAME is expanded at runtime
+CMD npx tsx apps/$SERVICE_NAME/src/index.ts
