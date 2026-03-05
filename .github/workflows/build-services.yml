@@ -20,6 +20,7 @@ on:
       - "packages/**"
       - "docker/Dockerfile.service"
       - "pnpm-lock.yaml"
+      - ".github/workflows/build-services.yml"
   workflow_dispatch:
     inputs:
       services:
