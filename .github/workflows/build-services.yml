@@ -31,6 +31,10 @@ env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/goldeneyce/zen-reactwbackend
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # Determine which services need building based on changed files
   detect-changes:
@@ -44,6 +48,8 @@ jobs:
 
       - name: Determine services to build
         id: set-services
+        env:
+          ALL_SERVICES: '["gateway-service","product-service","order-service","payment-service","auth-service","cart-service","email-service","user-service","history-service","wishlist-service","review-service","inventory-service","logistics-service"]'
         run: |
           # If manually triggered with specific services, use those
           if [ -n "${{ github.event.inputs.services }}" ]; then
@@ -52,12 +58,18 @@ jobs:
             exit 0
           fi
 
-          # Get changed files
+          # If manually triggered with no services specified, build all
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "services=$ALL_SERVICES" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Get changed files (push trigger)
           CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
           # If shared packages, lockfile, or Dockerfile changed → rebuild all
           if echo "$CHANGED" | grep -qE '^(packages/|docker/Dockerfile\.service|pnpm-lock\.yaml)'; then
-            echo 'services=["gateway-service","product-service","order-service","payment-service","auth-service","cart-service","email-service","user-service","history-service","wishlist-service","review-service","inventory-service","logistics-service"]' >> "$GITHUB_OUTPUT"
+            echo "services=$ALL_SERVICES" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
