@@ -33,7 +33,8 @@ export const postBySlugQuery = groq`
       slug,
       "image": mainImage,
       price,
-      description
+      description,
+      productLink
     }
   }
 `;

@@ -33,4 +33,5 @@ export interface RelatedProduct {
   image?: SanityImage;
   price?: number;
   description?: string;
+  productLink?: string;
 }

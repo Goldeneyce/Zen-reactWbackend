@@ -37,5 +37,12 @@ export default defineType({
       title: "Description",
       type: "text",
     }),
+    defineField({
+      name: "productLink",
+      title: "Product Page Slug",
+      type: "string",
+      description:
+        "Enter the product slug from your store (e.g. 'blue-running-shoes'). The link will resolve to /products/<slug>.",
+    }),
   ],
 });

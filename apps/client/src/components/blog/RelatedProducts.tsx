@@ -22,7 +22,13 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
         {products.map((product) => (
           <Link
             key={product._id}
-            href={product.slug ? `/products/${product.slug.current}` : "#"}
+            href={
+              product.productLink
+                ? `/products/${product.productLink}`
+                : product.slug
+                  ? `/products/${product.slug.current}`
+                  : "#"
+            }
             className="group bg-white dark:bg-white-dark rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
           >
             {/* Product image */}

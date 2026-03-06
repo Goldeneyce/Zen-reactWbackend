@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { LocationIcon, PlusIcon, PencilIcon, TrashIcon } from "@/components/Icons";
 
 const USER_SERVICE = process.env.NEXT_PUBLIC_USER_SERVICE_URL ?? "http://localhost:8004";
 
-/* ── types ── */
 interface Address {
   id: string;
   label: string;
@@ -15,8 +14,9 @@ interface Address {
   addressLine2?: string | null;
   city: string;
   state: string;
+  postalCode: string;
   country: string;
-  phone: string;
+  phone?: string | null;
   isDefault: boolean;
 }
 
@@ -27,6 +27,7 @@ const BLANK_FORM = {
   addressLine2: "",
   city: "",
   state: "",
+  postalCode: "",
   country: "Nigeria",
   phone: "",
   isDefault: false,
@@ -55,12 +56,8 @@ export default function AddressesPage() {
   // Delete confirm
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Toast notification (non-destructive, dismisses itself)
-  const [toast, setToast] = useState<string | null>(null);
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 4000); };
-
   /* ── Fetch ── */
-  const fetchAddresses = useCallback(async () => {
+  const fetchAddresses = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -72,11 +69,10 @@ export default function AddressesPage() {
       });
 
       if (res.status === 404) {
-        // Profile not created yet — show empty list
+        // Profile not created yet
         setAddresses([]);
       } else if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? "Failed to load addresses.");
+        throw new Error("Failed to load addresses.");
       } else {
         setAddresses(await res.json());
       }
@@ -85,9 +81,9 @@ export default function AddressesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => { fetchAddresses(); }, [fetchAddresses]);
+  useEffect(() => { fetchAddresses(); }, []);
 
   /* ── Helpers ── */
   const openAddForm = () => {
@@ -105,6 +101,7 @@ export default function AddressesPage() {
       addressLine2: addr.addressLine2 ?? "",
       city: addr.city,
       state: addr.state,
+      postalCode: addr.postalCode,
       country: addr.country,
       phone: addr.phone ?? "",
       isDefault: addr.isDefault,
@@ -140,8 +137,9 @@ export default function AddressesPage() {
         addressLine2: form.addressLine2 || undefined,
         city: form.city,
         state: form.state,
+        postalCode: form.postalCode,
         country: form.country,
-        phone: form.phone,
+        phone: form.phone || undefined,
         isDefault: form.isDefault,
       };
 
@@ -170,29 +168,16 @@ export default function AddressesPage() {
   };
 
   const handleSetDefault = async (id: string) => {
-    // Optimistic update — flip isDefault locally before the request finishes
-    setAddresses(prev =>
-      prev.map(a => ({ ...a, isDefault: a.id === id }))
-    );
     try {
       const token = await getToken();
-      if (!token) { await fetchAddresses(); return; }
-      const res = await fetch(`${USER_SERVICE}/addresses/${id}`, {
+      if (!token) return;
+      await fetch(`${USER_SERVICE}/addresses/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ isDefault: true }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? "Failed to set default address.");
-      }
-      // Sync with server to confirm
       await fetchAddresses();
-    } catch {
-      // Revert optimistic update and show non-destructive toast
-      await fetchAddresses();
-      showToast("Failed to set default address. Please try again.");
-    }
+    } catch { /* silent */ }
   };
 
   const handleDelete = async (id: string) => {
@@ -214,13 +199,6 @@ export default function AddressesPage() {
 
   return (
     <div className="container py-12">
-      {/* Toast notification */}
-      {toast && (
-        <div className="fixed top-6 right-6 z-50 rounded-xl border border-red-200 bg-red-50 dark:border-red-800/50 dark:bg-red-950/60 px-5 py-3 text-sm text-red-600 dark:text-red-300 shadow-lg animate-in fade-in slide-in-from-top-2">
-          {toast}
-          <button onClick={() => setToast(null)} className="ml-3 font-semibold hover:text-red-800 dark:hover:text-red-100">&times;</button>
-        </div>
-      )}
       <div className="max-w-4xl space-y-8">
         {/* Header card */}
         <div className="rounded-3xl border border-gray-200/70 dark:border-gray-700/70 bg-gradient-to-br from-white via-white to-secondary/10 dark:from-white-dark dark:via-white-dark dark:to-secondary/10 p-8 shadow-sm">
@@ -263,7 +241,7 @@ export default function AddressesPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Full Name *</label>
                   <input required name="fullName" value={form.fullName} onChange={handleChange}
-                    placeholder="Ciroma Chukwuma Adekunle"
+                    placeholder="John Doe"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div className="sm:col-span-2">
@@ -275,19 +253,25 @@ export default function AddressesPage() {
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-gray-500 mb-1">Address Line 2</label>
                   <input name="addressLine2" value={form.addressLine2} onChange={handleChange}
-                    placeholder="Landmark (optional)"
+                    placeholder="Apt 4B (optional)"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">City *</label>
                   <input required name="city" value={form.city} onChange={handleChange}
-                    placeholder="Asaba"
+                    placeholder="Lagos"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">State *</label>
                   <input required name="state" value={form.state} onChange={handleChange}
-                    placeholder="Delta State"
+                    placeholder="Lagos State"
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Postal Code *</label>
+                  <input required name="postalCode" value={form.postalCode} onChange={handleChange}
+                    placeholder="100001"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>
@@ -297,8 +281,8 @@ export default function AddressesPage() {
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Phone *</label>
-                  <input required name="phone" type="tel" value={form.phone} onChange={handleChange}
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+                  <input name="phone" type="tel" value={form.phone} onChange={handleChange}
                     placeholder="+234 800 000 0000"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white-dark px-4 py-2.5 text-sm" />
                 </div>
@@ -356,7 +340,7 @@ export default function AddressesPage() {
                     {addr.addressLine1}
                     {addr.addressLine2 && <>, {addr.addressLine2}</>}
                     <br />
-                    {addr.city}, {addr.state}
+                    {addr.city}, {addr.state} {addr.postalCode}
                     <br />
                     {addr.country}
                     {addr.phone && <><br />{addr.phone}</>}

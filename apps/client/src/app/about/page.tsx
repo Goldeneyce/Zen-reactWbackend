@@ -14,25 +14,25 @@ export default function AboutPage() {
   const teamMembers = [
     {
       id: '1',
-      name: 'Alex Johnson',
+      name: 'Victor Chekwube',
       role: 'Founder & CEO',
       description: '15+ years in electronics and smart home technology',
     },
     {
       id: '2',
-      name: 'Sarah Williams',
+      name: 'Victor Chekwube',
       role: 'Head of Technology',
       description: 'Expert in home automation and security systems',
     },
     {
       id: '3',
-      name: 'Michael Chen',
+      name: 'Florence Innocent',
       role: 'Solar Solutions Director',
       description: 'Renewable energy specialist with 12 years experience',
     },
     {
       id: '4',
-      name: 'David Rodriguez',
+      name: 'Grace Osasere',
       role: 'Customer Experience Manager',
       description: 'Ensuring exceptional service for every client',
     },

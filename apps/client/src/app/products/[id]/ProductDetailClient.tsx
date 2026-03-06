@@ -59,9 +59,14 @@ export default function ProductDetailClient({ product }: { product: ProductType 
     window.location.href = '/cart';
   };
 
-  const toggleWishlist = () => {
-    toggleItem(product);
-    if (isWishlisted) {
+  const toggleWishlist = async () => {
+    const wasWishlisted = isWishlisted;
+    const success = await toggleItem(product);
+    if (!success) {
+      toast.info("Please log in to manage your wishlist");
+      return;
+    }
+    if (wasWishlisted) {
       toast.info(`${product.name} removed from wishlist`);
     } else {
       toast.success(`${product.name} added to wishlist!`);
