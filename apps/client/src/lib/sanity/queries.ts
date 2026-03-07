@@ -5,7 +5,7 @@ import { groq } from "next-sanity";
 /*  Blog listing – fetch all published posts, newest first            */
 /* ------------------------------------------------------------------ */
 export const postsQuery = groq`
-  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+  *[_type == "post" && defined(slug.current) && isPublished == true] | order(publishedAt desc) {
     _id,
     title,
     slug,
@@ -43,5 +43,5 @@ export const postBySlugQuery = groq`
 /*  All post slugs – used for generateStaticParams                    */
 /* ------------------------------------------------------------------ */
 export const postSlugsQuery = groq`
-  *[_type == "post" && defined(slug.current)][].slug.current
+  *[_type == "post" && defined(slug.current) && isPublished == true][].slug.current
 `;

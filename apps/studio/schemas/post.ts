@@ -40,6 +40,13 @@ export default defineType({
       of: [{ type: "block" }, { type: "image" }],
     }),
     defineField({
+      name: "isPublished",
+      title: "Published",
+      type: "boolean",
+      description: "Toggle on to make this post visible on the blog page",
+      initialValue: false,
+    }),
+    defineField({
       name: "relatedProducts",
       title: "Related Products",
       type: "array",
